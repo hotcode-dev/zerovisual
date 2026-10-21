@@ -207,3 +207,104 @@ export async function optimizeImageForProvider(
     tileDimensions: tileDims
   };
 }
+
+/**
+ * Calculates estimated Vision LLM token consumption for a given pixel resolution.
+ */
+export function estimateVisionTokens(
+  width: number,
+  height: number,
+  provider: TargetProvider = 'anthropic',
+  lowTokenMode = false
+): number {
+  if (width <= 0 || height <= 0) return 0;
+
+  if (provider === 'openai') {
+    const tilesW = Math.ceil(width / 512);
+    const tilesH = Math.ceil(height / 512);
+    return 85 + tilesW * tilesH * 170;
+  }
+
+  if (provider === 'anthropic') {
+    const patchesW = Math.ceil(width / 28);
+    const patchesH = Math.ceil(height / 28);
+    return patchesW * patchesH;
+  }
+
+  if (provider === 'gemini') {
+    const tileDim = lowTokenMode ? 384 : 768;
+    const tilesW = Math.ceil(width / tileDim);
+    const tilesH = Math.ceil(height / tileDim);
+    return tilesW * tilesH * 258;
+  }
+
+  // Local / default
+  const patchesW = Math.ceil(width / 28);
+  const patchesH = Math.ceil(height / 28);
+  return patchesW * patchesH;
+}
+
+export interface ImageOptimizationStats {
+  originalWidth: number;
+  originalHeight: number;
+  originalBytes: number;
+  originalTokens: number;
+  optimizedWidth: number;
+  optimizedHeight: number;
+  optimizedBytes: number;
+  optimizedTokens: number;
+  tokenSavingsPercent: number;
+  byteSavingsPercent: number;
+}
+
+/**
+ * Standalone optimizer for arbitrary screenshots or UI images,
+ * returning the optimized WebP buffer alongside token and byte efficiency stats.
+ */
+export async function optimizeImageStandalone(
+  imageInput: Buffer | string,
+  options: OptimizeImageOptions = {}
+): Promise<{
+  result: OptimizedImageResult;
+  stats: ImageOptimizationStats;
+}> {
+  const provider = options.provider ?? 'anthropic';
+  const lowTokenMode = options.lowTokenMode ?? false;
+
+  const metadata = await sharp(imageInput).metadata();
+  const origWidth = metadata.width ?? 1;
+  const origHeight = metadata.height ?? 1;
+  const origBytes = metadata.size ?? (Buffer.isBuffer(imageInput) ? imageInput.length : 0);
+
+  const result = await optimizeImageForProvider(imageInput, options);
+
+  const origTokens = estimateVisionTokens(origWidth, origHeight, provider, lowTokenMode);
+  const optTokens = estimateVisionTokens(result.width, result.height, provider, lowTokenMode);
+
+  const tokenSavingsPercent =
+    origTokens > 0
+      ? Math.max(0, Number((((origTokens - optTokens) / origTokens) * 100).toFixed(1)))
+      : 0;
+
+  const byteSavingsPercent =
+    origBytes > 0
+      ? Math.max(0, Number((((origBytes - result.buffer.length) / origBytes) * 100).toFixed(1)))
+      : 0;
+
+  return {
+    result,
+    stats: {
+      originalWidth: origWidth,
+      originalHeight: origHeight,
+      originalBytes: origBytes,
+      originalTokens: origTokens,
+      optimizedWidth: result.width,
+      optimizedHeight: result.height,
+      optimizedBytes: result.buffer.length,
+      optimizedTokens: optTokens,
+      tokenSavingsPercent,
+      byteSavingsPercent
+    }
+  };
+}
+

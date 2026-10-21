@@ -5,6 +5,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { TriagePayloadSchema, TargetProviderSchema, type TriagePayload } from '../core/schema.js';
 import { runDesignQaCommand } from '../cli/commands/design-qa.js';
+import { optimizeImageStandalone } from '../core/image-optimizer.js';
 
 export interface McpServerOptions {
   baseDir?: string;
@@ -206,6 +207,106 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
             {
               type: 'text',
               text: `Error during UI Design QA audit: ${err?.message ?? err}`
+            }
+          ]
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------
+  // Tool 4: optimize_image
+  // -------------------------------------------------------------
+  server.tool(
+    'optimize_image',
+    'Optimizes an arbitrary screenshot or UI image file for Vision LLM token grids (OpenAI, Anthropic, Gemini, Local) and reports token and byte savings',
+    {
+      imagePath: z.string().optional().describe('Local file path to the image to optimize'),
+      imageBase64: z.string().optional().describe('Base64-encoded image string to optimize'),
+      provider: z
+        .enum(['openai', 'anthropic', 'gemini', 'local'])
+        .optional()
+        .describe('Target Vision LLM provider (default: anthropic)'),
+      lowTokenMode: z
+        .boolean()
+        .optional()
+        .describe('Enable aggressive token reduction (e.g. 384x384 for Gemini)'),
+      quality: z.number().optional().describe('WebP compression quality (default: 80)')
+    },
+    async ({ imagePath, imageBase64, provider, lowTokenMode, quality }) => {
+      try {
+        let inputBuffer: Buffer;
+        let sourceName = 'base64-image';
+
+        if (imagePath) {
+          const resolved = path.resolve(baseDir, imagePath);
+          if (!fs.existsSync(resolved)) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: `Error: Image file not found at ${resolved}`
+                }
+              ]
+            };
+          }
+          inputBuffer = fs.readFileSync(resolved);
+          sourceName = path.basename(resolved);
+        } else if (imageBase64) {
+          const cleanBase64 = imageBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+          inputBuffer = Buffer.from(cleanBase64, 'base64');
+        } else {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'Error: Must provide either imagePath or imageBase64'
+              }
+            ]
+          };
+        }
+
+        const { result, stats } = await optimizeImageStandalone(inputBuffer, {
+          provider: provider ?? 'anthropic',
+          lowTokenMode: lowTokenMode ?? false,
+          quality: quality ?? 80
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  source: sourceName,
+                  provider: result.provider,
+                  format: result.format,
+                  dataUri: result.dataUri,
+                  width: result.width,
+                  height: result.height,
+                  stats: {
+                    originalResolution: `${stats.originalWidth}x${stats.originalHeight}`,
+                    optimizedResolution: `${stats.optimizedWidth}x${stats.optimizedHeight}`,
+                    originalTokens: stats.originalTokens,
+                    optimizedTokens: stats.optimizedTokens,
+                    tokenSavingsPercent: `${stats.tokenSavingsPercent}%`,
+                    originalBytes: stats.originalBytes,
+                    optimizedBytes: stats.optimizedBytes,
+                    byteSavingsPercent: `${stats.byteSavingsPercent}%`
+                  }
+                },
+                null,
+                2
+              )
+            }
+          ]
+        };
+      } catch (err: any) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error optimizing image: ${err?.message ?? err}`
             }
           ]
         };

@@ -142,30 +142,47 @@ npx zerovisual design-qa \
   --provider anthropic
 ```
 
+#### Mode C: Optimize Screenshots & UI Images (`zerovisual optimize` / `zerovisual-optimize`)
+Optimize any local screenshot (e.g. `Cmd + Shift + 4` Retina captures) or folder of images before sending to a Vision LLM—saving up to 90% tokens and 99% network payload:
+
+```bash
+# Optimize a single UI screenshot for Anthropic (504x504 max tile):
+npx zerovisual optimize ./screenshot.png --provider anthropic
+
+# Or use the direct alias:
+npx zerovisual-optimize ./bug-report.png --provider openai
+
+# Batch optimize an entire directory of UI screenshots:
+npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
+```
+
+
 ---
 
 ### 3. Install Agent Skills (`npx skills add`)
 
-Install the isolated ZeroVisual Agent Skills (`zerovisual-regression` and `zerovisual-design-qa`) into your project or IDE agent workspace using `npx skills`:
+Install the isolated ZeroVisual Agent Skills (`zerovisual-regression`, `zerovisual-design-qa`, and `zerovisual-optimize`) into your project or IDE agent workspace using `npx skills`:
 
 ```bash
-# Install both ZeroVisual Agent Skills from the repository
+# Install all ZeroVisual Agent Skills from the repository
 npx skills add hotcode-dev/zerovisual
 
 # Or install individually:
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-optimize
 ```
 
 This installs:
 * **`skills/zerovisual-regression`**: Teaches agents strict code-to-code regression triage (cross-viewport correlation, semantic AOM validation, anti-aliasing noise filtering).
 * **`skills/zerovisual-design-qa`**: Teaches agents objective UI/UX mentoring guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind fixes).
+* **`skills/zerovisual-optimize`**: Teaches agents how and when to optimize user screenshots and UI images to eliminate token waste and payload latency.
 
 ---
 
 ### 4. MCP Server Integration (Cursor, Claude Code, Antigravity)
 
-Connect ZeroVisual directly to your AI IDE over `stdio` so your coding agent can inspect visual failures and critique your UI on demand.
+Connect ZeroVisual directly to your AI IDE over `stdio` so your coding agent can inspect visual failures, optimize screenshots, and critique your UI on demand.
 
 #### Quick Setup via CLI
 ```bash
@@ -197,6 +214,7 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 * `list_visual_failures`: Lists all failed Playwright visual tests and affected viewports.
 * `get_visual_failure_bundle`: Fetches the resized WebP images, `ariaSnapshot` YAML, and computed styles for a specific `testId`.
 * `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot diff, and returns a token-optimized design critique bundle.
+* `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns token savings and byte reductions.
 
 #### Available MCP Prompts (Skills)
 * `triage-regression`: Loads `skills/zerovisual-regression/SKILL.md` and enforces strict pass/fail JSON triage.

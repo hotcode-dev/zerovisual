@@ -88,7 +88,7 @@ describe('ZeroVisual MCP Server Integration', () => {
     return { client, server };
   }
 
-  it('should register all 3 required tools: list_visual_failures, get_visual_failure_bundle, audit_live_ui_design', async () => {
+  it('should register all 4 required tools: list_visual_failures, get_visual_failure_bundle, audit_live_ui_design, optimize_image', async () => {
     const { client, server } = await setupClientAndServer();
 
     const toolsResponse = await client.listTools();
@@ -97,6 +97,32 @@ describe('ZeroVisual MCP Server Integration', () => {
     expect(toolNames).toContain('list_visual_failures');
     expect(toolNames).toContain('get_visual_failure_bundle');
     expect(toolNames).toContain('audit_live_ui_design');
+    expect(toolNames).toContain('optimize_image');
+
+    await client.close();
+    await server.close();
+  });
+
+  it('tool: optimize_image should optimize base64 image and return stats', async () => {
+    const { client, server } = await setupClientAndServer();
+
+    // 1x1 transparent png
+    const base64Png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+    const res = await client.callTool({
+      name: 'optimize_image',
+      arguments: {
+        imageBase64: base64Png,
+        provider: 'anthropic'
+      }
+    });
+
+    expect(res.content).toBeDefined();
+    const content = (res.content as any[])[0];
+    const parsed = JSON.parse(content.text);
+    expect(parsed.format).toBe('webp');
+    expect(parsed.dataUri).toContain('data:image/webp;base64,');
+    expect(parsed.stats).toBeDefined();
+    expect(parsed.stats.optimizedResolution).toBeDefined();
 
     await client.close();
     await server.close();

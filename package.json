@@ -8,6 +8,7 @@
   "types": "./dist/index.d.ts",
   "bin": {
     "zerovisual": "./dist/cli/index.js",
+    "zerovisual-optimize": "./dist/cli/index.js",
     "zerovisual-mcp": "./dist/mcp/server.js"
   },
   "files": [
