@@ -4,4 +4,6 @@ test-results/
 test-results-*/
 *.log
 .DS_Store
+
 .specs
+.env

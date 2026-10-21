@@ -1,51 +1,47 @@
 ---
-// Premium Side-by-Side Visual Regression & Image Optimization Comparison
-import githubDiffCanvas from '../assets/github-diff-canvas.webp';
-import githubCrop from '../assets/github-zerovisual-crop.webp';
-import githubMobileDiff from '../assets/github-mobile-diff.webp';
-import githubMobileCrop from '../assets/github-mobile-crop.webp';
+// High-Fidelity Wikipedia Visual Regression & Token Optimization Showcase
+import wikiDiffFull from '../assets/wiki-diff-full.webp';
+import wikiDiffCrop from '../assets/wiki-diff-crop.webp';
+import wikiDiffMobile from '../assets/wiki-diff-mobile.webp';
+import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
 ---
 
 <div class="compare-wrapper">
   <!-- Top Feature Pill -->
   <div class="pill-banner">
     <span class="live-dot"></span>
-    <span class="pill-text">Responsive Multi-Viewport Testing</span>
+    <span class="pill-text">ZeroVisual in Action</span>
     <span class="pill-divider">/</span>
-    <span class="pill-stat">Desktop + Mobile Aggregation</span>
+    <span class="pill-stat">Real-World Wikipedia Portal (https://www.wikipedia.org)</span>
   </div>
 
   <div class="compare-header">
-    <h3>Real-World Responsive Visual Regression Triage</h3>
+    <h3>Automated Visual Regression Triage</h3>
     <p>
-      See how ZeroVisual intercepts Playwright failures across both Desktop and Mobile viewports, isolates the diffs, and aggregates them into a single <code>triage-ready.json</code> payload.
+      In an E2E Playwright test for <strong>https://www.wikipedia.org/</strong>, an unexpected +8px button padding shift causes the central <code>#search-form</code> to fail visual comparison. Without ZeroVisual, AI coding agents receive massive full-viewport screenshots overloaded with irrelevant footer links and empty whitespace. ZeroVisual isolates the defect, aligns to model-native vision tiles, and feeds clean, actionable context to your agent:
     </p>
   </div>
 
   <!-- Scenario Tabs -->
   <div class="scenario-nav">
-    <button type="button" class="scenario-tab active" data-scenario="desktop">
+    <button type="button" id="btn-tab-desktop" class="scenario-tab active" data-scenario="desktop">
       <span class="tab-icon">🖥️</span>
-      <span class="tab-title">Desktop Chrome (1920×1080)</span>
-      <span class="tab-badge-emerald">-98.9% Tokens</span>
+      <span class="tab-title">Desktop Chrome (1280×800)</span>
+      <span class="tab-badge-emerald">-77.1% Tokens</span>
     </button>
-    <button type="button" class="scenario-tab" data-scenario="mobile">
+    <button type="button" id="btn-tab-mobile" class="scenario-tab" data-scenario="mobile">
       <span class="tab-icon">📱</span>
       <span class="tab-title">Mobile Safari (390×844)</span>
-      <span class="tab-badge-emerald">-87.5% Tokens</span>
+      <span class="tab-badge-emerald">-29.2% to -92% Tokens</span>
     </button>
-    <button type="button" class="scenario-tab" data-scenario="aggregation">
+    <button type="button" id="btn-tab-aggregation" class="scenario-tab" data-scenario="aggregation">
       <span class="tab-icon">⚡️</span>
       <span class="tab-title">Multi-Viewport Aggregation</span>
-      <span class="tab-badge-cyan">1 Prompt</span>
-    </button>
-    <button type="button" class="scenario-tab" data-scenario="slider">
-      <span class="tab-icon">↔️</span>
-      <span class="tab-title">Split Slider</span>
+      <span class="tab-badge-cyan">1 Single Prompt</span>
     </button>
   </div>
 
-  <!-- View 1: Desktop Chrome -->
+  <!-- View 1: Desktop Wikipedia -->
   <div id="scenario-desktop" class="scenario-content active">
     <div class="browser-window">
       <div class="browser-toolbar">
@@ -59,47 +55,49 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
-          <span class="url-text">https://github.com/hotcode-dev/zerovisual [Desktop Chrome]</span>
+          <span class="url-text">https://www.wikipedia.org/ [Desktop Chrome]</span>
         </div>
         <div class="test-status-badge fail">
-          <span>● Playwright: FAILED</span>
+          <span>● Playwright: FAILED (tests/wikipedia.spec.ts:Search Component)</span>
         </div>
       </div>
 
       <div class="comparison-grid">
-        <!-- Left: Full HD GitHub Screenshot -->
+        <!-- Left: Full 1280x800 Wikipedia Page -->
         <div class="compare-card raw-card">
           <div class="card-top-bar">
-            <div class="card-badge raw">Before: Full 1920×1080 Canvas</div>
-            <div class="card-token-counter text-red">2,691 Tokens</div>
+            <div class="card-badge raw">Before: Full 1280×800 Viewport</div>
+            <div class="card-token-counter text-red">1,334 Tokens</div>
           </div>
           <div class="image-stage">
-            <img
-              src={githubDiffCanvas.src}
-              alt="Raw 1920x1080 GitHub page with Playwright visual regression diff"
-              class="stage-image full-canvas"
-              loading="lazy"
-            />
-            <div class="crop-bounding-indicator github-indicator">
-              <span class="indicator-chip">Repository Header (32px Clamped Padding)</span>
+            <div class="canvas-viewport-frame">
+              <img
+                src={wikiDiffFull.src}
+                alt="Raw 1280x800 Wikipedia homepage with Search Box failure"
+                class="stage-image full-canvas"
+                loading="lazy"
+              />
+              <div class="crop-bounding-indicator wiki-desktop-indicator">
+                <span class="indicator-chip">Search Component (+8px Shift)</span>
+              </div>
             </div>
           </div>
           <div class="card-metrics-grid">
             <div class="metric-cell">
               <span class="cell-label">Resolution</span>
-              <span class="cell-value">1920 × 1080 px</span>
+              <span class="cell-value">1280 × 800 px</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Base64 Payload</span>
-              <span class="cell-value text-red">~2,100 KB</span>
+              <span class="cell-value text-red">~1,200 KB</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Anthropic Tokens</span>
-              <span class="cell-value text-red">2,691 tokens</span>
+              <span class="cell-value text-red">1,334 tokens</span>
             </div>
             <div class="metric-cell">
-              <span class="cell-label">Context Noise</span>
-              <span class="cell-value text-red">92% Noise</span>
+              <span class="cell-label">Visual Noise</span>
+              <span class="cell-value text-red">66% Irrelevant Footer & Margins</span>
             </div>
           </div>
         </div>
@@ -107,38 +105,38 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
         <!-- Right: ZeroVisual Cropped & Model Aligned -->
         <div class="compare-card opt-card">
           <div class="card-top-bar">
-            <div class="card-badge opt">After: ZeroVisual Component Isolation</div>
-            <div class="card-token-counter text-emerald">90 Tokens (-96.7%)</div>
+            <div class="card-badge opt">After: ZeroVisual Model-Aligned Crop</div>
+            <div class="card-token-counter text-emerald">306 Tokens (-77.1%)</div>
           </div>
           <div class="image-stage crop-stage">
             <div class="crop-focus-frame">
               <img
-                src={githubCrop.src}
-                alt="ZeroVisual model-aligned crop of GitHub repository header component"
+                src={wikiDiffCrop.src}
+                alt="ZeroVisual model-aligned crop of Wikipedia Search Component"
                 class="stage-image crop-result"
                 loading="lazy"
               />
             </div>
             <div class="patch-info-pill">
-              <span>18 × 5 Grid = 90 Patches (Exact 1-Tile Fit)</span>
+              <span>18 × 16 Grid = 288 Patches (Exact 1-Tile Fit)</span>
             </div>
           </div>
           <div class="card-metrics-grid">
             <div class="metric-cell">
               <span class="cell-label">Resolution</span>
-              <span class="cell-value text-emerald">504 × 126 px (Model Aligned)</span>
+              <span class="cell-value text-emerald">504 × 457 px (Single Tile)</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">WebP Payload</span>
-              <span class="cell-value text-emerald">5.6 KB (99.7% smaller)</span>
+              <span class="cell-value text-emerald">21.0 KB (98.2% smaller)</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Anthropic Tokens</span>
-              <span class="cell-value text-emerald">90 tokens</span>
+              <span class="cell-value text-emerald">306 tokens</span>
             </div>
             <div class="metric-cell">
-              <span class="cell-label">Visual Focus</span>
-              <span class="cell-value text-emerald">100% Focused</span>
+              <span class="cell-label">Model Focus</span>
+              <span class="cell-value text-emerald">100% on Wikipedia Search Defect</span>
             </div>
           </div>
         </div>
@@ -146,9 +144,9 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     </div>
   </div>
 
-  <!-- View 2: Mobile Safari (iPhone 14) -->
+  <!-- View 2: Mobile Wikipedia (iPhone 14) -->
   <div id="scenario-mobile" class="scenario-content">
-    <div class="browser-window mobile-window">
+    <div class="browser-window">
       <div class="browser-toolbar">
         <div class="window-dots">
           <span class="dot red"></span>
@@ -156,26 +154,26 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
           <span class="dot green"></span>
         </div>
         <div class="url-bar">
-          <span class="url-text">https://github.com/hotcode-dev/zerovisual [iPhone 14]</span>
+          <span class="url-text">https://www.wikipedia.org/ [iPhone 14 Safari]</span>
         </div>
         <div class="test-status-badge fail">
           <span>● Playwright: FAILED</span>
         </div>
       </div>
 
-      <div class="comparison-grid mobile-grid">
-        <!-- Left: Full Mobile Viewport -->
-        <div class="compare-card raw-card mobile-frame-card">
+      <div class="comparison-grid mobile-comparison-grid">
+        <!-- Left: Full Mobile Screen -->
+        <div class="compare-card raw-card">
           <div class="card-top-bar">
-            <div class="card-badge raw">Before: Full Mobile Screen</div>
-            <div class="card-token-counter text-red">450 Tokens</div>
+            <div class="card-badge raw">Before: Full Mobile Viewport</div>
+            <div class="card-token-counter text-red">336 – 3,024 Tokens</div>
           </div>
-          <div class="image-stage mobile-stage">
-            <div class="iphone-frame">
+          <div class="image-stage mobile-stage-wrap">
+            <div class="phone-frame">
               <img
-                src={githubMobileDiff.src}
-                alt="Raw 390x844 iPhone screenshot with diff overlay"
-                class="stage-image iphone-screen"
+                src={wikiDiffMobile.src}
+                alt="Raw iPhone Wikipedia page with Search Button shift"
+                class="stage-image phone-screen"
                 loading="lazy"
               />
             </div>
@@ -183,58 +181,58 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
           <div class="card-metrics-grid">
             <div class="metric-cell">
               <span class="cell-label">Viewport</span>
-              <span class="cell-value">390 × 844 px</span>
+              <span class="cell-value">390 × 664 px</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Payload Size</span>
-              <span class="cell-value text-red">~172 KB</span>
+              <span class="cell-value text-red">~250 KB – 2.5 MB</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Vision Tokens</span>
-              <span class="cell-value text-red">450 tokens</span>
+              <span class="cell-value text-red">336 – 3,024 tokens</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Signal-to-Noise</span>
-              <span class="cell-value text-red">Full Screen</span>
+              <span class="cell-value text-red">Full Screen Overload</span>
             </div>
           </div>
         </div>
 
-        <!-- Right: ZeroVisual Mobile Clamped Crop -->
+        <!-- Right: ZeroVisual Mobile Component Crop -->
         <div class="compare-card opt-card">
           <div class="card-top-bar">
             <div class="card-badge opt">After: ZeroVisual Mobile Crop</div>
-            <div class="card-token-counter text-emerald">140 Tokens (-68.9%)</div>
+            <div class="card-token-counter text-emerald">238 Tokens (-29.2% to -92%)</div>
           </div>
           <div class="image-stage crop-stage">
             <div class="crop-focus-frame">
               <img
-                src={githubMobileCrop.src}
-                alt="ZeroVisual cropped mobile header diff"
+                src={wikiDiffMobileCrop.src}
+                alt="ZeroVisual cropped mobile Wikipedia Search component"
                 class="stage-image crop-result"
                 loading="lazy"
               />
             </div>
             <div class="patch-info-pill">
-              <span>14 × 10 Grid = 140 Patches</span>
+              <span>14 × 17 Grid = 238 Patches</span>
             </div>
           </div>
           <div class="card-metrics-grid">
             <div class="metric-cell">
               <span class="cell-label">Resolution</span>
-              <span class="cell-value text-emerald">390 × 280 px (Mobile Header)</span>
+              <span class="cell-value text-emerald">390 × 470 px (No Upscale)</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">WebP Payload</span>
-              <span class="cell-value text-emerald">1.2 KB (99.3% smaller)</span>
+              <span class="cell-value text-emerald">17.3 KB (93% smaller)</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Vision Tokens</span>
-              <span class="cell-value text-emerald">140 tokens</span>
+              <span class="cell-value text-emerald">238 tokens</span>
             </div>
             <div class="metric-cell">
               <span class="cell-label">Visual Focus</span>
-              <span class="cell-value text-emerald">100% Focused</span>
+              <span class="cell-value text-emerald">100% on Mobile Search Defect</span>
             </div>
           </div>
         </div>
@@ -247,19 +245,19 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     <div class="aggregation-card">
       <div class="agg-header">
         <div class="agg-badge">Feature 5: Multi-Viewport Correlation</div>
-        <h4>One Single Prompt Diagnoses Desktop + Mobile Breakpoints</h4>
+        <h4>One Single Prompt Diagnoses Responsive Breakpoints</h4>
         <p>
-          Instead of triggering multiple disconnected AI reviews for the same broken CSS layout, ZeroVisual groups Desktop Chrome and Mobile Safari under a single normalized <code>testId</code> in <code>triage-ready.json</code>:
+          Instead of triggering separate AI reviews with disconnected full-page screenshots, ZeroVisual correlates Desktop Chrome and Mobile Safari under a single normalized <code>testId</code> in <code>triage-ready.json</code>:
         </p>
       </div>
 
       <div class="agg-visual-flow">
         <div class="agg-box">
-          <div class="box-title">Desktop Chrome (1920×1080)</div>
+          <div class="box-title">Desktop Chrome (1280×800)</div>
           <div class="box-crop">
-            <img src={githubCrop.src} alt="Desktop Crop" />
+            <img src={wikiDiffCrop.src} alt="Desktop Wikipedia Crop" />
           </div>
-          <div class="box-tokens">90 Tokens (5.6 KB)</div>
+          <div class="box-tokens">306 Tokens (21.0 KB)</div>
         </div>
 
         <div class="agg-plus">+</div>
@@ -267,49 +265,44 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
         <div class="agg-box">
           <div class="box-title">Mobile Safari (390×844)</div>
           <div class="box-crop">
-            <img src={githubMobileCrop.src} alt="Mobile Crop" />
+            <img src={wikiDiffMobileCrop.src} alt="Mobile Wikipedia Crop" />
           </div>
-          <div class="box-tokens">140 Tokens (1.2 KB)</div>
+          <div class="box-tokens">238 Tokens (17.3 KB)</div>
         </div>
 
         <div class="agg-equals">=</div>
 
         <div class="agg-bundle-result">
-          <div class="bundle-tag">Normalized testId: "tests/repo.spec.ts:header"</div>
-          <div class="bundle-stat">Total: 230 Tokens (6.8 KB Payload)</div>
-          <div class="bundle-compare">Without ZeroVisual: 3,141 Tokens (2.3 MB)</div>
-          <div class="bundle-savings">92.7% Total Token Savings across Viewports!</div>
+          <div class="bundle-tag">Normalized testId: "tests/wikipedia.spec.ts:search-input"</div>
+          <div class="bundle-stat">Total: 544 Tokens (38.3 KB Payload)</div>
+          <div class="bundle-compare">Without ZeroVisual: 1,670 to 4,358 Tokens (3.7 MB)</div>
+          <div class="bundle-savings">67.4% to 87.5% Total Token Savings across Viewports!</div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- View 4: Split Slider -->
-  <div id="scenario-slider" class="scenario-content">
-    <div class="slider-interactive-wrapper">
-      <div class="slider-container-box" id="github-split-slider">
-        <img
-          src={githubDiffCanvas.src}
-          alt="GitHub Full Canvas"
-          class="slider-img base-layer"
-        />
-        <div class="slider-reveal-layer" id="github-slider-overlay">
-          <img
-            src={githubDiffCanvas.src}
-            alt="GitHub Overlay Layer"
-            class="slider-img"
-          />
-          <div class="slider-crop-guide" style="left: 59.5%; top: 24.5%; width: 6.5%; height: 3.5%;">
-            <span class="guide-tag">Target Bounding Box</span>
-          </div>
+      <div class="triage-json-preview">
+        <div class="json-header">
+          <span class="json-dot"></span>
+          <span>triage-ready.json (Delivered to AI Coding Agent)</span>
         </div>
-        <div class="slider-divider-line" id="github-slider-handle">
-          <div class="slider-thumb">↔</div>
-        </div>
-      </div>
-      <div class="slider-caption-bar">
-        <span>◀ Raw 1920×1080 Screenshot</span>
-        <span>Drag to inspect detected diff region ▶</span>
+        <pre><code>{`{
+  "testId": "tests/wikipedia.spec.ts:search-input",
+  "status": "failed",
+  "diff": {
+    "desktop_chrome": {
+      "tokens": 306,
+      "tileGrid": "18x16",
+      "image": "data:image/webp;base64,UklGRm..."
+    },
+    "mobile_safari": {
+      "tokens": 238,
+      "tileGrid": "14x17",
+      "image": "data:image/webp;base64,UklGRn..."
+    }
+  },
+  "totalTokens": 544,
+  "savingsPercent": 77.1
+}`}</code></pre>
       </div>
     </div>
   </div>
@@ -373,6 +366,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     max-width: 850px;
   }
 
+  /* Scenario Tabs Navigation */
   .scenario-nav {
     display: flex;
     flex-wrap: wrap;
@@ -436,6 +430,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
   .scenario-content { display: none; }
   .scenario-content.active { display: block; }
 
+  /* Browser Window Mockup */
   .browser-window {
     background: #090d16;
     border: 1px solid rgba(71, 85, 105, 0.4);
@@ -471,7 +466,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     font-size: 0.8rem;
     color: #94a3b8;
     flex: 1;
-    max-width: 480px;
+    max-width: 540px;
     font-family: var(--sl-font-mono);
   }
 
@@ -485,6 +480,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     border-radius: 6px;
   }
 
+  /* Comparison Grid */
   .comparison-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -532,30 +528,38 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
   .image-stage {
     position: relative;
     background: #020617;
-    padding: 0.75rem;
+    padding: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 250px;
+    min-height: 280px;
     overflow: hidden;
+  }
+
+  .canvas-viewport-frame {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    background: #ffffff;
   }
 
   .stage-image {
     max-width: 100%;
     height: auto;
-    border-radius: 6px;
     display: block;
   }
 
-  .github-indicator {
+  /* Red bounding box around Wikipedia Search component on the 1280x800 canvas */
+  .wiki-desktop-indicator {
     position: absolute;
-    left: 16.7%;
-    top: 10.2%;
-    width: 66.7%;
-    height: 29.6%;
+    left: 28.5%;
+    top: 57.0%;
+    width: 43.0%;
+    height: 8.5%;
     border: 2px dashed #f43f5e;
-    background: rgba(244, 63, 94, 0.15);
-    border-radius: 4px;
+    background: rgba(244, 63, 94, 0.2);
+    border-radius: 6px;
     pointer-events: none;
     animation: pulseIndicator 2s infinite;
   }
@@ -567,36 +571,43 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
 
   .indicator-chip {
     position: absolute;
-    top: -22px;
+    top: -24px;
     left: 50%;
     transform: translateX(-50%);
     background: #f43f5e;
     color: #fff;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 800;
-    padding: 1px 6px;
+    padding: 2px 8px;
     border-radius: 4px;
     white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
   }
 
   .crop-stage {
     background: radial-gradient(circle at center, rgba(30, 41, 59, 0.9), #040812);
-    padding: 2.5rem 1.5rem;
+    padding: 1.5rem;
   }
 
   .crop-focus-frame {
     padding: 6px;
     border: 2px solid rgba(52, 211, 153, 0.6);
     border-radius: 10px;
-    background: rgba(15, 23, 42, 0.95);
+    background: #ffffff;
     box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.3);
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .crop-focus-frame img {
+    border-radius: 6px;
   }
 
   .patch-info-pill {
     position: absolute;
     bottom: 12px;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(52, 211, 153, 0.4);
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(52, 211, 153, 0.5);
     color: #a7f3d0;
     font-size: 0.72rem;
     font-weight: 700;
@@ -623,18 +634,19 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
   }
   .cell-value { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; }
 
-  /* Mobile Frame Styling */
-  .mobile-stage {
+  /* Mobile Phone Frame */
+  .mobile-stage-wrap {
     padding: 1rem;
   }
-  .iphone-frame {
-    max-width: 200px;
+  .phone-frame {
+    max-width: 220px;
     border: 4px solid #334155;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    background: #ffffff;
   }
-  .iphone-screen {
+  .phone-screen {
     width: 100%;
     height: auto;
     display: block;
@@ -680,6 +692,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     justify-content: center;
     gap: 1.25rem;
     flex-wrap: wrap;
+    margin-bottom: 1.75rem;
   }
 
   .agg-box {
@@ -688,7 +701,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     border-radius: 10px;
     padding: 1rem;
     text-align: center;
-    width: 200px;
+    width: 220px;
   }
 
   .box-title {
@@ -698,12 +711,20 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     margin-bottom: 0.5rem;
   }
 
+  .box-crop {
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .box-crop img {
     max-width: 100%;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid rgba(52, 211, 153, 0.4);
+    height: 75px;
+    object-fit: contain;
+    border-radius: 4px;
   }
 
   .box-tokens {
@@ -724,7 +745,7 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     border: 1px solid rgba(52, 211, 153, 0.5);
     border-radius: 12px;
     padding: 1.25rem 1.5rem;
-    min-width: 280px;
+    min-width: 290px;
   }
 
   .bundle-tag {
@@ -753,100 +774,53 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
     color: #6ee7b7;
   }
 
-  /* Slider Interactive */
-  .slider-interactive-wrapper { max-width: 950px; margin: 0 auto; }
-  .slider-container-box {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 14px;
-    overflow: hidden;
-    user-select: none;
-    border: 1px solid rgba(99, 102, 241, 0.4);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
-  }
-
-  .slider-img {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-  }
-
-  .slider-reveal-layer {
-    position: absolute;
-    top: 0; left: 0;
-    width: 50%; height: 100%;
-    overflow: hidden;
-    border-right: 2px solid #6366f1;
+  .triage-json-preview {
     background: #090d16;
+    border: 1px solid rgba(71, 85, 105, 0.35);
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .slider-reveal-layer .slider-img { width: 200%; max-width: none; }
-  .slider-crop-guide {
-    position: absolute;
-    border: 2px solid #34d399;
-    background: rgba(52, 211, 153, 0.25);
-    border-radius: 4px;
-  }
-
-  .guide-tag {
-    position: absolute;
-    bottom: -22px; left: 50%;
-    transform: translateX(-50%);
-    background: #0f172a;
-    color: #34d399;
-    border: 1px solid #34d399;
-    font-size: 0.68rem;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-
-  .slider-divider-line {
-    position: absolute;
-    top: 0; bottom: 0; left: 50%;
-    width: 4px; margin-left: -2px;
-    background: #6366f1;
-    cursor: ew-resize;
-    z-index: 10;
-  }
-
-  .slider-thumb {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 34px; height: 34px;
-    background: #6366f1;
-    color: #ffffff;
-    border-radius: 50%;
+  .json-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    box-shadow: 0 0 16px rgba(99, 102, 241, 0.9);
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(30, 41, 59, 0.5);
+    border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-family: var(--sl-font-mono);
   }
 
-  .slider-caption-bar {
-    display: flex;
-    justify-content: space-between;
+  .json-dot {
+    width: 7px;
+    height: 7px;
+    background: #34d399;
+    border-radius: 50%;
+  }
+
+  .triage-json-preview pre {
+    margin: 0;
+    padding: 1rem;
+    background: transparent !important;
+  }
+
+  .triage-json-preview code {
     font-size: 0.82rem;
-    color: #94a3b8;
-    margin-top: 0.75rem;
-    padding: 0 0.5rem;
-    font-weight: 500;
+    line-height: 1.45;
+    color: #cbd5e1;
+    font-family: var(--sl-font-mono);
   }
 </style>
 
 <script>
-  function setupInteractiveImageCompare() {
+  function setupImageCompareTabs() {
     const tabs = document.querySelectorAll('.scenario-tab');
     const contents = document.querySelectorAll('.scenario-content');
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
+      tab.onclick = () => {
         tabs.forEach((t) => t.classList.remove('active'));
         contents.forEach((c) => c.classList.remove('active'));
 
@@ -854,56 +828,11 @@ import githubMobileCrop from '../assets/github-mobile-crop.webp';
         const scenario = tab.getAttribute('data-scenario');
         const target = document.getElementById(`scenario-${scenario}`);
         if (target) target.classList.add('active');
-      });
-    });
-
-    // Slider
-    const sliderBox = document.getElementById('github-split-slider');
-    const overlay = document.getElementById('github-slider-overlay');
-    const handle = document.getElementById('github-slider-handle');
-
-    if (!sliderBox || !overlay || !handle) return;
-
-    let dragging = false;
-
-    function move(clientX: number) {
-      const rect = sliderBox.getBoundingClientRect();
-      const posX = Math.max(0, Math.min(clientX - rect.left, rect.width));
-      const pct = (posX / rect.width) * 100;
-
-      overlay.style.width = `${pct}%`;
-      handle.style.left = `${pct}%`;
-    }
-
-    sliderBox.addEventListener('mousedown', (e) => {
-      dragging = true;
-      move(e.clientX);
-    });
-
-    window.addEventListener('mouseup', () => {
-      dragging = false;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!dragging) return;
-      move(e.clientX);
-    });
-
-    sliderBox.addEventListener('touchstart', (e) => {
-      dragging = true;
-      if (e.touches[0]) move(e.touches[0].clientX);
-    });
-
-    window.addEventListener('touchend', () => {
-      dragging = false;
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!dragging || !e.touches[0]) return;
-      move(e.touches[0].clientX);
+      };
     });
   }
 
-  document.addEventListener('DOMContentLoaded', setupInteractiveImageCompare);
-  setupInteractiveImageCompare();
+  document.addEventListener('DOMContentLoaded', setupImageCompareTabs);
+  document.addEventListener('astro:page-load', setupImageCompareTabs);
+  setupImageCompareTabs();
 </script>
