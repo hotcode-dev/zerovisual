@@ -43,6 +43,7 @@ export function getProviderDimensions(
     case 'openai':
       return { maxWidth: 512, maxHeight: 512 };
     case 'anthropic':
+    case 'qwen':
       return { maxWidth: 504, maxHeight: 504 };
     case 'gemini':
       return lowTokenMode
@@ -57,15 +58,17 @@ export function getProviderDimensions(
 
 /**
  * Default pixel matcher for Playwright / pixelmatch diff images.
- * Detects red diff markers (r >= 200, g <= 100, b <= 100),
- * magenta diff markers (r >= 200, g <= 100, b >= 150),
- * or non-transparent pixels in masked diffs.
+ * Detects red diff markers, magenta/rose markers, and high-saturation difference pixels.
  */
 export function defaultDiffPixelMatcher(r: number, g: number, b: number, a: number): boolean {
   if (a === 0) return false;
-  const isRedDiff = r >= 200 && g <= 100 && b <= 100;
-  const isMagentaDiff = r >= 200 && g <= 100 && b >= 150;
-  return isRedDiff || isMagentaDiff;
+  // Standard red diff (e.g. pixelmatch red or #f43f5e)
+  const isRedDiff = r >= 190 && g <= 100 && b <= 120;
+  // Standard magenta / pink / rose diff (e.g. Playwright magenta #ff00ff, #ff007f, #e11d48)
+  const isMagentaDiff = r >= 190 && g <= 100 && b >= 100;
+  // General high-saturation red-dominant diff
+  const isHighSatRed = r >= 180 && (r - g) >= 80 && (r - b) >= 60;
+  return isRedDiff || isMagentaDiff || isHighSatRed;
 }
 
 /**
@@ -225,7 +228,7 @@ export function estimateVisionTokens(
     return 85 + tilesW * tilesH * 170;
   }
 
-  if (provider === 'anthropic') {
+  if (provider === 'anthropic' || provider === 'qwen') {
     const patchesW = Math.ceil(width / 28);
     const patchesH = Math.ceil(height / 28);
     return patchesW * patchesH;

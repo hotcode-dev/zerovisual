@@ -1,0 +1,23 @@
+{
+  "id": "05-dashboard-stat-overflow",
+  "name": "Dashboard KPI Metric Overflow and Clipping",
+  "category": "Text Overflow / Component Clipping",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 42776,
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

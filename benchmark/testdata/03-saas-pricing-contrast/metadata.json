@@ -1,0 +1,23 @@
+{
+  "id": "03-saas-pricing-contrast",
+  "name": "SaaS Pricing Card Contrast Violation",
+  "category": "Accessibility / Color Contrast Failure",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 8152,
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

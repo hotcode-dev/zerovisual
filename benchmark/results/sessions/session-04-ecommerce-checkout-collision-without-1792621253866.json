@@ -1,0 +1,46 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-without-1792621253866",
+  "timestamp": "2026-10-21T22:20:53.866Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 22948,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\n\"Pay\" button and \"Total Due\" row within the Order Summary card.\n\n**2. Nature of the Visual Defect**\nElement overlap / Layout merging. The \"Total Due\" text (left), the \"Pay $53.41 Now\" button text (center), and the total price (right) are all crammed into a single green background block, causing severe text collision and unreadability.\n\n**3. Probable Root Cause in CSS or layout**\nThe \"Pay\" button is likely nested inside the flex container for the \"Total Due\" row, or the green background styling (e.g., `background-color: green;`) was accidentally applied to the parent row container instead of just the button element. This caused the row and the button to merge into a single visual block.\n\n**4. Suggested Fix or code snippet**\nEnsure the total row and the call-to-action button are separate, block-level siblings. Remove the background color from the total row and apply it only to the button.\n\n```html\n<!-- Correct Structure -->\n<div class=\"order-summary\">\n  <!-- Total Row (No background) -->\n  <div class=\"total-row flex justify-between items-center mb-4\">\n    <span class=\"text-gray-700 font-bold\">Total Due</span>\n    <span class=\"text-gray-900 font-bold\">$53.41</span>\n  </div>\n  \n  <!-- Button (Full width, Green background) -->\n  <button class=\"w-full bg-green-500 text-white font-bold py-3 rounded-lg\">\n    Pay $53.41 Now\n  </button>\n</div>\n```",
+    "reasoning": "Looking at the screenshot, I need to identify the visual defect.\nThe main issue is in the green button at the bottom of the \"Order Summary\" card.\nThe text inside the button (\"Pay $53.41 Now\") is overlapping with the text on the left (\"Total Due\") and the text on the right (\"$53.41\").\nSpecifically, the button seems to contain three distinct text elements that are colliding:\n1. \"Total Due\" (left aligned, black text)\n2. \"Pay $53.41 Now\" (centered, white text)\n3. \"$53.41\" (right aligned, black text)\nWait, looking closely at the green button:\nIt has \"Total Due\" on the left in black.\nIt has \"Pay $53.41 Now\" in the middle in white.\nIt has \"$53.41\" on the right in black.\nThis looks like a layout where a flex container or grid is trying to fit too much content, or the button itself is just a container that has absorbed the row above it, or the row above it has a background color applied to it incorrectly.\nActually, it looks like the \"Total Due\" row and the \"Pay\" button have merged or the button's background has expanded to cover the total row, but the text from the total row is still there, overlapping with the button's text.\nLet's re-examine.\nThe green background is a rounded rectangle.\nInside it:\nLeft: \"Total Due\" (black)\nCenter: \"Pay $53.41 Now\" (white)\nRight: \"$53.41\" (black)\nThis strongly suggests that a flex row containing \"Total Due\" and \"$53.41\" has been given a green background, and a button \"Pay $53.41 Now\" has been placed inside it or overlapping it, OR the button is just a div with a green background that contains all three elements, and the layout is broken.\nMost likely, the developer intended a row for \"Total Due\" ... \"$53.41\" and a separate button below it, OR a button that says \"Pay $53.41 Now\" and the total row is separate.\nHere, the green background encompasses the total row, and the button text is injected in the middle.\nDefect: Element overlap / layout collapse. The \"Total Due\" row and the \"Pay\" button have merged into a single green block, causing text overlap.\nRoot cause: Likely a missing `display: block` or `width: 100%` on the button, or the button is nested inside the total row's flex container, or a CSS class was mistakenly applied to the parent container instead of the button.\nLet's formulate the response.\n1. Affected Element: \"Pay\" button / Total Due row in the Order Summary card.\n2. Nature of Defect: Element overlap / layout merging. The text from the \"Total Due\" row is overlapping with the \"Pay\" button text within a single green background.\n3. Probable Root Cause: The \"Pay\" button is likely nested inside the flex container for the \"Total Due\" row, or the green background styling (`.btn-primary` or similar) was accidentally applied to the parent row container instead of just the button element.\n4. Suggested Fix: Ensure the button is a sibling to the total row, not a child. Or, if it's meant to be one component, use a proper grid/flex layout with `justify-content: space-between` and ensure text colors are correct (all white, or separate the total from the CTA).\nActually, looking at it, it's highly probable that the button element `<button>Pay $53.41 Now</button>` was placed *inside* the `<div class=\"total-row\">` which has `display: flex; justify-content: space-between;`, and the green background class was applied to the `.total-row` by mistake, or the button has `position: absolute` and is overlapping.\nLet's keep it simple: The button and the total row have merged.\nFix: Separate the total row and the button into distinct block-level elements.\n```html\n<!-- Incorrect (likely) -->\n<div class=\"total-row bg-green\">\n  <span>Total Due</span>\n  <button>Pay $53.41 Now</button>\n  <span>$53.41</span>\n</div>\n\n<!-- Correct -->\n<div class=\"total-row\">\n  <span>Total Due</span>\n  <span>$53.41</span>\n</div>\n<button class=\"btn-primary w-full\">Pay $53.41 Now</button>\n```\nOr if it's meant to be a single button with a complex layout, it's still a mess. I will state the overlap and the probable nesting issue.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 1429,
+    "reasoningTokens": 1058,
+    "totalTokens": 2567,
+    "latencyMs": 78966,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

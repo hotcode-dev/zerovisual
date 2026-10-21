@@ -1,0 +1,23 @@
+{
+  "id": "02-github-pr-merge",
+  "name": "GitHub Pull Request Merge Card Regression",
+  "category": "Button Layout Shift / Sizing",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 21898,
+  "groundTruth": {
+    "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+    "affectedElement": ".btn-merge",
+    "defectType": "button_styling_regression",
+    "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+    "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+    "expectedBoundingBox": {
+      "x": 550,
+      "y": 110,
+      "width": 280,
+      "height": 90
+    }
+  }
+}

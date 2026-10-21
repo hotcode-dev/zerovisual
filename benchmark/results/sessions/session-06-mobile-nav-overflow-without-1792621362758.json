@@ -1,0 +1,46 @@
+{
+  "id": "session-06-mobile-nav-overflow-without-1792621362758",
+  "timestamp": "2026-10-21T22:22:42.758Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 5612,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\nMain Content Area / Page Body\n\n**2. Nature of the Visual Defect**\nMissing Content / Blank Screen. The primary application view is completely empty (black), while the navigation header and dropdown menu are visible.\n\n**3. Probable Root Cause in CSS or layout**\nThe main content container is likely hidden via `display: none`, `visibility: hidden`, or has a height of `0`. It is also possible that a JavaScript error prevented the main view from rendering, or a `z-index` issue is causing an invisible overlay to block the view (though less likely given the pure black background).\n\n**4. Suggested Fix or code snippet**\nEnsure the main content wrapper is visible and occupies the viewport.\n\n```css\n/* Ensure main content is visible */\n.main-content {\n  display: block; /* or flex/grid */\n  visibility: visible;\n  height: 100vh; /* or auto */\n  z-index: 1; /* Ensure it's above background but below nav if needed */\n}\n```",
+    "reasoning": "The screenshot shows a mobile view of a \"ZeroVisual\" app. The top bar contains the logo and a hamburger menu button. Below it, a dropdown menu is open showing two options: \"Mobile Dashboard View\" and \"Real-Time QA Stream\".\n\nThe critical issue is that the rest of the screen (the main content area) is completely empty/black. This indicates that the main content of the page is not rendering or is hidden.\n\n1.  **Affected Element:** Main Content Area / Page Body.\n2.  **Nature of Defect:** Missing content / Blank screen. The navigation menu is visible, but the primary view is empty.\n3.  **Probable Root Cause:** The main content container likely has `display: none`, `visibility: hidden`, or `height: 0`. Alternatively, the content failed to load (JS error), but in a visual regression context, a CSS issue hiding the main wrapper is a strong candidate. Another possibility is that the dropdown menu is covering the content, but the content area looks completely black, suggesting it's not there.\n4.  **Suggested Fix:** Ensure the main content container is visible and has proper dimensions. Check for z-index issues if the menu is overlapping, but primarily check the visibility of the main app container.\n"
+  },
+  "metrics": {
+    "promptTokens": 390,
+    "imageTokens": 252,
+    "completionTokens": 498,
+    "reasoningTokens": 266,
+    "totalTokens": 888,
+    "latencyMs": 26022,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

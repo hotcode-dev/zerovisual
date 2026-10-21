@@ -1,0 +1,23 @@
+{
+  "id": "04-ecommerce-checkout-collision",
+  "name": "E-Commerce Checkout Total & Button Collision",
+  "category": "Layout Collision / Margin Collapse",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 45692,
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

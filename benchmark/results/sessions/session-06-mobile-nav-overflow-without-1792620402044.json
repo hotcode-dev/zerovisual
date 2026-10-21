@@ -1,0 +1,46 @@
+{
+  "id": "session-06-mobile-nav-overflow-without-1792620402044",
+  "timestamp": "2026-10-21T22:06:42.044Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 5612,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The screenshot shows a mobile view of a \"ZeroVisual\" app. There's a header with a logo and a hamburger menu button. Below it, two menu items are visible: \"Mobile Dashboard View\" and \"Real-Time QA Stream\". The rest of the screen is empty black space.\n\nThe visual regression test flagged a mismatch. What's the defect? The menu appears to be open (the hamburger icon is shown, and menu items are visible). But the menu items look like they're floating at the top with no container/background panel. Typically, a mobile drawer menu would have a background panel, padding, and possibly a slide-in animation. Here the menu items appear as isolated dark boxes at the top with no surrounding drawer container, no close state, and the rest of the page is empty.\n\nPossible defects: The navigation drawer is missing its container background/padding, or the menu is rendered but the drawer panel's height/background is missing, causing the items to appear detached. Or the menu items are overlapping the header? They don't overlap; they're below the header.\n\nLet me think about what a typical \"flagged visual mismatch\" would be: The menu is open but the drawer background is missing, so the items appear as floating boxes with a large empty area. The root cause could be that the drawer's `background` or `min-height` is missing, or the menu is positioned absolutely without a container, or the drawer's transform/height is zero.\n\nAlternatively, the defect could be that the menu items are displayed when they shouldn't be (the menu should be closed by default), i.e., a state issue. But the question asks for a CSS/layout root cause.\n\nGiven the screenshot: header at top, two menu items directly below with a gap, then a huge empty space. The menu items have a dark background (#1a1f2e-ish) and rounded corners. There's no drawer panel behind them. So the defect: missing drawer container background/padding; menu items are rendered without a parent panel, causing a layout where the items float at the top and the rest of the viewport is empty.\n\nProbable root cause: The `.drawer` or `.nav-menu` container is missing `background-color`, `padding`, and `min-height: 100vh` (or height), or the container's height collapsed because it's absolutely positioned with no height. Or the menu is using `position: absolute` with `top: 0` overlapping the header? No.\n\nAnother possibility: The menu is supposed to be hidden (transform: translateX(-100%)) but is showing; but the test flagged a visual mismatch, maybe the baseline had the menu closed. But the screenshot shows the menu open with items; if the baseline was closed, the defect would be \"menu unexpectedly open.\" But the question expects a CSS root cause like padding shift, etc.\n\nLet me craft a reasonable answer: Affected element: mobile navigation drawer / hamburger menu panel (`.nav-menu` / `.drawer`). Nature: The drawer panel's background and full-height container are missing; menu items render as isolated floating boxes at the top with no enclosing panel, leaving the rest of the viewport empty (layout collapse / missing container). Root cause: The drawer container lacks `background-color`, `min-height: 100vh` (or `height: 100%`), and padding; possibly the container is `position: absolute` without dimensions, or a flex/height collapse. Suggested fix: Provide CSS.\n\nAlternatively, the defect could be that the menu items overlap the header? They start at y=40, header ends around 30. There's a small gap. Not overlap.\n\nMaybe the intended design: The menu should be a slide-in panel from the right with a full-height background. The screenshot shows items at top-left with no panel. So the fix: add background and full height to the drawer.\n\nI'll write the answer accordingly, with a code snippet.\n\nLet me structure:\n\n1. Affected element: Mobile nav drawer (hamburger-triggered menu) — `.nav-drawer` / `.menu-list` containing \"Mobile Dashboard View\" and \"Real-Time QA Stream\".\n\n2. Nature: Missing drawer container — menu items render as detached floating boxes directly under the header with no enclosing panel, background, or padding; the remainder of the viewport is empty (layout collapse / missing background & height). Possibly also a spacing issue: items are crammed at the top with no vertical padding.\n\n3. Root cause: The drawer wrapper is likely `position: absolute/fixed` with no explicit height/background, or its `background-color`/`min-height` was removed; the list items have their own backgrounds so they show, but the container collapsed to content height. Could also be a missing `transform` state causing the open menu to render without the panel styles (e.g., panel styles scoped to `.drawer.open .panel` but the class is on a different element).\n\n4. Fix: CSS snippet:\n\n```css\n.nav-drawer {\n  position: fixed;\n  inset: 0 0 0 auto; /* or top: 0; left: 0; */\n  width: 280px;\n  height: 100%;\n  background: #0f1420;\n  padding: 64px 16px 16px; /* offset for header */\n  transform: translateX(-100%);\n  transition: transform .25s ease;\n}\n.nav-drawer.is-open { transform: translateX(0); }\n.nav-drawer a {\n  display: block;\n  padding: 12px 16px;"
+  },
+  "metrics": {
+    "promptTokens": 392,
+    "imageTokens": 252,
+    "completionTokens": 1200,
+    "reasoningTokens": 1200,
+    "totalTokens": 1592,
+    "latencyMs": 80564,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

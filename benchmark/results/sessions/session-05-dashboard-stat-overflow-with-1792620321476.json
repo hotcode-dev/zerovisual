@@ -1,0 +1,52 @@
+{
+  "id": "session-05-dashboard-stat-overflow-with-1792620321476",
+  "timestamp": "2026-10-21T22:05:21.476Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 448,
+      "height": 280
+    },
+    "format": "webp",
+    "bytes": 3692,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot and identify the visual defect.\n\nLet me examine the screenshot. There's a header \"Production Telemetry\" and four cards in a row:\n1. \"TOKENS SAVED\" - 94.2% - \"+ 4.1% vs avg\" (green)\n2. \"ACTIVE AGENTS\" - 12,450 - \"+ 12% since 9am\" (gray)\n3. \"PAYLOAD P55\" - 34 KB - \"+ 18% reduced\" (green)\n4. \"COST PER DIFF\" - $0.0002 - \"Zero API keys\" (green)\n\nNow let me look for the visual defect. The cards appear to be in a row. Let me look at the alignment and spacing.\n\nLooking carefully at the cards:\n- Card 1 (TOKENS SAVED): The label \"TOKENS SAVED\" is at the top, then \"94.2%\" below it, then \"+ 4.1% vs avg\" below that.\n- Card 2 (ACTIVE AGENTS): \"ACTIVE AGENTS\" at top, \"12,450\" in large red/pink font, \"+ 12% since 9am\" below.\n- Card 3 (PAYLOAD P55): \"PAYLOAD P55\" at top, \"34 KB\" below, \"+ 18% reduced\" below.\n- Card 4 (COST PER DIFF): \"COST PER DIFF\" at top, \"$0.0002\" below, \"Zero API keys\" below.\n\nNow let me look at vertical alignment. The labels at the top: \"TOKENS SAVED\" appears to be at a certain y position. \"ACTIVE AGENTS\" appears to be at the same y position. \"PAYLOAD P55\" and \"COST PER DIFF\" also at the same y position. Good.\n\nNow the main values: \"94.2%\" is at a certain y. \"12,450\" is at a certain y. \"34 KB\" at a certain y. \"$0.0002\" at a certain y.\n\nHmm, let me look at the vertical positions of the main values. In card 1, \"94.2%\" baseline. In card 2, \"12,450\" baseline. In card 3, \"34 KB\" baseline. In card 4, \"$0.0002\" baseline.\n\nLooking at the image, the main values seem roughly aligned but let me look more carefully. Actually, the \"12,450\" in card 2 looks like it might be positioned slightly differently. Hmm.\n\nLet me look at the bottom text. In card 1, \"+ 4.1% vs avg\" is green. In card 2, \"+ 12% since 9am\" is gray. In card 3, \"+ 18% reduced\" is green. In card 4, \"Zero API keys\" is green.\n\nNow, the vertical alignment of the bottom text: card 1's bottom text appears at a certain y. Card 2's bottom text appears at a certain y. Card 3's bottom text appears at a certain y. Card 4's bottom text appears at a certain y.\n\nHmm, let me look at the spacing between the main value and the bottom text. In card 1, the gap between \"94.2%\" and \"+ 4.1% vs avg\" looks small. In card 2, the gap between \"12,450\" and \"+ 12% since 9am\" looks larger. In card 3, the gap between \"34 KB\" and \"+ 18% reduced\" looks small. In card 4, the gap between \"$0.0002\" and \"Zero API keys\" looks small.\n\nWait, actually let me look at the vertical position of the bottom text across cards. Card 1 bottom text y ~ 73. Card 2 bottom text y ~ 83. Card 3 bottom text y ~ 73. Card 4 bottom text y ~ 73. So card 2's bottom text is lower than the others! That's a misalignment.\n\nLet me look at the main values. Card 1 \"94.2%\" y ~ 58. Card 2 \"12,450\" y ~ 58. Card 3 \"34 KB\" y ~ 58. Card 4 \"$0.0002\" y ~ 58. These look aligned.\n\nBut the bottom text in card 2 is lower. Why? Because the \"12,450\" font is larger (it's a bigger number, more digits, larger font size). The larger font might have a larger line-height, pushing the bottom text down. Or the card 2 has extra padding.\n\nActually, look at the labels at top. Card 1 \"TOKENS SAVED\" y ~ 43. Card 2 \"ACTIVE AGENTS\" y ~ 43. Card 3 \"PAYLOAD P55\" y ~ 43. Card 4 \"COST PER DIFF\" y ~ 43. Aligned.\n\nNow the main value: card 1 \"94.2%\" top ~ 48, bottom ~ 68. Card 2 \"12,450\" top ~ 45, bottom ~ 72"
+  },
+  "metrics": {
+    "promptTokens": 266,
+    "imageTokens": 126,
+    "completionTokens": 1200,
+    "reasoningTokens": 1200,
+    "totalTokens": 1466,
+    "latencyMs": 61600,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

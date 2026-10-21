@@ -1,0 +1,23 @@
+{
+  "id": "06-mobile-nav-overflow",
+  "name": "Mobile Safari Navigation Drawer Overflow",
+  "category": "Mobile Responsive / Viewport Overflow",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "diffPixels": 1700,
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

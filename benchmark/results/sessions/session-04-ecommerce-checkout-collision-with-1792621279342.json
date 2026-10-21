@@ -1,0 +1,52 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-with-1792621279342",
+  "timestamp": "2026-10-21T22:21:19.342Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 328
+    },
+    "format": "webp",
+    "bytes": 7156,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 388,
+      "y": 247,
+      "width": 504,
+      "height": 328
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\nBottom action button (Green button containing \"Total Due\", \"Pay $53.41 Now\", and \"$53.41\").\n\n**2. Nature of the Visual Defect**\nText overlap and layout collapse. The text elements inside the button are overlapping each other instead of being spaced evenly across the button's width.\n\n**3. Probable Root Cause in CSS or layout**\nThe button is likely a flex container intended to space out its children (e.g., `justify-content: space-between`), but the text elements are missing `white-space: nowrap`, causing them to shrink or wrap. Alternatively, the button lacks a defined `width` or `min-width`, causing the flex container to collapse to the size of its content, resulting in the overlap.\n\n**4. Suggested Fix or code snippet**\nEnsure the button acts as a proper flex container and the text does not wrap:\n\n```css\n.order-summary-button {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  width: 100%; /* or a specific fixed width */\n  padding: 0 16px;\n}\n\n.order-summary-button span {\n  white-space: nowrap;\n}\n```",
+    "reasoning": "The user wants a visual regression analysis of the provided screenshot.\n1.  **Analyze the image:** The image shows an \"Order Summary\" card. Inside, there's a green button at the bottom.\n2.  **Identify the defect:** The text inside the green button (\"Total Due\", \"Pay $53.41 Now\", \"$53.41\") is overlapping. The text is bunched up in the middle, and the left/right alignment is broken.\n3.  **Determine the component:** The green button at the bottom of the \"Order Summary\" card.\n4.  **Nature of defect:** Text overlap / layout collapse within the button.\n5.  **Probable root cause:** The button likely uses `display: flex` with `justify-content: space-between` to separate the text. However, the text elements inside are probably missing `white-space: nowrap`, causing them to wrap or shrink, or the button itself lacks a fixed width/`min-width`, causing the flex container to collapse and overlap the text.\n6.  **Suggested fix:** Add `white-space: nowrap` to the text spans inside the button, and ensure the button has `display: flex; justify-content: space-between; align-items: center;` with a proper width.\n"
+  },
+  "metrics": {
+    "promptTokens": 298,
+    "imageTokens": 160,
+    "completionTokens": 549,
+    "reasoningTokens": 274,
+    "totalTokens": 847,
+    "latencyMs": 25435,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

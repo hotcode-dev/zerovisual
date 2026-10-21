@@ -1,0 +1,52 @@
+{
+  "id": "session-01-wikipedia-search-offset-with-1792621022921",
+  "timestamp": "2026-10-21T22:17:02.922Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "01-wikipedia-search-offset",
+  "caseName": "Wikipedia Portal Search Bar Shift",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 389
+    },
+    "format": "webp",
+    "bytes": 6134,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 338,
+      "y": 160,
+      "width": 634,
+      "height": 489
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\nSearch Input Container / Wrapper\n\n**2. Nature of the Visual Defect**\nUnexpected thick red border surrounding the entire search component (input field, language selector, and button).\n\n**3. Probable Root Cause in CSS or layout**\nThe search input or its parent container is currently in a `:focus` or `:focus-within` state. Automated test scripts often programmatically focus input fields to type text. The CSS for this focus state is applying a prominent red border (likely intended for accessibility or error indication, but triggering a false positive in the visual baseline).\n\n**4. Suggested Fix or code snippet**\n*   **Test Script Fix (Preferred):** Ensure the element is blurred before the screenshot is taken.\n    ```javascript\n    // Example in Playwright/Puppeteer\n    await page.keyboard.press('Tab'); // or explicitly blur the element\n    // take screenshot\n    ```\n*   **CSS Fix:** Ensure the focus state does not drastically change the border color/width if it's not intended to be part of the standard visual baseline.\n    ```css\n    .search-container:focus-within {\n      /* Remove or adjust the red border if it's causing test failures */\n      /* border: 2px solid red; */\n      outline: 2px solid #3366cc; /* Use a standard, expected focus indicator */\n    }\n    ```",
+    "reasoning": "1.  **Analyze the image:** The image shows a mockup of a Wikipedia search page. The most prominent visual anomaly is a thick, solid red border surrounding the entire search input group (the text input, the language dropdown, and the search button).\n2.  **Identify the affected element:** The search input container or wrapper.\n3.  **Determine the nature of the defect:** An unexpected, thick red border is applied to the search component.\n4.  **Determine the probable root cause:** This is a classic symptom of a CSS `:focus` or `:focus-within` state being triggered. In automated testing (like Puppeteer or Playwright), the search input is often programmatically focused to type text. If the CSS for the focused state uses a red border (perhaps for accessibility, error states, or just a specific design choice that wasn't expected in the baseline), it will appear in the screenshot.\n5.  **Formulate the suggested fix:** The test script should blur the element before taking the screenshot, or the CSS should be adjusted so the focus state doesn't alter the border color/width so drastically, or the test should explicitly target the unfocused state.\n"
+  },
+  "metrics": {
+    "promptTokens": 330,
+    "imageTokens": 192,
+    "completionTokens": 557,
+    "reasoningTokens": 252,
+    "totalTokens": 887,
+    "latencyMs": 38100,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.",
+    "affectedElement": ".search-box",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS",
+    "suggestedFix": "Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c",
+    "expectedBoundingBox": {
+      "x": 370,
+      "y": 460,
+      "width": 600,
+      "height": 90
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "session-03-saas-pricing-contrast-with-1792620026461",
+  "timestamp": "2026-10-21T22:00:26.461Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 448,
+      "height": 280
+    },
+    "format": "webp",
+    "bytes": 2902,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nLet me examine the three pricing cards: Starter, Pro, Enterprise.\n\nStarter card: \"Starter\" heading, \"$0\" price, \"5 Projects\", \"Community Support\", then a button \"Start Free\" with a light gray background and dark text.\n\nPro card: \"Pro\" heading, \"$29/mo\" price, \"Unlimited Projects\", \"Advanced MCP\", \"24/7 SLA\", then a button that appears to have a light gray background but the text on it is very faint/low contrast. The text looks like it might say \"Upgrade\" or similar but it's barely visible. The button background is light gray, and the text appears to be a light gray or white color, creating a contrast violation.\n\nEnterprise card: \"Enterprise\" heading, \"$99/mo\" price, \"Dedicated VPC\", \"Custom Integrations\", then a dark button \"Contact Sales\" with white text.\n\nSo the visual defect is on the Pro card's button. The button text is nearly invisible. The button has a light gray background (similar to the Starter button's background) but the text color is light/white instead of dark. This is a contrast violation.\n\nLet me look more carefully. The Starter button: light gray background, dark text \"Start Free\" - readable. The Pro button: light gray background, but the text is very faint, looks like light gray text on light gray background. The Enterprise button: dark background, white text - readable.\n\nSo the Pro button has a contrast issue. The text color is wrong. It seems the Pro button might be intended to be a \"primary\" or \"highlighted\" button (since the Pro card has a purple border indicating it's the featured plan), but the button styling is broken. Possibly the button should have a dark background with white text (like a primary CTA), but instead it has a light background with light text, OR it should have a light background with dark text but the text color variable resolved to a light value.\n\nLooking at the Pro card border being purple/indigo (the highlighted plan), the button inside is probably meant to be the primary CTA. In many designs, the highlighted plan's button is filled with the brand color (indigo/purple) or dark. But here the button background is light gray and the text is light gray/white, making it unreadable.\n\nSo the nature of the defect: contrast violation / unreadable button text on the Pro plan's CTA button.\n\nProbable root cause: The Pro button likely uses a CSS class that sets color to white (or a light color) assuming a dark/colored background, but the background color is missing or set to a light value. Or a CSS variable for the button text color is undefined and falling back to a light color. Or the button's background color property was removed/overridden, leaving a default light background while the text color remained white.\n\nAlternatively, the button might be in a disabled state? No, the text is faint but present, not a typical disabled look. Actually a disabled button often has reduced opacity. Hmm. But the Starter and Enterprise buttons look fine. The Pro button text is faint. Could be the button has `color: inherit` or `color: white` with a transparent/light background.\n\nLet me think about typical visual regression flags. The most likely intended design: Pro is the highlighted plan, so its button should be a solid indigo/purple button with white text (matching the border color). But the background color didn't apply (maybe a missing CSS rule or a specificity issue), so the button shows the default light background while the text color (white) was applied, causing low contrast.\n\nSo root cause: missing/overridden background-color on the primary button variant; text color set to white for a dark background that never rendered.\n\nSuggested fix: ensure the Pro CTA button has a solid background (e.g., the indigo brand color) and white text, or if it's meant to be a light button, set the text color to a dark value. Provide code snippet.\n\nLet me write the response with the four required sections.\n\nI'll be precise and concise. I'll mention the element: Pro plan CTA button (\"Upgrade\"/\"Get Pro\" button).\n\nLet me look at the faint text. It's hard to read but might say \"Upgrade\" or \"Get Pro\". I'll just refer to it as the Pro plan's call-to-action button.\n\nNow structure the answer.\n\n1. Affected Element / Component name: The primary CTA button inside the \"Pro\" pricing card (the middle, highlighted card). Possibly the `.btn-primary` / `.card--featured .btn` selector.\n\n2. Nature of the Visual Defect: Contrast violation / illegible text. The button label is rendered in a near-white/light-gray color on a light-gray background, making it unreadable. The button also lacks the expected filled background that distinguishes the featured plan's CTA.\n\n3. Probable Root Cause: The featured/primary button variant sets `color: #fff` (or a light text token) expecting a dark/brand background, but the `background-color` rule for that variant is missing, overridden, or scoped incorrectly (specificity/cascade issue), so the element falls back to the default light surface color. Result: light text on light background. Could also be a CSS variable like `--btn-bg` undefined in the featured scope.\n\n4. Suggested Fix: Provide code.\n\nI'll give a snippet:\n\n```css\n/* Featured plan CTA should be a solid brand button */\n.card--featured ."
+  },
+  "metrics": {
+    "promptTokens": 266,
+    "imageTokens": 126,
+    "completionTokens": 1200,
+    "reasoningTokens": 1202,
+    "totalTokens": 1466,
+    "latencyMs": 69705,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

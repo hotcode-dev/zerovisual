@@ -1,0 +1,46 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-without-1792620103260",
+  "timestamp": "2026-10-21T22:01:43.261Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 22948,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nLet me examine the screenshot in detail. There's a card titled \"Order Summary\" on a light gray background. Inside the card:\n- \"Vision Token Pack\" ... \"$49.00\"\n- \"Estimated Tax\" ... \"$4.41\"\n- A dashed horizontal separator line\n- A green button/row at the bottom that contains \"Total Due\", \"Pay $53.41 Now\", and \"$53.41\"\n\nNow let me look at the green button row carefully. The text inside the green button appears to be overlapping or colliding. I see \"Total Due\" on the left in black bold text, then \"Pay $53.41 Now\" in white bold text in the middle, and \"$53.41\" in black bold text on the right.\n\nWait, this looks wrong. The green element is supposed to be a \"Pay $53.41 Now\" button, presumably. But the \"Total Due\" label and the \"$53.41\" value, which should be a separate row above the button (like the other rows: label on left, value on right), appear to be rendered ON TOP of the green button, overlapping it.\n\nLet me look. The green button spans the full width of the card content. Inside it, on the left, there's \"Total Due\" in black. In the center, \"Pay $53.41 Now\" in white. On the right, \"$53.41\" in black.\n\nSo the \"Total Due ... $53.41\" row, which should be a normal text row (label left, value right, like the others), is overlapping with the green CTA button. The green button's text \"Pay $53.41 Now\" is centered, and the \"Total Due\" row's text is sitting on top of the green background.\n\nThis is a classic overlap / z-index / layout collapse issue. The \"Total Due\" row and the \"Pay\" button are occupying the same vertical space. The green button background is showing through behind the \"Total Due\" and \"$53.41\" text.\n\nSo the nature of the defect: overlap / collision between the \"Total Due\" summary row and the \"Pay\" CTA button. The total row's text is rendered over the green button background, making it look like the button contains three pieces of text. The black text on green has poor contrast too, but the main issue is the overlap.\n\nProbable root cause: The \"Total Due\" row and the button are likely both positioned absolutely, or the container lost its height / margin collapse, or the button has a negative margin, or the total row is missing its own block height so the button overlaps it. Another common cause: the total row is `position: absolute` or the button is `position: absolute` with top set to overlap. Or the dashed separator and total row got pushed up. Actually look: the dashed line is right above the green button. The \"Total Due\" text baseline is roughly aligned with the green button's vertical center. So the total row is overlapping the button.\n\nHmm, perhaps the intended layout is:\nRow 1: Vision Token Pack ... $49.00\nRow 2: Estimated Tax ... $4.41\nRow 3 (total): Total Due ... $53.41  (bold, maybe with top border)\nThen the green button \"Pay $53.41 Now\" below it.\n\nBut what we see is the green button overlapping row 3. So the button is positioned too high, or row 3 has zero height / is absolutely positioned behind the button.\n\nMost likely root cause: The \"Total Due\" row is set to `position: absolute` (or the button is), causing it to not take up layout space, so the button slides up into its space. Or the total row's container has `height: 0` / `display: contents` issue. Or there's a negative margin-top on the button equal to the row height.\n\nAlternatively, the green button is `position: absolute; bottom: ...` and the total row is in normal flow but the button's top overlaps. Hard to say.\n\nLet me think about what's most plausible and give a clean answer. I'll describe the overlap and propose fixes: ensure the total row is in normal flow with proper height, remove absolute positioning, add margin-top to the button, or use flex column with gap.\n\nLet me look at the contrast too: \"Total Due\" black on green is low contrast, and \"$53.41\" black on green low contrast. But that's a consequence of the overlap. The white \"Pay $53.41 Now\" is fine.\n\nI'll structure the answer with the four required points.\n\nLet me also note the dashed separator line position: it's between \"Estimated Tax\" and the green button. In a correct layout, the dashed line might be above the total row, and the total row above the button. Here the dashed line is directly above the button, and the total row text is on the button. So the total row collapsed onto the button.\n\nI think the cleanest root cause explanation: The \"Total Due\" row and the CTA button are siblings in a flex/block container, but the total row has been given `position: absolute` (or the button has a large negative `margin-top`), so the button no longer respects the total row's height and overlaps it. The total row's text (black) is painted over the button's green background."
+  },
+  "metrics": {
+    "promptTokens": 1140,
+    "imageTokens": 1000,
+    "completionTokens": 1200,
+    "reasoningTokens": 1201,
+    "totalTokens": 2340,
+    "latencyMs": 76796,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

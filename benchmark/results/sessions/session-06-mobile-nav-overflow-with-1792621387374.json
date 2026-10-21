@@ -1,0 +1,52 @@
+{
+  "id": "session-06-mobile-nav-overflow-with-1792621387374",
+  "timestamp": "2026-10-21T22:23:07.374Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 194,
+      "height": 121
+    },
+    "format": "webp",
+    "bytes": 1482,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 194,
+      "height": 121
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\nTop-right red menu button and the \"Mobile Dashboard View\" button.\n\n**2. Nature of the Visual Defect:**\nElement overlap / Z-index collision. The red menu button is overlapping the top-right corner of the \"Mobile Dashboard View\" button.\n\n**3. Probable Root Cause in CSS or layout:**\nThe red button is likely positioned absolutely (`position: absolute` or `fixed`) and lacks a sufficient `z-index` to remain above the subsequent content. Alternatively, the main content container lacks the necessary top padding or margin to clear the header area where the red button resides.\n\n**4. Suggested Fix or code snippet:**\n*   **Option A (Z-index):** Ensure the red button has a higher stacking context.\n    ```css\n    .menu-button {\n      position: absolute; /* or fixed */\n      z-index: 100; /* Ensure it's higher than the content buttons */\n    }\n    ```\n*   **Option B (Layout/Padding):** Adjust the main content container to push the buttons down so they don't intersect with the header area.\n    ```css\n    .main-content {\n      padding-top: 80px; /* Adjust value to clear the header height */\n    }\n    ```",
+    "reasoning": "1.  **Analyze the image:** The image shows a dark-themed UI. There's a logo \"ZeroVisual\" in the top left. In the top right, there's a red square button with a white hamburger menu icon. Below that, there are two dark rectangular buttons/cards: \"Mobile Dashboard View\" and \"Real-Time QA Stream\".\n2.  **Identify the defect:** The red button in the top right is overlapping the top-right corner of the first dark button (\"Mobile Dashboard View\").\n3.  **Determine the nature of the defect:** Element overlap / Z-index issue / Layout collision.\n4.  **Determine the probable root cause:** The red button is likely positioned absolutely (`position: absolute` or `fixed`) without proper `z-index` management, or the container holding the dark buttons lacks sufficient top padding/margin to account for the height of the header/absolute element.\n5.  **Formulate the suggested fix:** Add a `z-index` to the red button to ensure it stays on top, or adjust the layout so the main content area starts below the header (e.g., using flexbox column layout or adding `padding-top` to the main container).\n"
+  },
+  "metrics": {
+    "promptTokens": 215,
+    "imageTokens": 77,
+    "completionTokens": 528,
+    "reasoningTokens": 251,
+    "totalTokens": 743,
+    "latencyMs": 24603,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

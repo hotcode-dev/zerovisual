@@ -1,0 +1,52 @@
+{
+  "id": "session-06-mobile-nav-overflow-with-1792620472517",
+  "timestamp": "2026-10-21T22:07:52.517Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 263,
+      "height": 448
+    },
+    "format": "webp",
+    "bytes": 986,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 664
+    }
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot and identify the defect.\n\nLet me look at the screenshot carefully. It's a dark-themed interface. At the top left there's a blue link \"Dashboard\". At the top right there's a red/pink square button with what looks like a grid icon (four dots or squares). Below that, on the left side, there's a dropdown or menu with two items: \"Mobile Dashboard View\" and \"Real-Time GA Stream\".\n\nNow, what's the visual defect? The screenshot is mostly empty black space. The dropdown menu appears to be floating. Let me think about what a visual regression test would flag here.\n\nLooking at the layout: The \"Dashboard\" link is at top-left. The red button is at top-right. The dropdown menu with two options appears below the red button area but is positioned on the left side, roughly aligned with the left edge but indented a bit. Actually the dropdown's left edge is around x=35, while the \"Dashboard\" link is at x=8. The red button is at the far right.\n\nHmm. The dropdown menu seems to be positioned oddly. Typically a dropdown menu would be anchored to its trigger button. The red button at top-right might be the trigger (a menu/grid icon). But the dropdown is appearing on the left side, not aligned with the red button. That's a misalignment / positioning defect.\n\nAlternatively, the dropdown could be a separate component. Let's look at the vertical position. The red button is at the very top (y ~ 8-22). The dropdown starts at y ~ 35 and goes to ~100. So the dropdown is below the top bar.\n\nThe most likely intended behavior: The red button is a \"menu\" or \"view switcher\" button. When clicked, a dropdown should appear directly below it, right-aligned to the button. But instead the dropdown is appearing on the left, far from the button. This is a positioning/alignment defect.\n\nBut wait, maybe the red button is just a decorative icon and the dropdown is triggered by something else. Hard to say.\n\nLet me think about typical visual regression defects that get flagged: padding shift, font size, contrast violation, margin collapse, overlap. The prompt gives examples. The screenshot shows a dropdown that looks like it's floating in the wrong place, or perhaps the dropdown's container has wrong width/position.\n\nActually, look more carefully. The dropdown box has a dark background slightly lighter than the page. It contains two rows. The first row \"Mobile Dashboard View\" has a slightly lighter background (hover state?) and the second \"Real-Time GA Stream\" is darker. The dropdown's left edge is at about x=35, right edge at about x=290. The page width appears to be ~320 (since the red button right edge is ~290 and there's some margin). So the dropdown is roughly centered-left.\n\nHmm, what's the actual defect? In a visual regression test, the baseline would have had the dropdown in a specific position. The flagged mismatch could be that the dropdown is mispositioned (e.g., it should be right-aligned under the red button but is left-aligned), OR the dropdown is showing when it shouldn't (a state issue, not CSS), OR there's a layout shift.\n\nGiven the prompt wants CSS/layout root cause, I think the intended answer is about the dropdown's positioning: it's not anchored to its trigger. The probable root cause: the dropdown uses `position: absolute` with `left: 0` or is in normal flow instead of being positioned relative to the trigger button, or the parent container lacks `position: relative`, causing the absolute-positioned dropdown to anchor to the wrong containing block (e.g., the viewport or body) rather than the button.\n\nActually that's a very classic bug: a dropdown menu with `position: absolute` whose parent isn't `position: relative`, so it positions relative to the nearest positioned ancestor (often the page), landing in the wrong spot. That matches the visual: the menu is floating at top-left instead of under the red button at top-right.\n\nAlternatively, the red button might be the trigger and the menu should be right-aligned to it. The menu's right edge (~290) actually aligns with the red button's right edge (~290)! Look: red button right edge ~290, dropdown right edge ~290. Yes they align on the right! And the red button left edge ~250, dropdown left edge ~35. So the dropdown is right-aligned to the button's right edge but extends far to the left because it's wider than the button. That's actually normal for a dropdown that's wider than its trigger and right-aligned. Hmm.\n\nBut the vertical: the button is at top, the dropdown is below it. That's also normal. So maybe the dropdown IS correctly positioned relative to the button (right-aligned, below). Then what's the defect?\n\nLet me look at the \"Dashboard\" link position vs the dropdown. The Dashboard link is at top-left y~8. The dropdown top is at y~35. So the dropdown is below the top bar. Fine.\n\nHmm, maybe the defect is something else entirely. Let's look at the colors/contrast. The text \"Mobile Dashboard View\" and \"Real-Time GA Stream\" are light gray on dark background — fine contrast. The \"Dashboard\" link is blue on dark — fine.\n\nMaybe the defect is that the dropdown menu is overlapping or there's a missing element. The huge empty black area suggests the main content is missing — maybe the dashboard content didn't render, only"
+  },
+  "metrics": {
+    "promptTokens": 252,
+    "imageTokens": 112,
+    "completionTokens": 1200,
+    "reasoningTokens": 1200,
+    "totalTokens": 1452,
+    "latencyMs": 70452,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

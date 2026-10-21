@@ -1,0 +1,52 @@
+{
+  "id": "session-02-github-pr-merge-with-1792621133735",
+  "timestamp": "2026-10-21T22:18:53.735Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "02-github-pr-merge",
+  "caseName": "GitHub Pull Request Merge Card Regression",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 92
+    },
+    "format": "webp",
+    "bytes": 3420,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 8,
+      "y": 106,
+      "width": 864,
+      "height": 158
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element:** Primary action button — `Merge pull request` (orange CTA, right side of the merge panel).\n\n**2. Nature of the Visual Defect:** An unwanted **dashed focus outline / border** is rendered tightly around the button (no offset, hugging the orange fill). The button is not in a legitimate keyboard‑focus state in the design spec, so this outline is a regression artifact. No padding, font, or alignment shift on the left‑side text block.\n\n**3. Probable Root Cause:**\n- A `:focus` / `:focus-visible` rule (or a leftover `outline`/`border` rule) is applying `outline: … dashed` to the button, **or**\n- The element retained DOM focus at capture time (e.g., a prior click/tab in the test flow), so the focus ring was baked into the screenshot.\n\n**4. Suggested Fix:**\n- Replace the dashed ring with the design‑system focus indicator, scoped to `:focus-visible` only:\n```css\n.btn-merge:focus-visible {\n  outline: 2px solid var(--focus-ring, #fff);\n  outline-offset: 2px;\n}\n.btn-merge:focus:not(:focus-visible) {\n  outline: none;\n}\n```\n- In the test harness, clear focus before capture so the baseline is the unfocused state:\n```js\ndocument.activeElement?.blur();\nawait page.keyboard.press('Escape'); // optional\n```\n- Re‑run the snapshot; the dashed outline should disappear and the diff should clear.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nLooking at the image: There's a dark panel. Top left shows \"✓ All checks have passed (8 successful)\" in green. Below that, gray text \"Merging will update master branch and trigger deployment.\" On the right, an orange button \"Merge pull request\".\n\nNow I need to find the visual defect. Let me look closely. The orange button has a dashed border around it. That dashed border is the giveaway—it's a focus outline (focus ring) that should not be present in the default/screenshot state, OR it's an incorrectly styled focus indicator. Actually, in visual regression tests, a dashed outline around a button typically indicates that the element received focus (e.g., via keyboard navigation or programmatic focus) when it shouldn't have, OR the focus style is using a dashed outline that's misaligned/oversized.\n\nWait, but the question is about a \"failed visual test.\" The defect is the dashed outline around the button. In many UIs, the default focus ring is a solid or offset outline. A dashed border hugging the button tightly suggests either:\n1. An unwanted focus state captured in the screenshot (the button was focused when the screenshot was taken).\n2. A CSS `outline` or `border` style that's dashed and not matching the design spec.\n\nLet me look at the spacing. The button's dashed outline appears to be slightly outside the orange fill, like an outline with offset 0 or small. The text \"Merge pull request\" is centered.\n\nHmm, but is there another defect? Let's look at the layout. The green check text and the gray text are left-aligned. The button is right-aligned. The vertical alignment: the green text is at top, gray text below it, button vertically centered relative to the two lines? The button seems vertically centered against the block. That looks fine.\n\nThe most prominent anomaly is the dashed outline. In a clean design, the button would have no outline unless focused. So the visual defect is an unexpected focus outline / dashed border.\n\nBut wait—maybe the design intends a focus ring but it's the wrong style (dashed instead of solid, or wrong color/offset). Hard to say. The most likely root cause in a visual regression context: the test harness or a previous interaction left the button focused, OR a CSS rule applies `outline: dashed` to the button on `:focus` or even by default.\n\nActually, let's think about typical GitHub-like UI. The \"Merge pull request\" button when focused shows a focus ring. The dashed outline here looks like the browser default focus outline in some browsers? No, browser default is usually a solid or auto outline. Dashed is unusual.\n\nHmm, but maybe the screenshot tool or the test framework adds a dashed outline to highlight the element under test? Some visual testing tools (like BackstopJS) don't add outlines. But some QA tools do. However, the prompt says \"failed visual test\" and asks to identify the defect, so the dashed outline IS the defect.\n\nLet me consider another angle: maybe the defect is that the button has a dashed border that's part of CSS, indicating a \"disabled\" or \"draft\" state styling that's wrong. But the button looks enabled (solid orange).\n\nI think the cleanest answer: The orange \"Merge pull request\" button is showing an unwanted dashed focus outline. Root cause: a `:focus` / `:focus-visible` style using `outline: 2px dashed` (or a leftover `outline`/`border` style) is being rendered, or the element retained focus during capture. Fix: ensure focus is removed before capture, or replace the dashed outline with the design-system focus ring (e.g., `outline: 2px solid #fff; outline-offset: 2px;`) and only on `:focus-visible`.\n\nLet me double check there's no other issue like text truncation or misalignment. The gray text fits on one line. The green text fits. The button text fits. Vertical centering of button vs the two-line left column: the button's vertical center appears roughly aligned with the gap between the two lines, which is correct for a flex row with align-items center. Good.\n\nSo the single defect = dashed outline.\n\nI'll present concisely with the 4 points. Provide a code snippet.\n\nLet me make the code snippet realistic:\n\n```css\n.btn-merge:focus-visible {\n  outline: 2px solid var(--color-accent-fg);\n  outline-offset: 2px;\n}\n.btn-merge:focus:not(:focus-visible) {\n  outline: none;\n}\n```\n\nAnd note to blur active element before screenshot: `document.activeElement?.blur()`.\n\nI'll keep it concise.\n"
+  },
+  "metrics": {
+    "promptTokens": 214,
+    "imageTokens": 76,
+    "completionTokens": 1359,
+    "reasoningTokens": 1018,
+    "totalTokens": 1573,
+    "latencyMs": 86918,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+    "affectedElement": ".btn-merge",
+    "defectType": "button_styling_regression",
+    "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+    "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+    "expectedBoundingBox": {
+      "x": 550,
+      "y": 110,
+      "width": 280,
+      "height": 90
+    }
+  }
+}

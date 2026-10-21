@@ -1,0 +1,52 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-with-1792620180799",
+  "timestamp": "2026-10-21T22:03:00.799Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 448,
+      "height": 280
+    },
+    "format": "webp",
+    "bytes": 1918,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nLet me look at the image. There's a card titled \"Order Summary\". It has two rows: \"Vision Token Pack $49.00\" and \"Estimated Tax $4.41\". Then there's a green bar at the bottom that says \"Total Due\" on the left, then \"Pay $53.41 Now\" in the middle, and \"$53.41\" on the right.\n\nNow let me look for the visual defect. The green bar at the bottom looks off. Let me look carefully. The text \"Pay $53.41 Now\" appears to overlap with \"Total Due\" on the left. Actually, looking closely, \"Total Due\" is on the left in white text, then immediately after it there's \"Pay $53.41 Now\" which seems to be overlapping or crammed right next to it. The spacing between \"Total Due\" and \"Pay $53.41 Now\" is too tight—they look like they're colliding. \"Total Due\" ends and \"Pay\" starts almost immediately, with no gap. Actually it looks like \"Total Due\" and \"Pay $53.41 Now\" are overlapping or the gap is negative/zero.\n\nLet me look more carefully. The green bar contains three pieces of text: \"Total Due\" (left), \"Pay $53.41 Now\" (center-ish but actually positioned right after Total Due), and \"$53.41\" (right). The \"Pay $53.41 Now\" text appears to be overlapping with \"Total Due\"—the words are touching. This suggests a layout issue where the center element isn't centered or the flex layout is broken, causing the middle text to be pushed left and overlap the left text.\n\nAlso, the green bar's left edge appears to extend slightly beyond the card's left padding? Let me look. The card has rounded corners and white background with padding. The green bar seems to start at the left edge of the content area but maybe it's flush with the card edge while the text rows above have padding. Hmm, actually the green bar looks like it spans the full width of the inner content but its left edge might be misaligned. Let's look: the white card has some padding. The \"Order Summary\" title starts at a certain x. The \"Vision Token Pack\" starts at the same x. The green bar's left edge appears to align with... it looks like the green bar starts a bit to the left of the text? Hard to say. Actually the green bar left edge looks like it's at the same x as the text, maybe slightly left. The right edge of green bar aligns with the right edge of the card's inner content.\n\nThe most prominent defect is the overlap/collision between \"Total Due\" and \"Pay $53.41 Now\". The middle text is not centered; it's bunched against the left label. This is a classic flexbox issue: if the container uses `justify-content: space-between` with three items, the middle item should be in the middle. But here the middle item is right next to the left item, suggesting maybe the layout is `flex-start` or the middle element has no margin, or the container width is constrained.\n\nWait, but \"$53.41\" is at the far right. So we have left = \"Total Due\", right = \"$53.41\", and middle = \"Pay $53.41 Now\" which should be centered. But it's not centered; it's stuck to the left. That means the flex layout isn't distributing space. Possibly the container is `display: flex` with `justify-content: space-between` but there are only effectively two flex items because \"Pay $53.41 Now\" is wrapped in the same element as \"Total Due\"? Or the middle element has `margin-left: auto` missing? Hmm.\n\nActually if it were space-between with three items, the middle would be centered. The fact that the middle is hugging the left suggests the layout might be: left item, then middle item with no flex-grow, then right item with `margin-left: auto`. That would push the right item to the right and leave the middle item right after the left item. Yes! That's a common bug: developer intended space-between but instead used `margin-left: auto` on the last item only, so the first two items cluster on the left.\n\nSo the nature of the defect: text overlap / insufficient spacing between \"Total Due\" and the CTA button text \"Pay $53.41 Now\"; the CTA is not centered.\n\nAlso possibly the green bar height/padding: the text \"Pay $53.41 Now\" might be vertically fine.\n\nLet me also consider contrast: white text on green is fine.\n\nAnother possible defect: the green bar's left edge extends beyond the card's left padding, i.e., the bar is full-bleed while content above is padded, causing misalignment. Looking again: the white card's left edge is at some x. The text \"Order Summary\" is indented from the card's left edge by the padding. The green bar's left edge—does it align with the card's left edge or with the text? It looks like the green bar's left edge is slightly to the left of the text, maybe aligned with the card edge minus a tiny bit. Hmm, hard to be sure. The green bar appears to start at roughly the same x as the text actually. Let's look at the right side: the green bar's right edge appears to align with the card"
+  },
+  "metrics": {
+    "promptTokens": 266,
+    "imageTokens": 126,
+    "completionTokens": 1200,
+    "reasoningTokens": 1203,
+    "totalTokens": 1466,
+    "latencyMs": 77506,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

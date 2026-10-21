@@ -1,0 +1,23 @@
+{
+  "id": "01-wikipedia-search-offset",
+  "name": "Wikipedia Portal Search Bar Shift",
+  "category": "Layout Shift / Component Offset",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 20975,
+  "groundTruth": {
+    "defect": "The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.",
+    "affectedElement": ".search-box",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS",
+    "suggestedFix": "Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c",
+    "expectedBoundingBox": {
+      "x": 370,
+      "y": 460,
+      "width": 600,
+      "height": 90
+    }
+  }
+}

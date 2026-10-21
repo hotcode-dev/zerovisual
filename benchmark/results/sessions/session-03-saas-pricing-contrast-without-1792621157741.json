@@ -1,0 +1,46 @@
+{
+  "id": "session-03-saas-pricing-contrast-without-1792621157741",
+  "timestamp": "2026-10-21T22:19:17.741Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 35106,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\n\"Get Pro\" button within the \"Pro\" pricing card.\n\n**2. Nature of the Visual Defect**\nContrast violation / Invisible text. The button text is white, making it completely invisible against the white background of the card.\n\n**3. Probable Root Cause in CSS or layout**\nThe button's text color is set to white (`color: #fff`), but its background color is either missing, set to white, or transparent. This often happens when a specific styling class (e.g., `.btn-primary` or `.btn-dark`) fails to apply, or if a disabled/hover state is incorrectly overriding the default background color.\n\n**4. Suggested Fix or code snippet**\nApply a solid background color to the button to match the design system (likely the dark blue used on the Enterprise card).\n\n```css\n/* Assuming the button has a class like .btn-pro */\n.btn-pro {\n  background-color: #0f172a; /* Match Enterprise card button */\n  color: #ffffff;\n}\n```",
+    "reasoning": "1.  **Analyze the image:** The image shows three pricing cards: Starter, Pro, and Enterprise.\n2.  **Identify the defect:** The \"Pro\" card has a button labeled \"Get Pro\" that is completely invisible (white text on a white background). The other two buttons (\"Start Free\" and \"Contact Sales\") are clearly visible.\n3.  **Determine the affected element:** The \"Get Pro\" button inside the \"Pro\" pricing card.\n4.  **Characterize the defect:** Contrast violation / Invisible text.\n5.  **Hypothesize root cause:** The text color of the button is set to white, but the background color of the button is also white (or transparent, inheriting the card's white background). This is likely a missing CSS class or a failed state (like a disabled state or hover state that got stuck).\n6.  **Formulate fix:** Ensure the button has a distinct background color (like the dark blue in the Enterprise card) or change the text color to a dark color.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 456,
+    "reasoningTokens": 222,
+    "totalTokens": 1594,
+    "latencyMs": 24001,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

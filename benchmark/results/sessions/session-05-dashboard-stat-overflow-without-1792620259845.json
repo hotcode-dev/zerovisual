@@ -1,0 +1,46 @@
+{
+  "id": "session-05-dashboard-stat-overflow-without-1792620259845",
+  "timestamp": "2026-10-21T22:04:19.845Z",
+  "benchmarkRunTimestamp": "2026-10-21T21:53:12.741Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer.\nAnalyze the provided screenshot from an automated test run that flagged a visual mismatch.\n\nRespond with:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 33568,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**",
+    "reasoning": "Let me carefully analyze this screenshot.\n\nThe screenshot shows a \"Production Telemetry\" dashboard with four metric cards:\n1. TOKENS SAVED: 94.2%, with \"↑ 4.1% vs avg\" in green\n2. ACTIVE AGENTS: 12,450 in a very large red/pink font, with \"↑ 14% this week\" in green\n3. PAYLOAD P95: 34 KB, with \"↓ 98% reduced\" in green\n4. COST PER DIFF: $0.0002, with \"Zero API Keys\" in green\n\nThe visual defect: The \"ACTIVE AGENTS\" value \"12,450\" is rendered in a much larger font size than the other metric values (94.2%, 34 KB, $0.0002). The other values appear to be around 28–32px, but \"12,450\" looks like 60–70px. Also, it's colored red/pink (something like #f43f5e), whereas the others are white.\n\nSo the nature of the defect: font size inconsistency / color inconsistency on the \"ACTIVE AGENTS\" metric value. The number is overflowing the card's visual hierarchy — it's disproportionately large compared to sibling elements. It's not actually overflowing the card, but it's clearly inconsistent.\n\nProbable root cause: The \"ACTIVE AGENTS\" value element is missing a shared class, or has an incorrect class applied. For example, instead of the shared `.metric-value` class, it has a class like `.metric-value--large` or `.headline`, or the CSS selector for the second card is targeting the wrong element. Or a CSS specificity issue: a rule like `.card:nth-child(2) .value { font-size: 4rem; color: var(--danger); }` was intended for a different purpose, or a conditional class like `is-critical` / `alert` was applied because the value exceeded a threshold, but the styling for that state is wrong.\n\nActually, the red color suggests a \"critical/alert\" state styling was applied — perhaps the value exceeded a threshold and triggered a `.value--alert` class that sets a large font and red color. But the intended design is probably uniform white values. Or the red is intentional for highlighting, but the font size is wrong.\n\nLet me think about what's most plausible: In a telemetry dashboard, \"ACTIVE AGENTS 12,450\" being red might indicate an anomaly. But the font size being about 2x the others is the main visual regression. The root cause is probably that the element has an extra class like `text-6xl` (Tailwind) or `metric-value--xl` that was mistakenly added, or a CSS rule with a typo in the selector.\n\nAlternatively, the number \"12,450\" contains a comma, and maybe a CSS rule targeting `.value[data-format=\"number\"]`... no, that's overthinking it.\n\nMost plausible: The `.metric-value` class is missing on that element, and it's falling back to a default/heading style, or it has a conflicting class. Or a CSS variable like `--metric-font-size` is undefined for that card, and the fallback is huge.\n\nLet me structure the answer:\n\n1. Affected element: The \"ACTIVE AGENTS\" metric value (the \"12,450\" text node) inside the second KPI card in the Production Telemetry row.\n\n2. Nature of the defect: Font size inconsistency (the value is rendered at about 2x the size of sibling metric values) and color deviation (red/rose instead of white). This breaks the visual hierarchy and card alignment; the baseline of the card content is also shifted (the delta row \"↑ 14% this week\" is pushed down relative to the other cards).\n\n3. Probable root cause: The value element is missing the shared `.metric-value` class, or has an extra/conflicting class (e.g., `metric-value--xl` or an alert state class) that sets `font-size: 4rem` and `color: var(--danger)`. Possibly a CSS specificity issue where a rule like `.card:nth-child(2) .value` or a conditional `is-critical` class is overriding the base style. Or a template conditional that renders a different class when the value exceeds a threshold.\n\n4. Suggested fix: Ensure all metric values use the same class; remove the extra class; add a CSS rule:\n\n```css\n.metric-value {\n  font-size: 1.75rem; /* ~28px */\n  font-weight: 700;\n  color: var(--text-primary);\n  line-height: 1.2;\n}\n```\n\nAnd if the red highlight is intentional for alerts, keep the color but constrain the size:\n\n```css\n.metric-value.is-critical {\n  color: var(--danger);\n  /* do not change font-size */\n}\n```\n\nOr in the template, fix the class binding: `<span class=\"metric-value\" :class=\"{ 'is-critical': value > threshold }\">`.\n\nAlso mention that the delta row alignment is off because the taller value is pushing the content down; using a fixed height or flex with consistent line-height would help.\n\nFormat: The user asked for a numbered response with 4 items. I should provide a concise, structured answer. Use headings or a numbered list. Medium length. Include a code snippet. No tools needed. Just answer.\n\nLet me write it cleanly.\n"
+  },
+  "metrics": {
+    "promptTokens": 1140,
+    "imageTokens": 1000,
+    "completionTokens": 1200,
+    "reasoningTokens": 1198,
+    "totalTokens": 2340,
+    "latencyMs": 79042,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

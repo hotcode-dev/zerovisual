@@ -1,0 +1,52 @@
+{
+  "id": "session-05-dashboard-stat-overflow-with-1792621336731",
+  "timestamp": "2026-10-21T22:22:16.732Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 66
+    },
+    "format": "webp",
+    "bytes": 3452,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 8,
+      "y": 109,
+      "width": 1264,
+      "height": 166
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\n\"ACTIVE AGENTS\" metric card (specifically the subtext \"↑ 34% this week\").\n\n**2. Nature of the Visual Defect**\nText clipping / Vertical overflow. The bottom portion of the subtext is cut off by the card's boundary.\n\n**3. Probable Root Cause in CSS or layout**\nThe card container has a fixed `height` that is insufficient to contain the larger main value (\"12,450\") plus the subtext. The content is overflowing the container's bounds.\n\n**4. Suggested Fix or code snippet**\nChange the card's `height` to `min-height` to allow it to expand, or increase the fixed height value.\n\n```css\n.metric-card {\n  /* Change fixed height to allow expansion */\n  min-height: 120px; \n  /* OR increase the fixed height */\n  /* height: 130px; */\n}\n```",
+    "reasoning": "The user wants a visual regression analysis of the provided screenshot.\nI need to identify:\n1. Affected Element\n2. Nature of Defect\n3. Probable Root Cause\n4. Suggested Fix\n\nLooking at the image:\n- There are four cards.\n- The second card (\"ACTIVE AGENTS\") has a large red number \"12,450\".\n- The text below it, \"↑ 34% this week\", is cut off at the bottom. The 'k' in 'week' is missing its descender, and the bottom of the text is clipped.\n- The other cards have similar text below their main numbers, but they are fully visible.\n- The second card's main number is significantly larger than the others, causing the content to overflow the fixed height of the card.\n\n1. **Affected Element:** The second card, specifically the \"ACTIVE AGENTS\" metric block and its subtext (\"↑ 34% this week\").\n2. **Nature of Defect:** Text clipping / Overflow. The subtext is cut off at the bottom edge of the card.\n3. **Probable Root Cause:** The card container has a fixed height (`height` or `max-height`) that is too small to accommodate the larger font size of the main number (\"12,450\") combined with the subtext. The content is overflowing the container without `overflow: visible` or proper flexbox distribution.\n4. **Suggested Fix:** Increase the card's height, reduce the font size of the main number, or use `min-height` instead of `height` to allow the card to expand.\n"
+  },
+  "metrics": {
+    "promptTokens": 207,
+    "imageTokens": 69,
+    "completionTokens": 559,
+    "reasoningTokens": 346,
+    "totalTokens": 766,
+    "latencyMs": 26434,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

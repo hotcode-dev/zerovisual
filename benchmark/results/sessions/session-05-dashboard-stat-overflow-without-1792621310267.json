@@ -1,0 +1,46 @@
+{
+  "id": "session-05-dashboard-stat-overflow-without-1792621310267",
+  "timestamp": "2026-10-21T22:21:50.267Z",
+  "benchmarkRunTimestamp": "2026-10-21T22:14:08.708Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 33568,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\n\"ACTIVE AGENTS\" metric value (\"12,450\")\n\n**2. Nature of the Visual Defect:**\nFont size and color mismatch. The text is significantly larger than the other metric values and is colored red/pink instead of white.\n\n**3. Probable Root Cause in CSS or layout:**\nIncorrect CSS class application or conditional styling logic. A class intended for alerts, errors, or large display numbers (e.g., `.text-alert`, `.metric-large`) has been mistakenly applied to this specific element.\n\n**4. Suggested Fix or code snippet:**\nEnsure the CSS class for the metric value is consistent across all cards. Check the component logic to see why the \"ACTIVE AGENTS\" value is triggering the alert/large text state.\n\n```css\n/* Ensure consistent styling */\n.metric-value {\n  font-size: 1.5rem; /* or appropriate size */\n  color: #ffffff;\n}\n\n/* Remove or fix the conditional class that is causing the issue */\n.metric-value.alert {\n  /* Verify if this should exist or if it's being applied incorrectly */\n  font-size: 3rem; \n  color: #ff4d6d; \n}\n```",
+    "reasoning": "1.  **Analyze the image:** The image shows a dashboard with four metric cards. The second card, \"ACTIVE AGENTS\", has a value of \"12,450\".\n2.  **Identify the defect:** The text \"12,450\" is significantly larger than the text in the other cards (\"94.2%\", \"34 KB\", \"$0.0002\"). It is also colored red/pink, whereas the others are white. This is a clear visual regression.\n3.  **Determine the root cause:** The font size is likely set to a much larger value (e.g., `3rem` instead of `1.5rem`), or a specific class for large numbers/alerts was applied. The color change suggests a conditional class (like `.alert` or `.error`) was applied to this specific element.\n4.  **Formulate the response:**\n    *   **Affected Element:** \"ACTIVE AGENTS\" metric value (\"12,450\").\n    *   **Nature of Defect:** Font size and color mismatch (oversized text, incorrect color).\n    *   **Root Cause:** Incorrect CSS class application or conditional styling logic triggering an \"alert\" or \"large text\" state.\n    *   **Suggested Fix:** Ensure the CSS class for the metric value is consistent across all cards, and verify the conditional logic that applies the red color and larger font size.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 576,
+    "reasoningTokens": 308,
+    "totalTokens": 1714,
+    "latencyMs": 30920,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}
