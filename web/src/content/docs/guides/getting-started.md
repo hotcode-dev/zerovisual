@@ -91,23 +91,39 @@ npx zerovisual design-qa \
   --low-token
 ```
 
+### C. Optimize Screenshots & UI Images (`zerovisual optimize` / `zerovisual-optimize`)
+Pre-process Retina screenshots (`Cmd + Shift + 4`) or folders of UI images to match the exact patch grids of your target Vision LLM:
+
+```bash
+# Optimize a single UI screenshot for Anthropic (504x504):
+npx zerovisual optimize ./screenshot.png --provider anthropic
+
+# Or use the direct alias:
+npx zerovisual-optimize ./bug-report.png --provider openai
+
+# Batch optimize a directory of UI screenshots:
+npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
+```
+
 ---
 
 ## 4. Install Agent Skills (`npx skills add`)
 
-ZeroVisual comes with two specialized Agent Skills that you can install directly into your workspace:
+ZeroVisual comes with isolated Agent Skills that you can install directly into your workspace:
 
 ```bash
-# Install both skills into your project:
+# Install all skills into your project:
 npx skills add hotcode-dev/zerovisual
 
 # Or install individually:
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-optimize
 ```
 
 - **`zerovisual-regression`:** Teaches AI agents strict visual regression forensics (ignoring font anti-aliasing noise, correlating multi-viewport failures).
 - **`zerovisual-design-qa`:** Teaches AI agents design mentor guidelines (8pt grid rhythm, WCAG contrast ratios, touch targets, and exact Tailwind/CSS classes).
+- **`zerovisual-optimize`:** Teaches AI agents how to pre-process screenshots with model-tile math to eliminate token waste and payload latency.
 
 ---
 

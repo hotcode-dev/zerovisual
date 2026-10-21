@@ -83,7 +83,30 @@ npx zerovisual design-qa [options]
 
 ---
 
-## 4. MCP Server Tools & Prompts
+## 4. CLI: `zerovisual optimize` (or `zerovisual-optimize`)
+
+Optimizes arbitrary screenshot images or directories of UI images to align with Vision LLM patch grids and downscales to WebP format.
+
+```bash
+npx zerovisual optimize <input-path> [options]
+# Or using direct binary alias:
+npx zerovisual-optimize <input-path> [options]
+```
+
+### Command Flags
+
+| Flag | Shorthand | Type | Default | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `input` | *(Positional)* | `string` | *Required* | Path to an image file or directory of images to optimize. |
+| `--output` | `-o` | `string` | `undefined` | Output path for the optimized WebP file or directory. Defaults to `<filename>.optimized.webp`. |
+| `--provider` | `-p` | `string` | `'anthropic'` | Target vision provider (`anthropic`, `openai`, `gemini`, `local`). |
+| `--lowTokenMode` | | `boolean` | `false` | Enable aggressive token downscaling (e.g. 384×384 for Gemini). |
+| `--quality` | `-q` | `number` | `80` | WebP compression quality (1-100). |
+| `--json` | | `boolean` | `false` | Outputs JSON formatted statistics to stdout. |
+
+---
+
+## 5. MCP Server Tools & Prompts
 
 When running `zerovisual-mcp` over stdio:
 
@@ -94,6 +117,7 @@ When running `zerovisual-mcp` over stdio:
 | `list_visual_failures` | `{ testResultsDir?: string }` | Array of test failures with `testId`, failing viewports, and paths. | Lists all visual failures discovered in the test results directory. |
 | `get_visual_failure_bundle` | `{ testId: string; testResultsDir?: string; provider?: string }` | Complete payload: WebP Base64 images, AOM YAML snapshot, computed styles. | Returns the model-aligned triage bundle for a specific failing visual test. |
 | `audit_live_ui_design` | `{ url: string; penpotPath?: string; provider?: string }` | Design QA bundle with heuristic issues and token diffs. | Audits a live URL using headless Playwright and heuristic math. |
+| `optimize_image` | `{ imagePath?: string; imageBase64?: string; provider?: string; lowTokenMode?: boolean; quality?: number }` | WebP data URI, dimensions, and token/byte savings metrics. | Optimizes an arbitrary screenshot or image for Vision LLM tile grids on demand. |
 
 ### Prompts
 
@@ -101,3 +125,4 @@ When running `zerovisual-mcp` over stdio:
 | :--- | :--- | :--- |
 | `triage-regression` | `{ testId: string }` | Formats the regression bundle and binds `skills/zerovisual-regression` for forensic triage. |
 | `critique-ui-design` | `{ url: string; penpotPath?: string }` | Formats the design audit bundle and binds `skills/zerovisual-design-qa` for UI/UX mentoring. |
+

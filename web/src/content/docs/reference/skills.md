@@ -71,3 +71,17 @@ ZeroVisual provides two isolated, strictly-typed Agent Skills installed via `npx
   ]
 }
 ```
+
+---
+
+## 3. `zerovisual-optimize`
+
+- **Location:** `skills/zerovisual-optimize/SKILL.md`
+- **Role:** Vision Image Pre-Processing & Token Optimizer
+
+### Responsibilities
+- Identifies uncompressed screenshots (such as macOS high-DPI `2880×1800` captures or 4 MB PNG images) provided by the user.
+- Pre-processes them with model-aware tile math before dispatching to Vision LLMs.
+- Enforces downscaling to 504px (Anthropic), 512px (OpenAI), 768px/384px (Gemini), or 448px (Local), and compression to WebP (quality 80) to eliminate up to 90% vision tokens and 99% network payload.
+- Can invoke either the CLI `zerovisual optimize` or the MCP tool `optimize_image`.
+
