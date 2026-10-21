@@ -1,0 +1,13 @@
+---
+// ZeroVisual forces dark theme across the documentation
+---
+
+<script is:inline>
+  document.documentElement.dataset.theme = 'dark';
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('starlight-theme', 'dark');
+  }
+  window.StarlightThemeProvider = {
+    updatePickers() {}
+  };
+</script>

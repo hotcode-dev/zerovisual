@@ -18,10 +18,18 @@
 	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
 
-:root[data-theme='light'] {
-	--sl-color-accent-low: #e0e7ff;
-	--sl-color-accent: #4f46e5;
-	--sl-color-accent-high: #312e81;
+/* Force dark color scheme and eliminate theme selection */
+:root,
+html,
+html[data-theme='dark'],
+html[data-theme='light'] {
+	color-scheme: dark !important;
+}
+
+/* Completely hide theme selection controls */
+starlight-theme-select,
+.theme-select {
+	display: none !important;
 }
 
 /* Background ambient glow */
