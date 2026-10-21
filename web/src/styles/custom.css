@@ -1,4 +1,6 @@
-/* Custom design tokens and theme styling for ZeroVisual Docs */
+/* Premium typography & modern design system tokens for ZeroVisual */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 :root {
 	--sl-color-accent-low: #1e1b4b;
 	--sl-color-accent: #6366f1;
@@ -10,10 +12,10 @@
 	--sl-color-gray-4: #64748b;
 	--sl-color-gray-5: #334155;
 	--sl-color-gray-6: #1e293b;
-	--sl-color-black: #090d16;
+	--sl-color-black: #0b0f19;
 
-	--sl-font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-	--sl-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+	--sl-font-system: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
 
 :root[data-theme='light'] {
@@ -22,43 +24,127 @@
 	--sl-color-accent-high: #312e81;
 }
 
-/* Glassmorphism hero and cards */
+/* Background ambient glow */
+body {
+	background-color: #0b0f19 !important;
+	background-image: 
+		radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent),
+		radial-gradient(ellipse 60% 40% at 90% 80%, rgba(6, 182, 212, 0.08), transparent) !important;
+	background-attachment: fixed;
+	color: #e2e8f0;
+	letter-spacing: -0.01em;
+}
+
+/* Hero section upgrades */
+.hero {
+	padding: 3rem 0 2rem 0 !important;
+}
+
+.hero h1 {
+	font-weight: 800 !important;
+	letter-spacing: -0.03em !important;
+	background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-size: clamp(2.5rem, 5vw, 4rem) !important;
+	line-height: 1.15 !important;
+}
+
+.hero .tagline {
+	font-size: 1.15rem !important;
+	color: #94a3b8 !important;
+	max-width: 680px;
+	margin: 1rem auto 2rem auto;
+	line-height: 1.6 !important;
+}
+
+/* Hero Action Buttons */
+.action.primary {
+	background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+	border: 1px solid rgba(165, 180, 252, 0.4) !important;
+	box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.5) !important;
+	font-weight: 700 !important;
+	border-radius: 10px !important;
+	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.action.primary:hover {
+	transform: translateY(-2px) scale(1.02) !important;
+	box-shadow: 0 8px 28px -2px rgba(99, 102, 241, 0.7) !important;
+}
+
+.action.secondary {
+	background: rgba(30, 41, 59, 0.7) !important;
+	backdrop-filter: blur(12px) !important;
+	border: 1px solid rgba(100, 116, 139, 0.35) !important;
+	border-radius: 10px !important;
+	font-weight: 600 !important;
+	transition: all 0.2s ease !important;
+}
+
+.action.secondary:hover {
+	background: rgba(51, 65, 85, 0.9) !important;
+	border-color: #818cf8 !important;
+	color: #fff !important;
+}
+
+/* Glassmorphism cards */
 .card {
-	background: rgba(30, 41, 59, 0.5) !important;
-	backdrop-filter: blur(12px);
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.45), rgba(15, 23, 42, 0.65)) !important;
+	backdrop-filter: blur(16px);
 	border: 1px solid rgba(99, 102, 241, 0.15) !important;
-	border-radius: 12px;
-	transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	border-radius: 14px;
+	box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
 
 .card:hover {
-	transform: translateY(-2px);
-	border-color: rgba(99, 102, 241, 0.4) !important;
-	box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.15);
+	transform: translateY(-3px);
+	border-color: rgba(99, 102, 241, 0.45) !important;
+	box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.2);
 }
 
-/* Modern table styling */
+.card .title {
+	font-size: 1.1rem !important;
+	font-weight: 700 !important;
+	color: #f8fafc !important;
+}
+
+.card .body {
+	color: #94a3b8 !important;
+	font-size: 0.92rem !important;
+	line-height: 1.55;
+}
+
+/* Modern tables */
 table {
 	border-collapse: separate;
 	border-spacing: 0;
 	width: 100%;
-	margin: 1.5rem 0;
-	border: 1px solid var(--sl-color-gray-5);
-	border-radius: 8px;
+	margin: 1.75rem 0;
+	border: 1px solid rgba(51, 65, 85, 0.6);
+	border-radius: 12px;
 	overflow: hidden;
+	background: rgba(15, 23, 42, 0.6);
+	backdrop-filter: blur(8px);
 }
 
 th {
-	background-color: rgba(30, 41, 59, 0.8) !important;
-	color: var(--sl-color-white) !important;
-	font-weight: 600;
-	padding: 0.75rem 1rem !important;
-	border-bottom: 1px solid var(--sl-color-gray-5) !important;
+	background-color: rgba(30, 41, 59, 0.85) !important;
+	color: #f8fafc !important;
+	font-weight: 700;
+	font-size: 0.82rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	padding: 0.85rem 1.1rem !important;
+	border-bottom: 1px solid rgba(71, 85, 105, 0.5) !important;
 }
 
 td {
-	padding: 0.75rem 1rem !important;
-	border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important;
+	padding: 0.85rem 1.1rem !important;
+	border-bottom: 1px solid rgba(51, 65, 85, 0.4) !important;
+	font-size: 0.92rem;
+	color: #cbd5e1;
 }
 
 tr:last-child td {
@@ -66,31 +152,42 @@ tr:last-child td {
 }
 
 tr:nth-child(even) td {
-	background-color: rgba(15, 23, 42, 0.3);
+	background-color: rgba(30, 41, 59, 0.2);
 }
 
-/* Token badges */
-.badge-tech {
-	display: inline-flex;
-	align-items: center;
-	padding: 0.2rem 0.5rem;
-	font-size: 0.75rem;
-	font-weight: 600;
-	border-radius: 9999px;
-	background: rgba(99, 102, 241, 0.15);
-	color: #a5b4fc;
-	border: 1px solid rgba(99, 102, 241, 0.3);
-	margin-right: 0.25rem;
+/* Callouts / Blockquotes */
+blockquote {
+	background: linear-gradient(135deg, rgba(30, 27, 75, 0.5), rgba(15, 23, 42, 0.8)) !important;
+	border-left: 4px solid #6366f1 !important;
+	border-radius: 0 12px 12px 0;
+	padding: 1.1rem 1.4rem !important;
+	color: #cbd5e1 !important;
+	margin: 1.5rem 0 !important;
 }
 
-.badge-savings {
-	display: inline-flex;
-	align-items: center;
-	padding: 0.2rem 0.5rem;
-	font-size: 0.75rem;
-	font-weight: 700;
-	border-radius: 9999px;
-	background: rgba(16, 185, 129, 0.15);
-	color: #34d399;
-	border: 1px solid rgba(16, 185, 129, 0.3);
+blockquote strong {
+	color: #e0e7ff;
+}
+
+/* Code blocks */
+pre {
+	border: 1px solid rgba(71, 85, 105, 0.35) !important;
+	border-radius: 10px !important;
+	background: #090d16 !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+::-webkit-scrollbar-track {
+	background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+	background: #334155;
+	border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: #6366f1;
 }

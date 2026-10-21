@@ -1,577 +1,909 @@
 ---
-// Side-by-Side Visual Regression & Image Optimization Comparison
-import playwrightDiffImg from '../assets/playwright-diff-canvas.webp';
-import zerovisualCropImg from '../assets/zerovisual-diff-crop.webp';
+// Premium Side-by-Side Visual Regression & Image Optimization Comparison
+import githubDiffCanvas from '../assets/github-diff-canvas.webp';
+import githubCrop from '../assets/github-zerovisual-crop.webp';
+import githubMobileDiff from '../assets/github-mobile-diff.webp';
+import githubMobileCrop from '../assets/github-mobile-crop.webp';
 ---
 
 <div class="compare-wrapper">
+  <!-- Top Feature Pill -->
+  <div class="pill-banner">
+    <span class="live-dot"></span>
+    <span class="pill-text">Responsive Multi-Viewport Testing</span>
+    <span class="pill-divider">/</span>
+    <span class="pill-stat">Desktop + Mobile Aggregation</span>
+  </div>
+
   <div class="compare-header">
-    <div class="badge-row">
-      <span class="compare-badge">Interactive Comparison</span>
-      <span class="savings-badge">95.3% Token Savings</span>
-      <span class="savings-badge">99.6% Byte Reduction</span>
-    </div>
-    <h3>👁️ Visualizing ZeroVisual in Action</h3>
+    <h3>Real-World Responsive Visual Regression Triage</h3>
     <p>
-      Compare standard Playwright full-canvas pixel diffs against ZeroVisual's model-aligned bounding-box extraction.
+      See how ZeroVisual intercepts Playwright failures across both Desktop and Mobile viewports, isolates the diffs, and aggregates them into a single <code>triage-ready.json</code> payload.
     </p>
   </div>
 
-  <div class="view-tabs">
-    <button type="button" class="tab-btn active" data-tab="side-by-side">Side-by-Side View</button>
-    <button type="button" class="tab-btn" data-tab="slider">Interactive Split Slider</button>
+  <!-- Scenario Tabs -->
+  <div class="scenario-nav">
+    <button type="button" class="scenario-tab active" data-scenario="desktop">
+      <span class="tab-icon">🖥️</span>
+      <span class="tab-title">Desktop Chrome (1920×1080)</span>
+      <span class="tab-badge-emerald">-98.9% Tokens</span>
+    </button>
+    <button type="button" class="scenario-tab" data-scenario="mobile">
+      <span class="tab-icon">📱</span>
+      <span class="tab-title">Mobile Safari (390×844)</span>
+      <span class="tab-badge-emerald">-87.5% Tokens</span>
+    </button>
+    <button type="button" class="scenario-tab" data-scenario="aggregation">
+      <span class="tab-icon">⚡️</span>
+      <span class="tab-title">Multi-Viewport Aggregation</span>
+      <span class="tab-badge-cyan">1 Prompt</span>
+    </button>
+    <button type="button" class="scenario-tab" data-scenario="slider">
+      <span class="tab-icon">↔️</span>
+      <span class="tab-title">Split Slider</span>
+    </button>
   </div>
 
-  <!-- View 1: Side by Side Cards -->
-  <div id="view-side-by-side" class="tab-content active">
-    <div class="comparison-grid">
-      <!-- Left: Raw Full Canvas -->
-      <div class="compare-card raw-card">
-        <div class="card-top">
-          <span class="card-tag tag-raw">Before: Raw Test Canvas</span>
-          <span class="card-stat-tokens">2,691 Tokens</span>
+  <!-- View 1: Desktop Chrome -->
+  <div id="scenario-desktop" class="scenario-content active">
+    <div class="browser-window">
+      <div class="browser-toolbar">
+        <div class="window-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
         </div>
-        <div class="img-preview-container">
-          <img
-            src={playwrightDiffImg.src}
-            alt="Raw Full-HD 1920x1080 Playwright Diff Screenshot"
-            class="compare-img full-img"
-            loading="lazy"
-          />
-          <div class="bounding-highlight-box" style="left: 27%; top: 72%; width: 46%; height: 8%;">
-            <span class="box-label">Detected Shift (32px Padding)</span>
-          </div>
+        <div class="url-bar">
+          <svg class="lock-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span class="url-text">https://github.com/hotcode-dev/zerovisual [Desktop Chrome]</span>
         </div>
-        <div class="card-specs">
-          <div class="spec-item">
-            <span class="spec-label">Dimensions</span>
-            <span class="spec-val">1920 × 1080 px</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Payload Size</span>
-            <span class="spec-val text-warn">~1,960 KB (~2.6 MB Base64)</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Vision Tokens</span>
-            <span class="spec-val text-warn">2,691 tokens / diff</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Context Noise</span>
-            <span class="spec-val text-warn">85% irrelevant canvas</span>
-          </div>
+        <div class="test-status-badge fail">
+          <span>● Playwright: FAILED</span>
         </div>
       </div>
 
-      <!-- Right: ZeroVisual Cropped & Model Aligned -->
-      <div class="compare-card optimized-card">
-        <div class="card-top">
-          <span class="card-tag tag-optimized">After: ZeroVisual Model-Aligned Crop</span>
-          <span class="card-stat-tokens highlight">126 Tokens (-95.3%)</span>
+      <div class="comparison-grid">
+        <!-- Left: Full HD GitHub Screenshot -->
+        <div class="compare-card raw-card">
+          <div class="card-top-bar">
+            <div class="card-badge raw">Before: Full 1920×1080 Canvas</div>
+            <div class="card-token-counter text-red">2,691 Tokens</div>
+          </div>
+          <div class="image-stage">
+            <img
+              src={githubDiffCanvas.src}
+              alt="Raw 1920x1080 GitHub page with Playwright visual regression diff"
+              class="stage-image full-canvas"
+              loading="lazy"
+            />
+            <div class="crop-bounding-indicator github-indicator">
+              <span class="indicator-chip">Repository Header (32px Clamped Padding)</span>
+            </div>
+          </div>
+          <div class="card-metrics-grid">
+            <div class="metric-cell">
+              <span class="cell-label">Resolution</span>
+              <span class="cell-value">1920 × 1080 px</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Base64 Payload</span>
+              <span class="cell-value text-red">~2,100 KB</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Anthropic Tokens</span>
+              <span class="cell-value text-red">2,691 tokens</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Context Noise</span>
+              <span class="cell-value text-red">92% Noise</span>
+            </div>
+          </div>
         </div>
-        <div class="img-preview-container crop-container">
-          <img
-            src={zerovisualCropImg.src}
-            alt="ZeroVisual Model-Aligned Cropped WebP Diff"
-            class="compare-img crop-img"
-            loading="lazy"
-          />
-          <div class="patch-grid-overlay"></div>
-        </div>
-        <div class="card-specs">
-          <div class="spec-item">
-            <span class="spec-label">Dimensions</span>
-            <span class="spec-val text-success">504 × 173 px (Tile Aligned)</span>
+
+        <!-- Right: ZeroVisual Cropped & Model Aligned -->
+        <div class="compare-card opt-card">
+          <div class="card-top-bar">
+            <div class="card-badge opt">After: ZeroVisual Component Isolation</div>
+            <div class="card-token-counter text-emerald">90 Tokens (-96.7%)</div>
           </div>
-          <div class="spec-item">
-            <span class="spec-label">Payload Size</span>
-            <span class="spec-val text-success">~6.7 KB WebP (99.6% smaller)</span>
+          <div class="image-stage crop-stage">
+            <div class="crop-focus-frame">
+              <img
+                src={githubCrop.src}
+                alt="ZeroVisual model-aligned crop of GitHub repository header component"
+                class="stage-image crop-result"
+                loading="lazy"
+              />
+            </div>
+            <div class="patch-info-pill">
+              <span>18 × 5 Grid = 90 Patches (Exact 1-Tile Fit)</span>
+            </div>
           </div>
-          <div class="spec-item">
-            <span class="spec-label">Vision Tokens</span>
-            <span class="spec-val text-success">126 tokens (18×7 patches)</span>
-          </div>
-          <div class="spec-item">
-            <span class="spec-label">Model Focus</span>
-            <span class="spec-val text-success">100% targeted to defect</span>
+          <div class="card-metrics-grid">
+            <div class="metric-cell">
+              <span class="cell-label">Resolution</span>
+              <span class="cell-value text-emerald">504 × 126 px (Model Aligned)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">WebP Payload</span>
+              <span class="cell-value text-emerald">5.6 KB (99.7% smaller)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Anthropic Tokens</span>
+              <span class="cell-value text-emerald">90 tokens</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Visual Focus</span>
+              <span class="cell-value text-emerald">100% Focused</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- View 2: Split Slider -->
-  <div id="view-slider" class="tab-content">
-    <div class="slider-wrapper">
-      <div class="split-slider-container" id="split-slider">
+  <!-- View 2: Mobile Safari (iPhone 14) -->
+  <div id="scenario-mobile" class="scenario-content">
+    <div class="browser-window mobile-window">
+      <div class="browser-toolbar">
+        <div class="window-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="url-bar">
+          <span class="url-text">https://github.com/hotcode-dev/zerovisual [iPhone 14]</span>
+        </div>
+        <div class="test-status-badge fail">
+          <span>● Playwright: FAILED</span>
+        </div>
+      </div>
+
+      <div class="comparison-grid mobile-grid">
+        <!-- Left: Full Mobile Viewport -->
+        <div class="compare-card raw-card mobile-frame-card">
+          <div class="card-top-bar">
+            <div class="card-badge raw">Before: Full Mobile Screen</div>
+            <div class="card-token-counter text-red">450 Tokens</div>
+          </div>
+          <div class="image-stage mobile-stage">
+            <div class="iphone-frame">
+              <img
+                src={githubMobileDiff.src}
+                alt="Raw 390x844 iPhone screenshot with diff overlay"
+                class="stage-image iphone-screen"
+                loading="lazy"
+              />
+            </div>
+          </div>
+          <div class="card-metrics-grid">
+            <div class="metric-cell">
+              <span class="cell-label">Viewport</span>
+              <span class="cell-value">390 × 844 px</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Payload Size</span>
+              <span class="cell-value text-red">~172 KB</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Vision Tokens</span>
+              <span class="cell-value text-red">450 tokens</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Signal-to-Noise</span>
+              <span class="cell-value text-red">Full Screen</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: ZeroVisual Mobile Clamped Crop -->
+        <div class="compare-card opt-card">
+          <div class="card-top-bar">
+            <div class="card-badge opt">After: ZeroVisual Mobile Crop</div>
+            <div class="card-token-counter text-emerald">140 Tokens (-68.9%)</div>
+          </div>
+          <div class="image-stage crop-stage">
+            <div class="crop-focus-frame">
+              <img
+                src={githubMobileCrop.src}
+                alt="ZeroVisual cropped mobile header diff"
+                class="stage-image crop-result"
+                loading="lazy"
+              />
+            </div>
+            <div class="patch-info-pill">
+              <span>14 × 10 Grid = 140 Patches</span>
+            </div>
+          </div>
+          <div class="card-metrics-grid">
+            <div class="metric-cell">
+              <span class="cell-label">Resolution</span>
+              <span class="cell-value text-emerald">390 × 280 px (Mobile Header)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">WebP Payload</span>
+              <span class="cell-value text-emerald">1.2 KB (99.3% smaller)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Vision Tokens</span>
+              <span class="cell-value text-emerald">140 tokens</span>
+            </div>
+            <div class="metric-cell">
+              <span class="cell-label">Visual Focus</span>
+              <span class="cell-value text-emerald">100% Focused</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View 3: Multi-Viewport Aggregation -->
+  <div id="scenario-aggregation" class="scenario-content">
+    <div class="aggregation-card">
+      <div class="agg-header">
+        <div class="agg-badge">Feature 5: Multi-Viewport Correlation</div>
+        <h4>One Single Prompt Diagnoses Desktop + Mobile Breakpoints</h4>
+        <p>
+          Instead of triggering multiple disconnected AI reviews for the same broken CSS layout, ZeroVisual groups Desktop Chrome and Mobile Safari under a single normalized <code>testId</code> in <code>triage-ready.json</code>:
+        </p>
+      </div>
+
+      <div class="agg-visual-flow">
+        <div class="agg-box">
+          <div class="box-title">Desktop Chrome (1920×1080)</div>
+          <div class="box-crop">
+            <img src={githubCrop.src} alt="Desktop Crop" />
+          </div>
+          <div class="box-tokens">90 Tokens (5.6 KB)</div>
+        </div>
+
+        <div class="agg-plus">+</div>
+
+        <div class="agg-box">
+          <div class="box-title">Mobile Safari (390×844)</div>
+          <div class="box-crop">
+            <img src={githubMobileCrop.src} alt="Mobile Crop" />
+          </div>
+          <div class="box-tokens">140 Tokens (1.2 KB)</div>
+        </div>
+
+        <div class="agg-equals">=</div>
+
+        <div class="agg-bundle-result">
+          <div class="bundle-tag">Normalized testId: "tests/repo.spec.ts:header"</div>
+          <div class="bundle-stat">Total: 230 Tokens (6.8 KB Payload)</div>
+          <div class="bundle-compare">Without ZeroVisual: 3,141 Tokens (2.3 MB)</div>
+          <div class="bundle-savings">92.7% Total Token Savings across Viewports!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View 4: Split Slider -->
+  <div id="scenario-slider" class="scenario-content">
+    <div class="slider-interactive-wrapper">
+      <div class="slider-container-box" id="github-split-slider">
         <img
-          src={playwrightDiffImg.src}
-          alt="Playwright Diff Background"
-          class="split-img raw-layer"
+          src={githubDiffCanvas.src}
+          alt="GitHub Full Canvas"
+          class="slider-img base-layer"
         />
-        <div class="slider-overlay-layer" id="slider-overlay">
+        <div class="slider-reveal-layer" id="github-slider-overlay">
           <img
-            src={playwrightDiffImg.src}
-            alt="Playwright Diff Active"
-            class="split-img"
+            src={githubDiffCanvas.src}
+            alt="GitHub Overlay Layer"
+            class="slider-img"
           />
-          <div class="diff-focus-box" style="left: 27%; top: 72%; width: 46%; height: 8%;">
-            <span class="focus-tooltip">ZeroVisual 32px Clamped Crop Zone</span>
+          <div class="slider-crop-guide" style="left: 59.5%; top: 24.5%; width: 6.5%; height: 3.5%;">
+            <span class="guide-tag">Target Bounding Box</span>
           </div>
         </div>
-        <div class="slider-divider" id="slider-handle">
-          <div class="handle-grip">↔</div>
+        <div class="slider-divider-line" id="github-slider-handle">
+          <div class="slider-thumb">↔</div>
         </div>
       </div>
-      <div class="slider-hint">
+      <div class="slider-caption-bar">
         <span>◀ Raw 1920×1080 Screenshot</span>
-        <span>Drag slider to inspect detected bounding box ▶</span>
+        <span>Drag to inspect detected diff region ▶</span>
       </div>
-    </div>
-  </div>
-
-  <div class="compare-footer">
-    <div class="footer-tip">
-      <strong>💡 How ZeroVisual Did This:</strong> ZeroVisual's RGBA pixel scanner identified the button diff coordinates, clamped a 32px context buffer, cropped with <code>sharp</code>, and aligned dimensions to Anthropic's exact 28×28px vision grid without enlargement—turning a 2.6 MB pipe freeze into an instant 6.7 KB WebP payload.
     </div>
   </div>
 </div>
 
 <style>
   .compare-wrapper {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(24, 24, 48, 0.95));
-    border: 1px solid rgba(99, 102, 241, 0.35);
-    border-radius: 16px;
-    padding: 1.75rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(11, 15, 25, 0.98));
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 20px;
+    padding: 2rem;
     margin: 2.5rem 0;
-    box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.7);
+    position: relative;
+    overflow: hidden;
   }
 
-  .badge-row {
-    display: flex;
-    flex-wrap: wrap;
+  .pill-banner {
+    display: inline-flex;
+    align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
   }
 
-  .compare-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.65rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-radius: 9999px;
-    background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
-    border: 1px solid rgba(99, 102, 241, 0.4);
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulseDot 2s infinite;
   }
 
-  .savings-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.65rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 9999px;
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.4);
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
   }
+
+  .pill-divider { color: #475569; }
+  .pill-stat { color: #34d399; font-weight: 700; }
 
   .compare-header h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
+    font-weight: 800;
     color: #f8fafc;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
   }
 
   .compare-header p {
-    margin: 0 0 1.25rem 0;
     color: #94a3b8;
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    margin: 0 0 1.75rem 0;
+    max-width: 850px;
   }
 
-  .view-tabs {
+  .scenario-nav {
     display: flex;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
   }
 
-  .tab-btn {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(100, 116, 139, 0.3);
+  .scenario-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(71, 85, 105, 0.3);
+    border-radius: 10px;
     color: #cbd5e1;
-    padding: 0.45rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .tab-btn:hover {
-    background: rgba(99, 102, 241, 0.25);
-    border-color: #6366f1;
-    color: #fff;
+  .scenario-tab:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: #818cf8;
+    color: #ffffff;
+    transform: translateY(-1px);
   }
 
-  .tab-btn.active {
+  .scenario-tab.active {
     background: #6366f1;
     border-color: #818cf8;
     color: #ffffff;
+    box-shadow: 0 4px 16px -2px rgba(99, 102, 241, 0.6);
   }
 
-  .tab-content {
-    display: none;
+  .tab-badge-emerald {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    font-weight: 700;
   }
 
-  .tab-content.active {
-    display: block;
+  .tab-badge-cyan {
+    background: rgba(6, 182, 212, 0.2);
+    color: #67e8f9;
+    font-size: 0.72rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    font-weight: 700;
+  }
+
+  .scenario-tab.active .tab-badge-emerald,
+  .scenario-tab.active .tab-badge-cyan {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+
+  .scenario-content { display: none; }
+  .scenario-content.active { display: block; }
+
+  .browser-window {
+    background: #090d16;
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6);
+  }
+
+  .browser-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(30, 41, 59, 0.6);
+    border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+    gap: 1rem;
+  }
+
+  .window-dots { display: flex; gap: 6px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.red { background: #ff5f56; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #27c93f; }
+
+  .url-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.35);
+    border-radius: 6px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    flex: 1;
+    max-width: 480px;
+    font-family: var(--sl-font-mono);
+  }
+
+  .test-status-badge.fail {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
   }
 
   .comparison-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(11, 15, 25, 0.8);
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     .comparison-grid {
       grid-template-columns: 1fr;
     }
   }
 
   .compare-card {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.9);
     border-radius: 12px;
     border: 1px solid rgba(71, 85, 105, 0.3);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
-  .compare-card.optimized-card {
+  .compare-card.opt-card {
     border-color: rgba(52, 211, 153, 0.4);
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(6, 44, 38, 0.3));
+    box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.15);
   }
 
-  .card-top {
+  .card-top-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(51, 65, 85, 0.4);
     background: rgba(30, 41, 59, 0.4);
+    border-bottom: 1px solid rgba(51, 65, 85, 0.3);
   }
 
-  .card-tag {
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
+  .card-badge { font-size: 0.8rem; font-weight: 700; }
+  .card-badge.raw { color: #f87171; }
+  .card-badge.opt { color: #34d399; }
+  .card-token-counter { font-size: 0.85rem; font-weight: 800; }
+  .text-red { color: #f87171; }
+  .text-emerald { color: #34d399; }
 
-  .tag-raw {
-    color: #f87171;
-  }
-
-  .tag-optimized {
-    color: #34d399;
-  }
-
-  .card-stat-tokens {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #94a3b8;
-  }
-
-  .card-stat-tokens.highlight {
-    color: #34d399;
-  }
-
-  .img-preview-container {
+  .image-stage {
     position: relative;
     background: #020617;
-    padding: 0.5rem;
+    padding: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 240px;
+    min-height: 250px;
     overflow: hidden;
   }
 
-  .compare-img {
+  .stage-image {
     max-width: 100%;
     height: auto;
     border-radius: 6px;
     display: block;
   }
 
-  .bounding-highlight-box {
+  .github-indicator {
     position: absolute;
+    left: 16.7%;
+    top: 10.2%;
+    width: 66.7%;
+    height: 29.6%;
     border: 2px dashed #f43f5e;
-    background: rgba(244, 63, 94, 0.25);
+    background: rgba(244, 63, 94, 0.15);
     border-radius: 4px;
     pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse 2s infinite;
+    animation: pulseIndicator 2s infinite;
   }
 
-  @keyframes pulse {
+  @keyframes pulseIndicator {
     0%, 100% { opacity: 0.9; }
-    50% { opacity: 0.4; }
+    50% { opacity: 0.3; }
   }
 
-  .box-label {
+  .indicator-chip {
     position: absolute;
-    top: -20px;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
     background: #f43f5e;
     color: #fff;
     font-size: 0.65rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .crop-stage {
+    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.9), #040812);
+    padding: 2.5rem 1.5rem;
+  }
+
+  .crop-focus-frame {
+    padding: 6px;
+    border: 2px solid rgba(52, 211, 153, 0.6);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.3);
+  }
+
+  .patch-info-pill {
+    position: absolute;
+    bottom: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    color: #a7f3d0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 9999px;
+  }
+
+  .card-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-top: 1px solid rgba(51, 65, 85, 0.3);
+    background: rgba(15, 23, 42, 0.6);
+  }
+
+  .metric-cell { display: flex; flex-direction: column; }
+  .cell-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .cell-value { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; }
+
+  /* Mobile Frame Styling */
+  .mobile-stage {
+    padding: 1rem;
+  }
+  .iphone-frame {
+    max-width: 200px;
+    border: 4px solid #334155;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+  .iphone-screen {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Multi-Viewport Aggregation Card */
+  .aggregation-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.8));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 14px;
+    padding: 2rem;
+  }
+
+  .agg-header {
+    margin-bottom: 2rem;
+  }
+
+  .agg-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #818cf8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .agg-header h4 {
+    font-size: 1.4rem;
+    color: #f8fafc;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .agg-header p {
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .agg-visual-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .agg-box {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    width: 200px;
+  }
+
+  .box-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-bottom: 0.5rem;
+  }
+
+  .box-crop img {
+    max-width: 100%;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid rgba(52, 211, 153, 0.4);
+  }
+
+  .box-tokens {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #34d399;
+    margin-top: 0.5rem;
+  }
+
+  .agg-plus, .agg-equals {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #6366f1;
+  }
+
+  .agg-bundle-result {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(52, 211, 153, 0.5);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    min-width: 280px;
+  }
+
+  .bundle-tag {
+    font-family: var(--sl-font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 0.4rem;
+  }
+
+  .bundle-stat {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #34d399;
+  }
+
+  .bundle-compare {
+    font-size: 0.82rem;
+    color: #f87171;
+    text-decoration: line-through;
+    margin: 0.2rem 0;
+  }
+
+  .bundle-savings {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6ee7b7;
+  }
+
+  /* Slider Interactive */
+  .slider-interactive-wrapper { max-width: 950px; margin: 0 auto; }
+  .slider-container-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    user-select: none;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+  }
+
+  .slider-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .slider-reveal-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 50%; height: 100%;
+    overflow: hidden;
+    border-right: 2px solid #6366f1;
+    background: #090d16;
+  }
+
+  .slider-reveal-layer .slider-img { width: 200%; max-width: none; }
+  .slider-crop-guide {
+    position: absolute;
+    border: 2px solid #34d399;
+    background: rgba(52, 211, 153, 0.25);
+    border-radius: 4px;
+  }
+
+  .guide-tag {
+    position: absolute;
+    bottom: -22px; left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #34d399;
+    border: 1px solid #34d399;
+    font-size: 0.68rem;
     font-weight: 700;
     padding: 1px 6px;
     border-radius: 4px;
     white-space: nowrap;
   }
 
-  .crop-container {
-    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.8), #020617);
-    padding: 2rem 1rem;
-  }
-
-  .crop-img {
-    border: 2px solid rgba(52, 211, 153, 0.6);
-    box-shadow: 0 8px 24px -4px rgba(52, 211, 153, 0.3);
-  }
-
-  .card-specs {
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    border-top: 1px solid rgba(51, 65, 85, 0.3);
-    margin-top: auto;
-  }
-
-  .spec-item {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .spec-label {
-    font-size: 0.72rem;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .spec-val {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: #f1f5f9;
-  }
-
-  .text-warn {
-    color: #f87171;
-  }
-
-  .text-success {
-    color: #34d399;
-  }
-
-  /* Split Slider Styles */
-  .slider-wrapper {
-    position: relative;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .split-slider-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 12px;
-    overflow: hidden;
-    user-select: none;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-  }
-
-  .split-img {
+  .slider-divider-line {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-  }
-
-  .slider-overlay-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 100%;
-    overflow: hidden;
-    border-right: 2px solid #6366f1;
-    background: #090d16;
-  }
-
-  .slider-overlay-layer .split-img {
-    width: 200%;
-    max-width: none;
-  }
-
-  .diff-focus-box {
-    position: absolute;
-    border: 3px solid #34d399;
-    background: rgba(52, 211, 153, 0.2);
-    border-radius: 6px;
-  }
-
-  .focus-tooltip {
-    position: absolute;
-    bottom: -28px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #0f172a;
-    color: #34d399;
-    border: 1px solid #34d399;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-  }
-
-  .slider-divider {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 4px;
-    margin-left: -2px;
+    top: 0; bottom: 0; left: 50%;
+    width: 4px; margin-left: -2px;
     background: #6366f1;
     cursor: ew-resize;
     z-index: 10;
   }
 
-  .handle-grip {
+  .slider-thumb {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 32px;
-    height: 32px;
+    width: 34px; height: 34px;
     background: #6366f1;
-    color: #fff;
+    color: #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    box-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
+    font-weight: 800;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.9);
   }
 
-  .slider-hint {
+  .slider-caption-bar {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #94a3b8;
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     padding: 0 0.5rem;
-  }
-
-  .compare-footer {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(51, 65, 85, 0.3);
-  }
-
-  .footer-tip {
-    font-size: 0.85rem;
-    color: #cbd5e1;
-    line-height: 1.5;
-  }
-
-  .footer-tip code {
-    background: rgba(30, 41, 59, 0.7);
-    color: #a5b4fc;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    font-weight: 500;
   }
 </style>
 
 <script>
-  function setupComparison() {
-    // Tabs
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+  function setupInteractiveImageCompare() {
+    const tabs = document.querySelectorAll('.scenario-tab');
+    const contents = document.querySelectorAll('.scenario-content');
 
-    tabBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach((b) => b.classList.remove('active'));
-        tabContents.forEach((c) => c.classList.remove('active'));
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.classList.remove('active'));
+        contents.forEach((c) => c.classList.remove('active'));
 
-        btn.classList.add('active');
-        const tabId = btn.getAttribute('data-tab');
-        const activeContent = document.getElementById(`view-${tabId}`);
-        if (activeContent) activeContent.classList.add('active');
+        tab.classList.add('active');
+        const scenario = tab.getAttribute('data-scenario');
+        const target = document.getElementById(`scenario-${scenario}`);
+        if (target) target.classList.add('active');
       });
     });
 
     // Slider
-    const sliderContainer = document.getElementById('split-slider');
-    const sliderOverlay = document.getElementById('slider-overlay');
-    const sliderHandle = document.getElementById('slider-handle');
+    const sliderBox = document.getElementById('github-split-slider');
+    const overlay = document.getElementById('github-slider-overlay');
+    const handle = document.getElementById('github-slider-handle');
 
-    if (!sliderContainer || !sliderOverlay || !sliderHandle) return;
+    if (!sliderBox || !overlay || !handle) return;
 
-    let isDragging = false;
+    let dragging = false;
 
-    function setPosition(x: number) {
-      const rect = sliderContainer.getBoundingClientRect();
-      const relativeX = Math.max(0, Math.min(x - rect.left, rect.width));
-      const percentage = (relativeX / rect.width) * 100;
+    function move(clientX: number) {
+      const rect = sliderBox.getBoundingClientRect();
+      const posX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+      const pct = (posX / rect.width) * 100;
 
-      sliderOverlay.style.width = `${percentage}%`;
-      sliderHandle.style.left = `${percentage}%`;
+      overlay.style.width = `${pct}%`;
+      handle.style.left = `${pct}%`;
     }
 
-    sliderContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      setPosition(e.clientX);
+    sliderBox.addEventListener('mousedown', (e) => {
+      dragging = true;
+      move(e.clientX);
     });
 
     window.addEventListener('mouseup', () => {
-      isDragging = false;
+      dragging = false;
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      setPosition(e.clientX);
+      if (!dragging) return;
+      move(e.clientX);
     });
 
-    // Touch support
-    sliderContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      if (e.touches[0]) setPosition(e.touches[0].clientX);
+    sliderBox.addEventListener('touchstart', (e) => {
+      dragging = true;
+      if (e.touches[0]) move(e.touches[0].clientX);
     });
 
     window.addEventListener('touchend', () => {
-      isDragging = false;
+      dragging = false;
     });
 
     window.addEventListener('touchmove', (e) => {
-      if (!isDragging || !e.touches[0]) return;
-      setPosition(e.touches[0].clientX);
+      if (!dragging || !e.touches[0]) return;
+      move(e.touches[0].clientX);
     });
   }
 
-  document.addEventListener('DOMContentLoaded', setupComparison);
-  setupComparison();
+  document.addEventListener('DOMContentLoaded', setupInteractiveImageCompare);
+  setupInteractiveImageCompare();
 </script>
