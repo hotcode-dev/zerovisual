@@ -1,0 +1,86 @@
+{
+  "$ref": "#/definitions/DesignQaVerdict",
+  "definitions": {
+    "DesignQaVerdict": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "needs_revision"
+          ]
+        },
+        "overallScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule": {
+                "type": "string",
+                "enum": [
+                  "CONTRAST",
+                  "SPACING_GRID",
+                  "TAP_TARGET",
+                  "TYPOGRAPHY_SCALE",
+                  "PENPOT_TOKEN"
+                ]
+              },
+              "element": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "critical",
+                  "warning",
+                  "info"
+                ]
+              },
+              "recommendation": {
+                "type": "string"
+              },
+              "cssFix": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule",
+              "element",
+              "severity",
+              "recommendation",
+              "cssFix"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "suggestedTailwindCss": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "verdict",
+        "overallScore",
+        "violations",
+        "recommendations"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

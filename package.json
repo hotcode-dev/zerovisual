@@ -1,0 +1,60 @@
+{
+  "name": "zerovisual",
+  "version": "0.1.0",
+  "description": "Zero-API-key visual regression and automated UI design QA pre-processor, Playwright reporter, CLI, and MCP server",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "zerovisual": "./dist/cli/index.js",
+    "zerovisual-mcp": "./dist/mcp/server.js"
+  },
+  "files": [
+    "dist",
+    "skills"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "playwright",
+    "visual-regression",
+    "design-qa",
+    "mcp",
+    "model-context-protocol",
+    "testing",
+    "vlm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "citty": "^0.1.6",
+    "fast-xml-parser": "^4.5.3",
+    "sharp": "^0.33.5",
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.24.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.9",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
