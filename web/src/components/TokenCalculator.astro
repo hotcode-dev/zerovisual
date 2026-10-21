@@ -1,0 +1,334 @@
+---
+// Interactive Token & Byte Savings Calculator for ZeroVisual
+---
+
+<div class="token-calc-container">
+  <div class="calc-header">
+    <h3>⚡️ Interactive Token & Byte Savings Calculator</h3>
+    <p>See exactly how much AI token spend and network bandwidth ZeroVisual saves on your visual test failures.</p>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-controls">
+      <div class="control-group">
+        <label for="provider-select">Target Vision Model Provider</label>
+        <select id="provider-select" class="calc-select">
+          <option value="anthropic" selected>Anthropic Claude 3.5 / 3.7 Sonnet (504×504 max tile)</option>
+          <option value="openai">OpenAI GPT-4o / GPT-4o-mini (512×512 tile grid)</option>
+          <option value="gemini">Google Gemini 2.0 / 1.5 Pro (768×768 tile)</option>
+          <option value="gemini-low">Google Gemini Low-Token Mode (384×384 tile)</option>
+          <option value="local">Local VLM (448×448 grid)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Diff Size Scenario Preset</label>
+        <div class="scenario-buttons">
+          <button type="button" class="scenario-btn active" data-w="120" data-h="48" data-raw-w="1920" data-raw-h="1080">Button Shift (120×48)</button>
+          <button type="button" class="scenario-btn" data-w="380" data-h="140" data-raw-w="390" data-raw-h="844">Mobile Card (380×140)</button>
+          <button type="button" class="scenario-btn" data-w="640" data-h="420" data-raw-w="1920" data-raw-h="1080">Modal Dialog (640×420)</button>
+          <button type="button" class="scenario-btn" data-w="1600" data-h="800" data-raw-w="1920" data-raw-h="1080">Full Page Layout (1600×800)</button>
+        </div>
+      </div>
+
+      <div class="custom-dims-row">
+        <div class="control-group">
+          <label for="diff-width">Diff Width: <span id="diff-w-val">120</span>px</label>
+          <input type="range" id="diff-width" min="40" max="1920" value="120" step="10" class="calc-slider" />
+        </div>
+        <div class="control-group">
+          <label for="diff-height">Diff Height: <span id="diff-h-val">48</span>px</label>
+          <input type="range" id="diff-height" min="20" max="1080" value="48" step="10" class="calc-slider" />
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-results">
+      <div class="metric-card savings-highlight">
+        <div class="metric-label">Vision Token Reduction</div>
+        <div class="metric-value" id="token-savings-pct">98.9%</div>
+        <div class="metric-sub" id="token-comparison">2,691 tokens ➔ 28 tokens</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Network / IPC Payload Size</div>
+        <div class="metric-value" id="byte-savings-pct">99.8%</div>
+        <div class="metric-sub" id="byte-comparison">4,200 KB ➔ ~9 KB WebP</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">Model Context Clarity</div>
+        <div class="metric-value" id="clarity-status">100% Focused</div>
+        <div class="metric-sub" id="dim-comparison">Original 1920×1080 ➔ Cropped 184×112 (no upscale)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .token-calc-container {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.85));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin: 2rem 0;
+    box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.2);
+  }
+
+  .calc-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    color: #e0e7ff;
+  }
+
+  .calc-header p {
+    margin: 0 0 1.5rem 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .calc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .control-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .control-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 0.4rem;
+  }
+
+  .calc-select {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #475569;
+    color: #f8fafc;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .scenario-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .scenario-btn {
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .scenario-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #6366f1;
+    color: #fff;
+  }
+
+  .scenario-btn.active {
+    background: #6366f1;
+    border-color: #818cf8;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .custom-dims-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .calc-slider {
+    width: 100%;
+    accent-color: #6366f1;
+    cursor: pointer;
+  }
+
+  .calc-results {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .metric-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    border-radius: 12px;
+    padding: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+
+  .metric-card.savings-highlight {
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.5), rgba(15, 23, 42, 0.8));
+    border-color: rgba(52, 211, 153, 0.4);
+  }
+
+  .metric-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  .savings-highlight .metric-label {
+    color: #6ee7b7;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #f8fafc;
+    line-height: 1.2;
+    margin: 0.25rem 0;
+  }
+
+  .savings-highlight .metric-value {
+    color: #34d399;
+  }
+
+  .metric-sub {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+  }
+</style>
+
+<script>
+  function setupCalculator() {
+    const providerSelect = document.getElementById('provider-select') as HTMLSelectElement | null;
+    const diffWidthInput = document.getElementById('diff-width') as HTMLInputElement | null;
+    const diffHeightInput = document.getElementById('diff-height') as HTMLInputElement | null;
+    const diffWVal = document.getElementById('diff-w-val');
+    const diffHVal = document.getElementById('diff-h-val');
+    const scenarioBtns = document.querySelectorAll('.scenario-btn');
+
+    const tokenSavingsPct = document.getElementById('token-savings-pct');
+    const tokenComparison = document.getElementById('token-comparison');
+    const byteSavingsPct = document.getElementById('byte-savings-pct');
+    const byteComparison = document.getElementById('byte-comparison');
+    const clarityStatus = document.getElementById('clarity-status');
+    const dimComparison = document.getElementById('dim-comparison');
+
+    if (!providerSelect || !diffWidthInput || !diffHeightInput) return;
+
+    let rawW = 1920;
+    let rawH = 1080;
+
+    function calculateTokens(width: number, height: number, provider: string): number {
+      if (provider === 'openai') {
+        const tilesW = Math.ceil(width / 512);
+        const tilesH = Math.ceil(height / 512);
+        return 85 + (tilesW * tilesH * 170);
+      } else if (provider === 'anthropic') {
+        const patchesW = Math.ceil(width / 28);
+        const patchesH = Math.ceil(height / 28);
+        return patchesW * patchesH;
+      } else if (provider === 'gemini' || provider === 'gemini-low') {
+        const tileDim = provider === 'gemini-low' ? 384 : 768;
+        const tilesW = Math.ceil(width / tileDim);
+        const tilesH = Math.ceil(height / tileDim);
+        return tilesW * tilesH * 258;
+      } else {
+        // Local
+        const patchesW = Math.ceil(width / 28);
+        const patchesH = Math.ceil(height / 28);
+        return patchesW * patchesH;
+      }
+    }
+
+    function update() {
+      const provider = providerSelect.value;
+      const diffW = parseInt(diffWidthInput.value, 10);
+      const diffH = parseInt(diffHeightInput.value, 10);
+
+      if (diffWVal) diffWVal.textContent = diffW.toString();
+      if (diffHVal) diffHVal.textContent = diffH.toString();
+
+      // Bounding box with 32px clamped padding
+      const paddedW = diffW + 64;
+      const paddedH = diffH + 64;
+
+      // Provider dimensions limit
+      let maxTile = 504;
+      if (provider === 'openai') maxTile = 512;
+      else if (provider === 'gemini') maxTile = 768;
+      else if (provider === 'gemini-low') maxTile = 384;
+      else if (provider === 'local') maxTile = 448;
+
+      // Model-aware downscale with withoutEnlargement: true
+      let optW = paddedW;
+      let optH = paddedH;
+      if (optW > maxTile || optH > maxTile) {
+        const ratio = Math.min(maxTile / optW, maxTile / optH);
+        optW = Math.round(optW * ratio);
+        optH = Math.round(optH * ratio);
+      }
+
+      // Token calculations
+      const rawTokens = calculateTokens(rawW, rawH, provider);
+      const optTokens = calculateTokens(optW, optH, provider);
+      const tokenSaved = Math.max(0, Math.round(((rawTokens - optTokens) / rawTokens) * 1000) / 10);
+
+      // Byte calculations
+      const rawBytes = Math.round((rawW * rawH * 4) / 2000); // approx compressed PNG KB
+      const optBytes = Math.max(5, Math.round((optW * optH * 0.15) / 1024) + 4); // approx WebP q80 KB
+      const byteSaved = Math.max(0, Math.round(((rawBytes - optBytes) / rawBytes) * 1000) / 10);
+
+      if (tokenSavingsPct) tokenSavingsPct.textContent = `${tokenSaved}%`;
+      if (tokenComparison) tokenComparison.textContent = `${rawTokens.toLocaleString()} tokens ➔ ${optTokens.toLocaleString()} tokens`;
+
+      if (byteSavingsPct) byteSavingsPct.textContent = `${byteSaved}%`;
+      if (byteComparison) byteComparison.textContent = `${rawBytes.toLocaleString()} KB PNG ➔ ~${optBytes} KB WebP`;
+
+      if (dimComparison) {
+        dimComparison.textContent = `Raw ${rawW}×${rawH} ➔ Optimized ${optW}×${optH} (no enlargement)`;
+      }
+    }
+
+    providerSelect.addEventListener('change', update);
+    diffWidthInput.addEventListener('input', update);
+    diffHeightInput.addEventListener('input', update);
+
+    scenarioBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        scenarioBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const w = parseInt(btn.getAttribute('data-w') || '120', 10);
+        const h = parseInt(btn.getAttribute('data-h') || '48', 10);
+        rawW = parseInt(btn.getAttribute('data-raw-w') || '1920', 10);
+        rawH = parseInt(btn.getAttribute('data-raw-h') || '1080', 10);
+
+        diffWidthInput.value = w.toString();
+        diffHeightInput.value = h.toString();
+        update();
+      });
+    });
+
+    update();
+  }
+
+  // Handle client-side navigation in Astro
+  document.addEventListener('DOMContentLoaded', setupCalculator);
+  setupCalculator();
+</script>

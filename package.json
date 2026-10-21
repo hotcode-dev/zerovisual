@@ -18,7 +18,10 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:dev": "npm --prefix web run dev",
+    "docs:build": "npm --prefix web run build",
+    "docs:preview": "npm --prefix web run preview"
   },
   "keywords": [
     "playwright",
