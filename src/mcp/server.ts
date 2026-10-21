@@ -223,8 +223,13 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
       testId: z.string().optional().describe('Optional testId to preload failure context')
     },
     async ({ testId }) => {
-      const skillPath = path.resolve(baseDir, 'skills/visual-regression/SKILL.md');
-      const schemaPath = path.resolve(baseDir, 'skills/visual-regression/output.schema.json');
+      let skillPath = path.resolve(baseDir, 'skills/zerovisual-regression/SKILL.md');
+      let schemaPath = path.resolve(baseDir, 'skills/zerovisual-regression/output.schema.json');
+
+      if (!fs.existsSync(skillPath)) {
+        skillPath = path.resolve(baseDir, 'skills/visual-regression/SKILL.md');
+        schemaPath = path.resolve(baseDir, 'skills/visual-regression/output.schema.json');
+      }
 
       const skillContent = fs.existsSync(skillPath)
         ? fs.readFileSync(skillPath, 'utf-8')
@@ -267,8 +272,13 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
       url: z.string().optional().describe('Optional audited URL')
     },
     async ({ url }) => {
-      const skillPath = path.resolve(baseDir, 'skills/design-qa/SKILL.md');
-      const schemaPath = path.resolve(baseDir, 'skills/design-qa/output.schema.json');
+      let skillPath = path.resolve(baseDir, 'skills/zerovisual-design-qa/SKILL.md');
+      let schemaPath = path.resolve(baseDir, 'skills/zerovisual-design-qa/output.schema.json');
+
+      if (!fs.existsSync(skillPath)) {
+        skillPath = path.resolve(baseDir, 'skills/design-qa/SKILL.md');
+        schemaPath = path.resolve(baseDir, 'skills/design-qa/output.schema.json');
+      }
 
       const skillContent = fs.existsSync(skillPath)
         ? fs.readFileSync(skillPath, 'utf-8')

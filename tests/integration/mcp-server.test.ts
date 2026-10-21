@@ -61,6 +61,11 @@ describe('ZeroVisual MCP Server Integration', () => {
     fs.mkdirSync(path.dirname(triageFile), { recursive: true });
     fs.writeFileSync(triageFile, JSON.stringify(samplePayload, null, 2), 'utf-8');
     writeSkillSchemas(testDir);
+
+    const regSkillSrc = path.resolve(process.cwd(), 'skills/zerovisual-regression/SKILL.md');
+    const dqaSkillSrc = path.resolve(process.cwd(), 'skills/zerovisual-design-qa/SKILL.md');
+    fs.copyFileSync(regSkillSrc, path.join(testDir, 'skills/zerovisual-regression/SKILL.md'));
+    fs.copyFileSync(dqaSkillSrc, path.join(testDir, 'skills/zerovisual-design-qa/SKILL.md'));
   });
 
   afterEach(() => {

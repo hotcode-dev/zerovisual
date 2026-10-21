@@ -141,10 +141,39 @@ npx zerovisual design-qa \
 
 ---
 
-### 3. MCP Server Integration (Cursor, Claude Code, Antigravity)
+### 3. Install Agent Skills (`npx skills add`)
+
+Install the isolated ZeroVisual Agent Skills (`zerovisual-regression` and `zerovisual-design-qa`) into your project or IDE agent workspace using `npx skills`:
+
+```bash
+# Install both ZeroVisual Agent Skills from the repository
+npx skills add hotcode-dev/zerovisual
+
+# Or install individually:
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
+```
+
+This installs:
+* **`skills/zerovisual-regression`**: Teaches agents strict code-to-code regression triage (cross-viewport correlation, semantic AOM validation, anti-aliasing noise filtering).
+* **`skills/zerovisual-design-qa`**: Teaches agents objective UI/UX mentoring guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind fixes).
+
+---
+
+### 4. MCP Server Integration (Cursor, Claude Code, Antigravity)
 
 Connect ZeroVisual directly to your AI IDE over `stdio` so your coding agent can inspect visual failures and critique your UI on demand.
 
+#### Quick Setup via CLI
+```bash
+# Add ZeroVisual to Claude Code
+claude mcp add zerovisual -- npx -y zerovisual-mcp
+
+# Or register across your coding agents via add-mcp
+npx -y add-mcp "npx -y zerovisual-mcp"
+```
+
+#### Manual Configuration
 Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 
 ```json
@@ -152,7 +181,7 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
   "mcpServers": {
     "zerovisual": {
       "command": "npx",
-      "args": ["zerovisual-mcp"],
+      "args": ["-y", "zerovisual-mcp"],
       "env": {
         "ZEROVISUAL_PROVIDER": "anthropic"
       }
@@ -167,8 +196,8 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 * `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot diff, and returns a token-optimized design critique bundle.
 
 #### Available MCP Prompts (Skills)
-* `triage-regression`: Loads `skills/visual-regression/SKILL.md` and enforces strict pass/fail JSON triage.
-* `critique-ui-design`: Loads `skills/design-qa/SKILL.md` and outputs actionable CSS/Tailwind improvements.
+* `triage-regression`: Loads `skills/zerovisual-regression/SKILL.md` and enforces strict pass/fail JSON triage.
+* `critique-ui-design`: Loads `skills/zerovisual-design-qa/SKILL.md` and outputs actionable CSS/Tailwind improvements.
 
 ---
 

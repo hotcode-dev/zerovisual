@@ -21,8 +21,8 @@ describe('Skill Output Schema Generation', () => {
   it('should write output.schema.json to skills directories', () => {
     writeSkillSchemas(process.cwd());
 
-    const regFile = path.resolve(process.cwd(), 'skills/visual-regression/output.schema.json');
-    const dqaFile = path.resolve(process.cwd(), 'skills/design-qa/output.schema.json');
+    const regFile = path.resolve(process.cwd(), 'skills/zerovisual-regression/output.schema.json');
+    const dqaFile = path.resolve(process.cwd(), 'skills/zerovisual-design-qa/output.schema.json');
 
     expect(fs.existsSync(regFile)).toBe(true);
     expect(fs.existsSync(dqaFile)).toBe(true);

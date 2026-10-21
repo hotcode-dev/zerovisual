@@ -1,5 +1,5 @@
 ---
-name: design-qa
+name: zerovisual-design-qa
 description: Automated UI/UX design QA and mentor rubric for software engineers auditing live URLs against objective heuristics, WCAG 2.1 contrast, 8pt spatial grid, and Penpot tokens.
 ---
 

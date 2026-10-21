@@ -18,8 +18,8 @@ export function getDesignQaJsonSchema(): object {
 }
 
 export function writeSkillSchemas(baseDir = process.cwd()): void {
-  const visualRegressionDir = path.resolve(baseDir, 'skills/visual-regression');
-  const designQaDir = path.resolve(baseDir, 'skills/design-qa');
+  const visualRegressionDir = path.resolve(baseDir, 'skills/zerovisual-regression');
+  const designQaDir = path.resolve(baseDir, 'skills/zerovisual-design-qa');
 
   fs.mkdirSync(visualRegressionDir, { recursive: true });
   fs.mkdirSync(designQaDir, { recursive: true });

@@ -1,5 +1,5 @@
 ---
-name: visual-regression
+name: zerovisual-regression
 description: Triage failing Playwright visual regression test failures across responsive viewports using model-tile-aligned WebP diffs and scoped AOM snapshots.
 ---
 
