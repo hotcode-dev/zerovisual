@@ -1,0 +1,577 @@
+---
+// Side-by-Side Visual Regression & Image Optimization Comparison
+import playwrightDiffImg from '../assets/playwright-diff-canvas.webp';
+import zerovisualCropImg from '../assets/zerovisual-diff-crop.webp';
+---
+
+<div class="compare-wrapper">
+  <div class="compare-header">
+    <div class="badge-row">
+      <span class="compare-badge">Interactive Comparison</span>
+      <span class="savings-badge">95.3% Token Savings</span>
+      <span class="savings-badge">99.6% Byte Reduction</span>
+    </div>
+    <h3>👁️ Visualizing ZeroVisual in Action</h3>
+    <p>
+      Compare standard Playwright full-canvas pixel diffs against ZeroVisual's model-aligned bounding-box extraction.
+    </p>
+  </div>
+
+  <div class="view-tabs">
+    <button type="button" class="tab-btn active" data-tab="side-by-side">Side-by-Side View</button>
+    <button type="button" class="tab-btn" data-tab="slider">Interactive Split Slider</button>
+  </div>
+
+  <!-- View 1: Side by Side Cards -->
+  <div id="view-side-by-side" class="tab-content active">
+    <div class="comparison-grid">
+      <!-- Left: Raw Full Canvas -->
+      <div class="compare-card raw-card">
+        <div class="card-top">
+          <span class="card-tag tag-raw">Before: Raw Test Canvas</span>
+          <span class="card-stat-tokens">2,691 Tokens</span>
+        </div>
+        <div class="img-preview-container">
+          <img
+            src={playwrightDiffImg.src}
+            alt="Raw Full-HD 1920x1080 Playwright Diff Screenshot"
+            class="compare-img full-img"
+            loading="lazy"
+          />
+          <div class="bounding-highlight-box" style="left: 27%; top: 72%; width: 46%; height: 8%;">
+            <span class="box-label">Detected Shift (32px Padding)</span>
+          </div>
+        </div>
+        <div class="card-specs">
+          <div class="spec-item">
+            <span class="spec-label">Dimensions</span>
+            <span class="spec-val">1920 × 1080 px</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Payload Size</span>
+            <span class="spec-val text-warn">~1,960 KB (~2.6 MB Base64)</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Vision Tokens</span>
+            <span class="spec-val text-warn">2,691 tokens / diff</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Context Noise</span>
+            <span class="spec-val text-warn">85% irrelevant canvas</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: ZeroVisual Cropped & Model Aligned -->
+      <div class="compare-card optimized-card">
+        <div class="card-top">
+          <span class="card-tag tag-optimized">After: ZeroVisual Model-Aligned Crop</span>
+          <span class="card-stat-tokens highlight">126 Tokens (-95.3%)</span>
+        </div>
+        <div class="img-preview-container crop-container">
+          <img
+            src={zerovisualCropImg.src}
+            alt="ZeroVisual Model-Aligned Cropped WebP Diff"
+            class="compare-img crop-img"
+            loading="lazy"
+          />
+          <div class="patch-grid-overlay"></div>
+        </div>
+        <div class="card-specs">
+          <div class="spec-item">
+            <span class="spec-label">Dimensions</span>
+            <span class="spec-val text-success">504 × 173 px (Tile Aligned)</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Payload Size</span>
+            <span class="spec-val text-success">~6.7 KB WebP (99.6% smaller)</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Vision Tokens</span>
+            <span class="spec-val text-success">126 tokens (18×7 patches)</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Model Focus</span>
+            <span class="spec-val text-success">100% targeted to defect</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View 2: Split Slider -->
+  <div id="view-slider" class="tab-content">
+    <div class="slider-wrapper">
+      <div class="split-slider-container" id="split-slider">
+        <img
+          src={playwrightDiffImg.src}
+          alt="Playwright Diff Background"
+          class="split-img raw-layer"
+        />
+        <div class="slider-overlay-layer" id="slider-overlay">
+          <img
+            src={playwrightDiffImg.src}
+            alt="Playwright Diff Active"
+            class="split-img"
+          />
+          <div class="diff-focus-box" style="left: 27%; top: 72%; width: 46%; height: 8%;">
+            <span class="focus-tooltip">ZeroVisual 32px Clamped Crop Zone</span>
+          </div>
+        </div>
+        <div class="slider-divider" id="slider-handle">
+          <div class="handle-grip">↔</div>
+        </div>
+      </div>
+      <div class="slider-hint">
+        <span>◀ Raw 1920×1080 Screenshot</span>
+        <span>Drag slider to inspect detected bounding box ▶</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-footer">
+    <div class="footer-tip">
+      <strong>💡 How ZeroVisual Did This:</strong> ZeroVisual's RGBA pixel scanner identified the button diff coordinates, clamped a 32px context buffer, cropped with <code>sharp</code>, and aligned dimensions to Anthropic's exact 28×28px vision grid without enlargement—turning a 2.6 MB pipe freeze into an instant 6.7 KB WebP payload.
+    </div>
+  </div>
+</div>
+
+<style>
+  .compare-wrapper {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(24, 24, 48, 0.95));
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin: 2.5rem 0;
+    box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .compare-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+  }
+
+  .savings-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+
+  .compare-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    color: #f8fafc;
+  }
+
+  .compare-header p {
+    margin: 0 0 1.25rem 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .view-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    color: #cbd5e1;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: #6366f1;
+    color: #fff;
+  }
+
+  .tab-btn.active {
+    background: #6366f1;
+    border-color: #818cf8;
+    color: #ffffff;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .comparison-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .compare-card {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 12px;
+    border: 1px solid rgba(71, 85, 105, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .compare-card.optimized-card {
+    border-color: rgba(52, 211, 153, 0.4);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(6, 44, 38, 0.3));
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+    background: rgba(30, 41, 59, 0.4);
+  }
+
+  .card-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .tag-raw {
+    color: #f87171;
+  }
+
+  .tag-optimized {
+    color: #34d399;
+  }
+
+  .card-stat-tokens {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #94a3b8;
+  }
+
+  .card-stat-tokens.highlight {
+    color: #34d399;
+  }
+
+  .img-preview-container {
+    position: relative;
+    background: #020617;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    overflow: hidden;
+  }
+
+  .compare-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    display: block;
+  }
+
+  .bounding-highlight-box {
+    position: absolute;
+    border: 2px dashed #f43f5e;
+    background: rgba(244, 63, 94, 0.25);
+    border-radius: 4px;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.4; }
+  }
+
+  .box-label {
+    position: absolute;
+    top: -20px;
+    background: #f43f5e;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .crop-container {
+    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.8), #020617);
+    padding: 2rem 1rem;
+  }
+
+  .crop-img {
+    border: 2px solid rgba(52, 211, 153, 0.6);
+    box-shadow: 0 8px 24px -4px rgba(52, 211, 153, 0.3);
+  }
+
+  .card-specs {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    border-top: 1px solid rgba(51, 65, 85, 0.3);
+    margin-top: auto;
+  }
+
+  .spec-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spec-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .spec-val {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+
+  .text-warn {
+    color: #f87171;
+  }
+
+  .text-success {
+    color: #34d399;
+  }
+
+  /* Split Slider Styles */
+  .slider-wrapper {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .split-slider-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    user-select: none;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  .split-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .slider-overlay-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    border-right: 2px solid #6366f1;
+    background: #090d16;
+  }
+
+  .slider-overlay-layer .split-img {
+    width: 200%;
+    max-width: none;
+  }
+
+  .diff-focus-box {
+    position: absolute;
+    border: 3px solid #34d399;
+    background: rgba(52, 211, 153, 0.2);
+    border-radius: 6px;
+  }
+
+  .focus-tooltip {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #34d399;
+    border: 1px solid #34d399;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .slider-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    background: #6366f1;
+    cursor: ew-resize;
+    z-index: 10;
+  }
+
+  .handle-grip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    background: #6366f1;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
+  }
+
+  .slider-hint {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .compare-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(51, 65, 85, 0.3);
+  }
+
+  .footer-tip {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+  }
+
+  .footer-tip code {
+    background: rgba(30, 41, 59, 0.7);
+    color: #a5b4fc;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+</style>
+
+<script>
+  function setupComparison() {
+    // Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach((b) => b.classList.remove('active'));
+        tabContents.forEach((c) => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        const tabId = btn.getAttribute('data-tab');
+        const activeContent = document.getElementById(`view-${tabId}`);
+        if (activeContent) activeContent.classList.add('active');
+      });
+    });
+
+    // Slider
+    const sliderContainer = document.getElementById('split-slider');
+    const sliderOverlay = document.getElementById('slider-overlay');
+    const sliderHandle = document.getElementById('slider-handle');
+
+    if (!sliderContainer || !sliderOverlay || !sliderHandle) return;
+
+    let isDragging = false;
+
+    function setPosition(x: number) {
+      const rect = sliderContainer.getBoundingClientRect();
+      const relativeX = Math.max(0, Math.min(x - rect.left, rect.width));
+      const percentage = (relativeX / rect.width) * 100;
+
+      sliderOverlay.style.width = `${percentage}%`;
+      sliderHandle.style.left = `${percentage}%`;
+    }
+
+    sliderContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      setPosition(e.clientX);
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      setPosition(e.clientX);
+    });
+
+    // Touch support
+    sliderContainer.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      if (e.touches[0]) setPosition(e.touches[0].clientX);
+    });
+
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isDragging || !e.touches[0]) return;
+      setPosition(e.touches[0].clientX);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', setupComparison);
+  setupComparison();
+</script>
