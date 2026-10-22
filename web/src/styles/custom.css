@@ -3,6 +3,12 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@theme {
+	--font-system: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+/* Starlight Design Tokens */
 :root {
 	--sl-color-accent-low: #1e1b4b;
 	--sl-color-accent: #6366f1;
@@ -16,8 +22,8 @@
 	--sl-color-gray-6: #1e293b;
 	--sl-color-black: #0b0f19;
 
-	--sl-font-system: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+	--sl-font-system: var(--font-system);
+	--sl-font-mono: var(--font-mono);
 }
 
 /* Force dark color scheme and eliminate theme selection */
@@ -28,178 +34,123 @@ html[data-theme='light'] {
 	color-scheme: dark !important;
 }
 
-/* Completely hide theme selection controls */
+/* Hide theme selection controls */
 starlight-theme-select,
 .theme-select {
-	display: none !important;
+	@apply hidden;
 }
 
 /* Background ambient glow */
 body {
+	@apply bg-slate-950 text-slate-200 tracking-tight;
 	background-color: #0b0f19 !important;
 	background-image: 
 		radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent),
 		radial-gradient(ellipse 60% 40% at 90% 80%, rgba(6, 182, 212, 0.08), transparent) !important;
 	background-attachment: fixed;
-	color: #e2e8f0;
-	letter-spacing: -0.01em;
 }
 
-/* Hero section upgrades */
+/* Hero section upgrades using Tailwind utilities */
 .hero {
-	padding: 3rem 0 2rem 0 !important;
+	@apply py-12 px-0;
 }
 
 .hero h1 {
-	font-weight: 800 !important;
-	letter-spacing: -0.03em !important;
-	background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
+	@apply font-extrabold tracking-tight bg-gradient-to-br from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent;
 	font-size: clamp(2.5rem, 5vw, 4rem) !important;
 	line-height: 1.15 !important;
 }
 
 .hero .tagline {
-	font-size: 1.15rem !important;
-	color: #94a3b8 !important;
-	max-width: 680px;
-	margin: 1rem auto 2rem auto;
-	line-height: 1.6 !important;
+	@apply text-slate-400 text-lg max-w-2xl mx-auto mt-4 mb-8 leading-relaxed;
 }
 
-/* Hero Action Buttons */
+/* Hero Action Buttons using DaisyUI & Tailwind */
 .action.primary {
-	background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-	border: 1px solid rgba(165, 180, 252, 0.4) !important;
-	box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.5) !important;
-	font-weight: 700 !important;
-	border-radius: 10px !important;
-	transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+	@apply btn btn-primary font-bold shadow-lg shadow-indigo-500/50 rounded-xl transition-all duration-200 border border-indigo-300/40;
 }
 
 .action.primary:hover {
-	transform: translateY(-2px) scale(1.02) !important;
-	box-shadow: 0 8px 28px -2px rgba(99, 102, 241, 0.7) !important;
+	@apply -translate-y-0.5 scale-102 shadow-indigo-500/70;
 }
 
 .action.secondary {
-	background: rgba(30, 41, 59, 0.7) !important;
-	backdrop-filter: blur(12px) !important;
-	border: 1px solid rgba(100, 116, 139, 0.35) !important;
-	border-radius: 10px !important;
-	font-weight: 600 !important;
-	transition: all 0.2s ease !important;
+	@apply btn btn-outline border-slate-600/70 bg-slate-800/70 backdrop-blur-md text-slate-200 font-semibold rounded-xl transition-all duration-200;
 }
 
 .action.secondary:hover {
-	background: rgba(51, 65, 85, 0.9) !important;
-	border-color: #818cf8 !important;
-	color: #fff !important;
+	@apply bg-slate-700/90 border-indigo-400 text-white;
 }
 
-/* Glassmorphism cards */
+/* Glassmorphism cards using DaisyUI & Tailwind */
 .card {
-	background: linear-gradient(135deg, rgba(30, 41, 59, 0.45), rgba(15, 23, 42, 0.65)) !important;
-	backdrop-filter: blur(16px);
-	border: 1px solid rgba(99, 102, 241, 0.15) !important;
-	border-radius: 14px;
-	box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
-	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
+	@apply card bg-slate-900/50 backdrop-blur-xl border border-indigo-500/20 rounded-2xl shadow-xl transition-all duration-200;
 }
 
 .card:hover {
-	transform: translateY(-3px);
-	border-color: rgba(99, 102, 241, 0.45) !important;
-	box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.2);
+	@apply -translate-y-1 border-indigo-500/50 shadow-2xl shadow-indigo-500/20;
 }
 
 .card .title {
-	font-size: 1.1rem !important;
-	font-weight: 700 !important;
-	color: #f8fafc !important;
+	@apply card-title text-slate-50 font-bold text-lg;
 }
 
 .card .body {
-	color: #94a3b8 !important;
-	font-size: 0.92rem !important;
-	line-height: 1.55;
+	@apply text-slate-400 text-sm leading-relaxed;
 }
 
-/* Modern tables */
+/* Modern tables using DaisyUI & Tailwind */
 table {
+	@apply table w-full my-6 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md;
 	border-collapse: separate;
 	border-spacing: 0;
-	width: 100%;
-	margin: 1.75rem 0;
-	border: 1px solid rgba(51, 65, 85, 0.6);
-	border-radius: 12px;
-	overflow: hidden;
-	background: rgba(15, 23, 42, 0.6);
-	backdrop-filter: blur(8px);
 }
 
 th {
-	background-color: rgba(30, 41, 59, 0.85) !important;
-	color: #f8fafc !important;
-	font-weight: 700;
-	font-size: 0.82rem;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	padding: 0.85rem 1.1rem !important;
-	border-bottom: 1px solid rgba(71, 85, 105, 0.5) !important;
+	@apply bg-slate-800/90 text-slate-100 font-bold text-xs uppercase tracking-wider p-3.5 border-b border-slate-700/50;
 }
 
 td {
-	padding: 0.85rem 1.1rem !important;
-	border-bottom: 1px solid rgba(51, 65, 85, 0.4) !important;
-	font-size: 0.92rem;
-	color: #cbd5e1;
+	@apply p-3.5 border-b border-slate-700/40 text-slate-300 text-sm;
 }
 
 tr:last-child td {
-	border-bottom: none !important;
+	@apply border-b-0;
 }
 
 tr:nth-child(even) td {
-	background-color: rgba(30, 41, 59, 0.2);
+	@apply bg-slate-800/20;
 }
 
-/* Callouts / Blockquotes */
+/* Callouts / Blockquotes using Tailwind */
 blockquote {
-	background: linear-gradient(135deg, rgba(30, 27, 75, 0.5), rgba(15, 23, 42, 0.8)) !important;
-	border-left: 4px solid #6366f1 !important;
-	border-radius: 0 12px 12px 0;
-	padding: 1.1rem 1.4rem !important;
-	color: #cbd5e1 !important;
-	margin: 1.5rem 0 !important;
+	@apply border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-950/50 to-slate-900/80 rounded-r-xl p-4 my-6 text-slate-300;
 }
 
 blockquote strong {
-	color: #e0e7ff;
+	@apply text-indigo-100 font-semibold;
 }
 
-/* Code blocks */
+/* Code blocks using Tailwind */
 pre {
-	border: 1px solid rgba(71, 85, 105, 0.35) !important;
-	border-radius: 10px !important;
-	background: #090d16 !important;
+	@apply rounded-xl border border-slate-700/40 bg-[#090d16];
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
+	@apply w-2 h-2;
 }
+
 ::-webkit-scrollbar-track {
-	background: #090d16;
+	@apply bg-[#090d16];
 }
+
 ::-webkit-scrollbar-thumb {
-	background: #334155;
-	border-radius: 4px;
+	@apply bg-slate-700 rounded;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-	background: #6366f1;
+	@apply bg-indigo-500;
 }
 
 /* Prevent Starlight markdown sibling spacing rules from altering custom interactive components */
