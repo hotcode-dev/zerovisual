@@ -1,0 +1,46 @@
+{
+  "id": "session-02-github-pr-merge-without-1792688749371",
+  "timestamp": "2026-10-22T17:05:49.371Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "02-github-pr-merge",
+  "caseName": "GitHub Pull Request Merge Card Regression",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 27720,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\n\"Merge pull request\" button\n\n**2. Nature of the Visual Defect**\nUnintended focus ring (dashed outline)\n\n**3. Probable Root Cause in CSS or layout**\nThe button has received keyboard or programmatic focus, triggering the browser's default `:focus` style (the dashed outline). This often happens in automated tests if the test script interacts with the element via keyboard navigation or calls `.focus()`.\n\n**4. Suggested Fix or code snippet**\nOverride the default focus styles for the button to align with the design system.\n\n```css\n/* Remove default outline and add a custom focus state if needed */\n.merge-button:focus {\n  outline: none;\n  /* Optional: Add a subtle box-shadow to maintain accessibility */\n  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); \n}\n```",
+    "reasoning": "1.  **Analyze the image:** The image shows a dark-themed UI, likely a GitHub pull request interface. There is a title \"feat(auth): add OAuth2 token refresh #104\". Below it is a card containing a green success message (\"All checks have passed...\"), a gray description (\"Merging will update...\"), and a prominent orange button (\"Merge pull request\").\n2.  **Identify the defect:** The most obvious visual anomaly is the orange \"Merge pull request\" button. It has a distinct, dashed orange outline surrounding it. This is not a standard design element for a primary action button in this context; it's a classic browser focus ring.\n3.  **Determine the root cause:** This dashed outline appears when an element receives keyboard focus (e.g., via the `Tab` key) or programmatic focus (e.g., `element.focus()`), and the browser applies its default focus style. In automated testing, if a test script clicks the button or navigates to it via keyboard, this state can be captured in the screenshot.\n4.  **Formulate the fix:** The fix is to explicitly style the `:focus` or `:focus-visible` state of the button to match the intended design system, usually by removing the default outline and replacing it with a subtle box-shadow or border change, or simply removing it if the button's color change on hover/active is sufficient.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 507,
+    "reasoningTokens": 296,
+    "totalTokens": 1645,
+    "latencyMs": 20399,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+    "affectedElement": ".btn-merge",
+    "defectType": "button_styling_regression",
+    "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+    "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+    "expectedBoundingBox": {
+      "x": 550,
+      "y": 110,
+      "width": 280,
+      "height": 90
+    }
+  }
+}

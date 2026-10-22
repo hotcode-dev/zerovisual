@@ -1,0 +1,52 @@
+{
+  "id": "session-05-dashboard-stat-overflow-with-1792689110862",
+  "timestamp": "2026-10-22T17:11:50.862Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 66
+    },
+    "format": "webp",
+    "bytes": 3452,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 8,
+      "y": 109,
+      "width": 1264,
+      "height": 166
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\nThe \"COST PER OFF\" label in the fourth (rightmost) metric card.\n\n**2. Nature of the Visual Defect:**\nText truncation / clipping. The word \"OFFSET\" (or similar) is cut off, leaving only \"COST PER OFF\".\n\n**3. Probable Root Cause in CSS or layout:**\nThe container for the label has a fixed width or `max-width` that is too narrow to accommodate the full text string. Alternatively, the font size is too large for the allocated space, and `overflow: hidden` is clipping the text without an ellipsis.\n\n**4. Suggested Fix or code snippet:**\n*   **Option A (Best):** Increase the width of the card or the label container.\n*   **Option B:** Reduce the font size of the label.\n*   **Option C (If truncation is acceptable):** Add ellipsis to indicate missing text.\n    ```css\n    .card-label {\n      white-space: nowrap;\n      overflow: hidden;\n      text-overflow: ellipsis;\n    }\n    ```",
+    "reasoning": "1.  **Analyze the image:** The image shows four dark blue cards with text.\n    *   Card 1: \"TOKENS SAVED\", \"94.2%\", \"↑ 4.1% vs avg\"\n    *   Card 2: \"ACTIVE AGENTS\", \"12,450\", \"↑ 34% this week\"\n    *   Card 3: \"PAYLOAD P55\", \"34 KB\", \"↓ 98% reduced\"\n    *   Card 4: \"COST PER OFF\", \"0.0002\", \"Zero API Keys\"\n2.  **Identify the defect:** The text \"COST PER OFF\" in the fourth card is cut off. It should likely be \"COST PER OFFSET\" or similar. The text is overflowing the container or being clipped.\n3.  **Determine the root cause:** The container for the label has a fixed width or `max-width` that is too small for the text, or `overflow: hidden` is applied without `text-overflow: ellipsis`, or the font size is too large for the allocated space.\n4.  **Formulate the response:**\n    *   Element: \"COST PER OFF\" label in the fourth card.\n    *   Defect: Text truncation/clipping.\n    *   Root Cause: Container width too small for the text content, or missing text-overflow handling.\n    *   Fix: Increase container width, reduce font size, or add `text-overflow: ellipsis`.\n"
+  },
+  "metrics": {
+    "promptTokens": 207,
+    "imageTokens": 69,
+    "completionTokens": 577,
+    "reasoningTokens": 335,
+    "totalTokens": 784,
+    "latencyMs": 18929,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-with-1792689019623",
+  "timestamp": "2026-10-22T17:10:19.623Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 328
+    },
+    "format": "webp",
+    "bytes": 7156,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 388,
+      "y": 247,
+      "width": 504,
+      "height": 328
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`Order Summary` card → bottom \"Total Due\" row (the green bar containing the `Total Due` label, the `Pay $53.41 Now` CTA, and the `$53.41` total).\n\n**2. Nature of the Visual Defect**\nElement / text overlap. The centered CTA label `Pay $53.41 Now` collides with the right‑aligned total `$53.41` (the words \"Now\" and \"$53.41\" are touching/overlapping), and the left `Total Due` label is cramped against the CTA. The three items no longer have distinct horizontal zones.\n\n**3. Probable Root Cause**\nThe CTA is rendered in the *same* row as the total but is centered via absolute positioning / `transform: translateX(-50%)` (or a `margin: 0 auto` / `flex: 1` + `text-align:center` button) inside a `position: relative` container that also holds the right‑aligned price. Because the centered button's box is not part of the flex flow, it overlaps the price column. The row also lacks a `gap`, so once the button's intrinsic width grows (longer price/label), the columns collide.\n\n**4. Suggested Fix**\nMake the row a proper 3‑zone flex layout (no absolute positioning) with a `gap`, or move the CTA to its own row.\n\n```css\n.order-total-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;            /* prevents collision */\n  background: #10b981;\n  padding: 12px 16px;\n  border-radius: 8px;\n}\n.order-total-row .label { flex: 0 0 auto; }\n.order-total-row .cta   { flex: 1 1 auto; text-align: center; }\n.order-total-row .total { flex: 0 0 auto; }\n```\n\nIf the CTA must stay a full‑width button, stack it instead:\n\n```css\n.order-total-row { display: block; }\n.order-total-row .cta {\n  display: block;\n  width: 100%;\n  margin-top: 8px;\n  text-align: center;\n}\n```\n\nRemove any `position: absolute` / `transform: translateX(-50%)` on the CTA so it participates in normal flow. Re‑run the visual test to confirm the three zones no longer overlap.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot and identify the defect.\n\nLooking at the image: There's an \"Order Summary\" card. Inside, there's a green button/row at the bottom. The text inside this green element reads \"Total Due\" on the left, then \"Pay $53.41 Now\" in the middle, then \"$53.41\" on the right.\n\nThe defect: The text \"Pay $53.41 Now\" and \"$53.41\" are overlapping or colliding. The button label \"Pay $53.41 Now\" appears to be centered/absolutely positioned and is overlapping with the right-aligned price \"$53.41\". Also \"Total Due\" on the left is very close to the centered text. The layout looks broken — the green bar contains three text elements that are colliding. The \"Pay $53.41 Now\" text is overlapping the \"$53.41\" price on the right.\n\nLet me look more carefully. The green row has \"Total Due\" left-aligned, \"Pay $53.41 Now\" appears centered but it's actually overlapping with the right side \"$53.41\". The text \"Pay $53.41 Now\" ends with \"Now\" and then immediately \"$53.41\" follows with no space, they're colliding. Actually \"Pay $53.41 Now\" and \"$53.41\" are overlapping — the \"Now\" and \"$53.41\" are touching/overlapping.\n\nSo the nature of the defect: text overlap / element collision within the total row. The button (CTA) and the price label are overlapping.\n\nProbable root cause: The total row uses a flex layout with three children (label, button, price) but the button has a fixed/centered position or the flex container lacks proper spacing / the button is absolutely positioned or has `position: absolute` causing it to overlap the price. Or the row is using `justify-content: space-between` but the button is too wide / has `flex: 1` with text-align center causing overlap. More likely: the CTA button is absolutely positioned or the layout switched from a stacked layout to a single row without enough width, causing the centered button text to collide with the right-aligned total.\n\nActually a common pattern: the total row originally had \"Total Due\" + price on one line, and the \"Pay Now\" button below it. Now they've been merged into one row, and the button is centered via `position: absolute; left: 50%; transform: translateX(-50%)` which causes it to overlap the right price. Or the flex container has the button with `margin: 0 auto` but the price is also in flow.\n\nLet me think about the most plausible root cause. The green background spans the whole row. Inside we have three text nodes. The middle one \"Pay $53.41 Now\" looks like a button label that's centered. The right \"$53.41\" is the total. They overlap because the centered button's width plus the right price exceed available space, OR the button is absolutely positioned.\n\nI'll state: element overlap / text collision. Root cause: the CTA button is absolutely positioned (or centered with transform) inside a relative container that also holds the right-aligned total, so they share the same horizontal space. Or the flex row lacks `gap` and the button has `flex-grow` with centered text.\n\nSuggested fix: Use a proper flex layout with `justify-content: space-between` and `align-items: center`, give the button a fixed/auto width and add `gap`, or move the button to its own row. Provide code snippet.\n\nLet me write a concise answer.\n\nAffected element: \"Total Due\" summary row / CTA button (\"Pay $53.41 Now\") and the total price \"$53.41\".\n\nNature: Text/element overlap — the centered CTA label collides with the right-aligned total price; also left label cramped.\n\nRoot cause: The CTA is positioned absolutely (or centered via transform) within the same flex/relative row as the price, or the flex row has no gap and the button's intrinsic width overflows into the price column.\n\nFix: Restructure to flex with space-between and gap, or stack. Provide snippet.\n\nI'll keep it concise and direct as instructed.\n"
+  },
+  "metrics": {
+    "promptTokens": 298,
+    "imageTokens": 160,
+    "completionTokens": 1532,
+    "reasoningTokens": 957,
+    "totalTokens": 1830,
+    "latencyMs": 62391,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "session-06-mobile-nav-overflow-without-1792689171085",
+  "timestamp": "2026-10-22T17:12:51.085Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 5612,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`<nav>` header dropdown menu (the panel containing \"Mobile Dashboard View\" / \"Real-Time QA Stream\") triggered by the top‑right hamburger button (`.menu-toggle`).\n\n**2. Nature of the Visual Defect**\nMis‑anchored dropdown. The menu panel renders at the **top‑left** (under the \"ZeroVisual\" logo) instead of being anchored to the **top‑right** hamburger button. Secondary: the panel has no visible container chrome (no border, shadow, or rounded background box) — items float as bare rows.\n\n**3. Probable Root Cause**\nThe dropdown uses `position: absolute` but its containing block is the header/viewport, not the button. The button wrapper is missing `position: relative`, so `left: 0` resolves against the header's left edge (logo side). The menu is therefore positioned relative to the wrong ancestor.\n\n**4. Suggested Fix**\nMake the toggle the positioning context and anchor the panel to it:\n\n```css\n.menu-toggle { position: relative; }   /* was missing */\n\n.dropdown {\n  position: absolute;\n  top: 100%;\n  right: 0;            /* anchor to button, not header */\n  margin-top: 8px;\n  min-width: 220px;\n  background: #161b22;\n  border: 1px solid #30363d;\n  border-radius: 8px;\n  box-shadow: 0 8px 24px rgba(0,0,0,.4);\n  padding: 6px;\n}\n```\n\nEnsure the `.dropdown` is a **child of `.menu-toggle`** (or a sibling inside a `position: relative` wrapper around the button), and remove any `left: 0` that was pulling it to the logo edge. Re‑run the snapshot after the change.",
+    "reasoning": "The user wants a concise, direct analysis of a failed visual regression screenshot. Let me look carefully at the image.\n\nWhat I see: A dark background (near black, #0d1117-ish). Top-left has \"ZeroVisual\" text in blue. Top-right has a pink/magenta rounded square button with a hamburger menu icon (three horizontal lines). Below the logo, there are two menu items stacked vertically: \"Mobile Dashboard View\" and \"Real-Time QA Stream\". These appear to be dropdown menu items that have opened from the hamburger button.\n\nThe defect: The menu items are positioned at the top-left, directly under the logo, NOT under the hamburger button at the top-right. This is a classic positioning bug. The dropdown menu should be anchored to the hamburger button (top-right), but instead it's appearing at the top-left, aligned with the logo. This indicates the dropdown's positioning context is wrong — likely the menu is positioned relative to the wrong parent, or it's using `position: absolute` with `left: 0` relative to a container that spans the full header, or the menu is in normal flow / static positioning instead of being absolutely positioned relative to the button.\n\nAlso, the menu items look like they're floating in empty space with no visible dropdown container/background box around them — they have a subtle dark background but no border, no shadow, no clear panel. The expected behavior would be a dropdown panel anchored to the top-right button.\n\nLet me think about the layout. The header likely has the logo on the left and the button on the right (flex space-between). The dropdown menu, when opened, should appear below the button on the right. But it's appearing on the left. This strongly suggests the menu element is a sibling that's positioned absolutely with `top: 0; left: 0` relative to the header (or the header isn't `position: relative` and it's relative to the page/body, but then it'd be at top-left of viewport which matches... actually top-left of viewport would put it at the very top, but the logo is at top-left too).\n\nHmm, let's look at coordinates. The logo \"ZeroVisual\" is at roughly y=18. The menu items start at y=48. The hamburger button is at top-right around y=18-40. So the menu is vertically just below the header row, horizontally at the left edge. So the menu is anchored to the left edge of the header/viewport, not to the button.\n\nRoot cause: The dropdown is using `position: absolute` but its containing block is the header (or body) rather than the button wrapper. The button wrapper lacks `position: relative`, so the absolute menu resolves against the nearest positioned ancestor (the header or viewport), and with `left: 0` it lands at the left. Alternatively, the menu is rendered in document flow after the logo (static positioning) instead of being absolutely positioned.\n\nMost likely: the menu container is `position: absolute; top: 100%; left: 0;` but the parent (the nav/header) is the positioned ancestor, OR the menu is just a static block that flows after the logo because the header is a flex row and the menu got placed... no, if it were in flow it'd be on the same row or wrap.\n\nActually the cleanest explanation: The dropdown panel is absolutely positioned relative to the header (which is `position: relative`), with `left: 0`, so it aligns to the left edge of the header where the logo is. The fix is to make the button's wrapper `position: relative` and position the menu relative to that, with `right: 0` or `left: 0` relative to the button.\n\nLet me also note: the menu items have no visible panel styling (no border, no shadow, no rounded corners container) — they look like bare rows. That could be a secondary defect but the primary is mispositioning.\n\nI'll keep it concise per instructions. Provide the four points.\n\nLet me write the fix snippet:\n\n```css\n.menu-toggle { position: relative; }\n.dropdown {\n  position: absolute;\n  top: 100%;\n  right: 0;   /* anchor to button, not header */\n  margin-top: 8px;\n  background: #161b22;\n  border: 1px solid #30363d;\n  border-radius: 8px;\n  box-shadow: 0 8px 24px rgba(0,0,0,.4);\n}\n```\n\nAnd ensure the header is NOT the positioned ancestor causing left alignment, or if it is, the menu should be inside the button wrapper.\n\nGood. Concise.\n"
+  },
+  "metrics": {
+    "promptTokens": 390,
+    "imageTokens": 252,
+    "completionTokens": 1435,
+    "reasoningTokens": 1012,
+    "totalTokens": 1825,
+    "latencyMs": 60216,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

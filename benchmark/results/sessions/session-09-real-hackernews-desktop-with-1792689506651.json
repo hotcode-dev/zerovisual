@@ -1,0 +1,52 @@
+{
+  "id": "session-09-real-hackernews-desktop-with-1792689506651",
+  "timestamp": "2026-10-22T17:18:26.652Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "09-real-hackernews-desktop",
+  "caseName": "Real-World Hacker News (Desktop 1280×800) Header Navigation Collapse",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 354
+    },
+    "format": "webp",
+    "bytes": 18386,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 71,
+      "y": 0,
+      "width": 1138,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nTop header / site‑title banner (the red bar containing the logo glyph on the left and the wordmark text on the right). The numbered list below renders correctly, so the defect is isolated to this header.\n\n**2. Nature of the Visual Defect**\nThe header wordmark is not rendering as readable text — it appears as a row of tiny white dashes / missing‑glyph boxes (\"tofu\") instead of the expected title characters. The left logo glyph is also a fallback box. This is a font‑rendering / missing‑glyph failure, not a layout or color shift.\n\n**3. Probable Root Cause**\nThe header uses a custom web font (or an icon font for the logo) that failed to load or has no valid fallback, so the browser substitutes empty/placeholder glyphs. Typical triggers:\n- `@font-face` `src` URL 404 / wrong format / blocked by CSP or network.\n- `font-family` stack missing a usable system fallback.\n- Icon‑font codepoints not mapped (e.g., Font Awesome / custom icon font not loaded).\n\n**4. Suggested Fix**\n```css\n/* 1) Provide a safe fallback so text is never blank */\n.site-header__title {\n  font-family: \"BrandFont\", -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif;\n  font-display: swap;            /* avoid invisible text while font loads */\n}\n\n/* 2) Ensure the font actually ships */\n@font-face {\n  font-family: \"BrandFont\";\n  src: url(\"/fonts/BrandFont.woff2\") format(\"woff2\"),\n       url(\"/fonts/BrandFont.woff\")  format(\"woff\");\n  font-display: swap;\n}\n```\n- Verify the `.woff2`/`.woff` URLs return `200` and the correct `Content-Type` (`font/woff2`).\n- Add `<link rel=\"preconnect\">` / `preload` for the font to avoid FOUT/FOIT.\n- Replace the logo glyph with an inline `<svg>` or `<img>` instead of an icon‑font character so the brand mark can't break on font failure.\n- Re‑run the visual test after the font is cached to confirm the wordmark matches the baseline.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nLet me examine the image. There's a red banner at the top with a small yellow/orange icon on the left and some white text that appears to be broken or rendered as small dashes/boxes. The text in the red header looks like it's not rendering properly - it shows as a series of small white marks rather than readable text. This looks like a font rendering issue or missing font, where the text is showing as fallback glyphs or the font failed to load, resulting in tiny dashes.\n\nBelow that is a numbered list of items (1-18) which look fine - they have titles, links, and metadata.\n\nSo the affected element is the top header/banner. The visual defect: the header text is rendered as small dashes/boxes instead of readable characters - this is a classic \"tofu\" or missing glyph / font loading failure, OR it could be that the text color/contrast is wrong, but actually the text appears as tiny white specks. Let me look more carefully. The white marks look like they could be a font that didn't load, showing as small squares or the text is there but extremely small / wrong font.\n\nActually, looking again, the white text in the red banner appears as a row of small vertical dashes. This strongly suggests a font failure where the glyphs are not rendering correctly, or the font-family is set to something that doesn't have the glyphs, OR the text is being rendered with a font that has very thin/missing glyphs.\n\nAlternatively, it could be that the header text is supposed to be a title like \"Hacker News\" or some brand name, and it's showing as broken glyphs.\n\nLet me think about probable root cause: missing web font (e.g., @font-face failed to load, or font-family fallback chain missing), causing the browser to render fallback glyphs that look like dashes/boxes. Or it's an icon font (like Font Awesome) where the icon characters aren't mapping correctly.\n\nActually the small white marks could be an icon font rendering issue - like a logo made of icon font characters that aren't loading.\n\nHmm, but the layout of the list below looks fine. So the defect is isolated to the header.\n\nLet me consider another possibility: the header text has a contrast issue or the font-size is too small. But the marks are clearly not normal text.\n\nI'll go with: Affected element = Top header/banner (site title / logo text). Nature = text rendered as missing glyphs / broken font (tofu/dashes) instead of readable title. Root cause = web font / icon font failed to load or font-family fallback missing, or @font-face src incorrect. Suggested fix = ensure font loads, add fallback, preconnect, or replace with SVG/text.\n\nLet me look at the icon on the left - it's a yellow square with what looks like a symbol. That might be an icon font too.\n\nI'll write a concise answer.\n\nLet me make sure I'm concise and direct as instructed.\n\nFormat: numbered list matching the 4 requested items.\n"
+  },
+  "metrics": {
+    "promptTokens": 314,
+    "imageTokens": 176,
+    "completionTokens": 1157,
+    "reasoningTokens": 656,
+    "totalTokens": 1471,
+    "latencyMs": 54434,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.",
+    "affectedElement": ".pagetop",
+    "defectType": "navigation_collapse",
+    "rootCause": "Overridden padding and red background on main header td with font-size: 0px on .pagetop links",
+    "suggestedFix": "Restore default 2px padding, #ff6600 background, and remove font-size: 0px",
+    "expectedBoundingBox": {
+      "x": 71,
+      "y": 0,
+      "width": 1138,
+      "height": 800
+    }
+  }
+}

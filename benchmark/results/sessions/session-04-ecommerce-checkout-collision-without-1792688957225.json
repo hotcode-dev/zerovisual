@@ -1,0 +1,46 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-without-1792688957225",
+  "timestamp": "2026-10-22T17:09:17.225Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 22948,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`Order Summary` card footer — the **\"Total Due\"** summary row and the **\"Pay $53.41 Now\"** CTA button.\n\n**2. Nature of the Visual Defect**\nElement / text overlap. The green CTA button's background and centered label (`Pay $53.41 Now`) are rendered on the *same vertical line* as the `Total Due` label (left) and the `$53.41` value (right). Three text nodes collide horizontally, and the black row text is painted on top of the green button background.\n\n**3. Probable Root Cause**\nVertical layout collapse / mis-positioning in the card's footer. The CTA button and the total row are sharing one vertical slot instead of stacking — most likely the button is `position: absolute` (or has a negative `margin-top`) over the total row, or the flex/grid column lost its `gap`/row height so the row no longer reserves vertical space.\n\n**4. Suggested Fix**\nForce both into normal flow as separate stacked rows with explicit spacing; remove any absolute positioning / negative margin on the button.\n\n```css\n.order-summary__footer {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;            /* was missing → rows collapsed onto each other */\n}\n\n.order-summary__total {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  min-height: 24px;     /* reserve vertical space so it can't be overlapped */\n}\n\n.btn-pay {\n  position: static;     /* was absolute / negative margin */\n  width: 100%;\n  margin-top: 0;\n}\n```\n\nVerify by asserting the button's `getBoundingClientRect().top` is greater than the total row's `bottom` (no intersection) in the visual test.",
+    "reasoning": "The user wants a concise visual regression QA analysis. Let me look carefully at the screenshot.\n\nThere's an \"Order Summary\" card. Inside, there's a green button/row at the bottom. The text inside is overlapping badly: \"Total Due\" on the left, \"Pay $53.41 Now\" in the middle, and \"$53.41\" on the right. These three text elements are colliding/overlapping each other. The green background is a button that contains \"Pay $53.41 Now\" but it's overlapping with the \"Total Due\" label and the \"$53.41\" value that belong to the summary row above.\n\nSo the defect: element overlap / text collision in the total row. The \"Total Due\" row and the CTA button \"Pay $53.41 Now\" are stacked on top of each other, or the button is positioned absolutely over the total row, causing the three texts to overlap horizontally.\n\nLooking more carefully: The green bar spans the width. On it we see \"Total Due\" (left, black text), \"Pay $53.41 Now\" (center, white text), \"$53.41\" (right, black text). So the green button background is behind the total row, and the button's label is centered, while the total row's label and value are also rendered. This is a classic overlap: the CTA button is positioned over the total summary row, or the total row lost its vertical spacing and the button's content is showing through.\n\nProbable root cause: The CTA button and the \"Total Due\" row are in the same flex/grid container without proper spacing, or the button has `position: absolute` / negative margin, or the container height collapsed so the button overlaps the row. More likely: the total row and the button are siblings but the button is absolutely positioned or the row has zero height / the button's z-index and background cover the row. Actually the green background is the button; the black \"Total Due\" and \"$53.41\" text are on top of the green, meaning the total row text is rendered above the button (higher z-index or later in DOM) but they occupy the same vertical space. So vertical space collapse: the total row and button share the same vertical line.\n\nRoot cause: missing vertical margin/height on the total row, or the button is absolutely positioned at the same top offset, or a flex column lost its gap. Could be that the total row's `display` changed so it no longer takes vertical space, or the button has `margin-top: -X` / `position: absolute; top: ...`.\n\nSuggested fix: ensure the total row and CTA button are separate block-level rows with proper spacing; remove absolute positioning; add `margin-top` or `gap` to the container; ensure the button is `display: block` / full width on its own line.\n\nLet me write concisely.\n\nAffected element: \"Total Due\" summary row + \"Pay $53.41 Now\" CTA button (footer of Order Summary card).\n\nNature: text/element overlap — the CTA button's background and label are rendered on the same vertical line as the \"Total Due\" label and \"$53.41\" value, causing collision.\n\nRoot cause: vertical layout collapse / absolute positioning — the CTA button and the total row occupy the same vertical space (e.g., button is `position: absolute` or the row height collapsed / missing `gap`/`margin` in the flex column).\n\nFix: make them stack in normal flow with spacing.\n\nI'll provide a snippet.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 1192,
+    "reasoningTokens": 774,
+    "totalTokens": 2330,
+    "latencyMs": 52272,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

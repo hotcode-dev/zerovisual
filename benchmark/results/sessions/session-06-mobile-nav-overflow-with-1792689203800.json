@@ -1,0 +1,52 @@
+{
+  "id": "session-06-mobile-nav-overflow-with-1792689203800",
+  "timestamp": "2026-10-22T17:13:23.800Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 194,
+      "height": 121
+    },
+    "format": "webp",
+    "bytes": 1482,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 194,
+      "height": 121
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\nTop-right navigation button (Hamburger menu)\n\n**2. Nature of the Visual Defect**\nVertical misalignment of the icon. The hamburger icon is shifted significantly towards the top edge of the red button container instead of being centered.\n\n**3. Probable Root Cause in CSS or layout**\nThe button container is missing vertical centering properties. This is typically caused by a missing `align-items: center` in a flexbox layout, or asymmetric `padding-top` / `padding-bottom` values.\n\n**4. Suggested Fix or code snippet**\nApply flexbox centering to the button container to ensure the icon is perfectly aligned vertically and horizontally:\n\n```css\n.menu-button {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n```",
+    "reasoning": "1.  **Analyze the Request:** The user wants an automated visual regression QA analysis of a provided screenshot. I need to identify the affected element, the visual defect, the probable root cause, and a suggested fix. The tone should be concise and direct.\n\n2.  **Examine the Screenshot:**\n    *   **Overall layout:** Dark mode UI. Top left has a logo \"ZeroVisual\". Top right has a red square button with a hamburger menu icon. Below that, there are two large, dark rectangular buttons/cards: \"Mobile Dashboard View\" and \"Real-Time QA Stream\".\n    *   **Focus on the defect:** Look closely at the red button in the top right. The hamburger menu icon (three horizontal lines) is not centered vertically within the red square. It is shifted significantly towards the top edge.\n    *   **Other elements:** The text in the two main buttons looks properly centered. The logo looks fine. The main issue is definitely the icon alignment in the top-right button.\n\n3.  **Formulate the Analysis:**\n    *   **1. Affected Element / Component name:** Top-right navigation button (or Hamburger menu button).\n    *   **2. Nature of the Visual Defect:** Vertical misalignment of the icon. The hamburger icon is shifted upwards, not centered within its container.\n    *   **3. Probable Root Cause in CSS or layout:** The container is likely using `display: flex` or `display: grid`, but is missing the `align-items: center` property. Alternatively, if using absolute positioning, the `top` value or `transform` is incorrect. Given standard practices, missing flexbox centering is the most likely culprit. Another possibility is an incorrect `line-height` or `padding-top`/`padding-bottom` asymmetry.\n    *   **4. Suggested Fix or code snippet:** Provide the CSS to center the icon.\n        *   *Option A (Flexbox - Best Practice):*\n            ```css\n            .menu-button {\n              display: flex;\n              justify-content: center;\n              align-items: center;\n            }\n            ```\n        *   *Option B (Padding adjustment - if flex is already there but broken):* Ensure `padding-top` equals `padding-bottom`.\n\n4.  **Refine the Output:** Ensure it matches the requested format and is concise.\n\n    *   *Element:* Top-right menu button (Hamburger icon)\n    *   *Defect:* Vertical misalignment (icon shifted to the top)\n    *   *Root Cause:* Missing vertical centering properties on the button container (e.g., missing `align-items: center` in a flexbox layout, or asymmetric padding).\n    *   *Fix:* Add flexbox centering to the button class.\n\n5.  **Final Polish:** (Self-Correction during drafting) Make sure to explicitly state the CSS properties. The red button is the clear focal point of the failure.\n\n    *   **1. Affected Element:** Top-right navigation button (Hamburger menu)\n    *   **2. Nature of Visual Defect:** Vertical misalignment of the icon (shifted upwards).\n    *   **3. Probable Root Cause:** The button container is likely missing vertical centering CSS properties (e.g., `align-items: center` in a flex container) or has asymmetric top/bottom padding.\n    *   **4. Suggested Fix:**\n        ```css\n        .menu-button {\n          display: flex;\n          justify-content: center;\n          align-items: center;\n        }\n        ```\n"
+  },
+  "metrics": {
+    "promptTokens": 215,
+    "imageTokens": 77,
+    "completionTokens": 945,
+    "reasoningTokens": 765,
+    "totalTokens": 1160,
+    "latencyMs": 32710,
+    "accuracyScore": 70
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

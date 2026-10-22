@@ -1,0 +1,52 @@
+{
+  "id": "session-07-real-wikipedia-desktop-with-1792689299031",
+  "timestamp": "2026-10-22T17:14:59.032Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "07-real-wikipedia-desktop",
+  "caseName": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 145
+    },
+    "format": "webp",
+    "bytes": 6070,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nHeader search bar — specifically the language `<select>` + text input + the red \"search\" submit button (the `.searchbox` / `.searchbox__form` group at the top of the page).\n\n**2. Nature of the Visual Defect**\nColor / contrast regression on the search control. The submit button is rendered in a saturated red/magenta and the input's border color has shifted, so the whole control's pixel signature differs from the baseline. The diff mask (red outline) tightly wraps the input border + button, indicating a styling change rather than a content change. No text or icon is missing; it is a pure paint‑layer difference (possible 1–2 px border‑width shift contributing to the diff).\n\n**3. Probable Root Cause**\nA CSS color token / theme variable for the primary action and the input border was changed or is no longer being applied to the search form. Most likely the button's `background-color` and the input's `border-color` now resolve to the wrong value (e.g., a fallback red instead of the expected brand blue), or a `:focus`/`outline` rule is leaking into the default state.\n\n**4. Suggested Fix**\nPin the search control to the design‑system tokens and remove any stray outline:\n\n```css\n.searchbox__input {\n  border: 1px solid var(--color-border, #a2a9b1); /* was shifting */\n  outline: none;\n}\n.searchbox__button {\n  background-color: var(--color-primary, #3366cc); /* was rendering red */\n  color: #fff;\n  border: 0;\n}\n.searchbox__button:focus-visible {\n  outline: 2px solid var(--color-focus, #3366cc);\n  outline-offset: 2px;\n}\n```\n\nRe‑run the snapshot after the change; if the button is *supposed* to be red, update the baseline instead of the code. Verify the input border width is exactly `1px` to rule out a sub‑pixel layout shift.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look at the screenshot carefully.\n\nLooking at the image: There's a search bar at the top with a language dropdown \"EN\" and a red search button. The entire search bar component is wrapped in a red/pink rectangular outline (the diff highlight box). Below it is a \"Read Wikipedia in your language\" dropdown. Then there's a grid of links (Wikimedia Foundation, Commons, Wikivoyage, Wiktionary, etc.).\n\nThe red outline is the visual diff highlight indicating the changed region. What changed? The search bar appears to have a red border/outline around it. In visual regression tests, the red box is the diff mask, not necessarily the actual defect. But the question asks to identify the visual defect.\n\nLet me look closely. The search input field has a blue border normally? The diff box is red. The defect region is the search bar. What's the nature? Possibly the search bar's border color changed, or padding/spacing shifted, or the search button color changed (it's red/magenta which might be a contrast or color change).\n\nHmm. The red box is the diff highlight. Inside it, the search bar has a blue outline around the input and a red button. The diff likely indicates a change in the search bar's appearance—maybe the border color of the input changed, or the button background changed, or the overall component shifted.\n\nGiven typical visual regression failures, the most common is a color change or a layout shift. The red highlight tightly wraps the search bar including the button. The button is a strong red/magenta. Possibly the button's background color changed (e.g., from blue to red) or the input border changed.\n\nActually, looking carefully, the input field has a thin blue border, and the button is red. The diff box (pink/red outline) surrounds the whole thing. The nature of defect: likely a color change on the search button or the input border, OR a padding/margin shift causing the component to move.\n\nLet me think about what's most plausible. The diff box is exactly around the search bar. If it were a color change inside, the diff would highlight only the changed pixels (the button or border), not the whole box with empty space. The fact that the diff box includes the white space of the input and the gap suggests a layout shift or a border/outline change around the whole component.\n\nHmm, but visual diff tools often draw a bounding box around all changed pixels. If the input border color changed (e.g., from gray to blue), the changed pixels would be the border outline, and the bounding box would be the whole input. Plus the button. So the bounding box covers input + button.\n\nI think the most reasonable interpretation: The search bar component's styling changed—specifically the input border color and/or the search button background color. The red button looks like a \"primary\" color that may have changed.\n\nAlternatively, the defect could be that the search bar now has an unexpected outline (focus ring) or the border color is wrong.\n\nLet me look at the colors: input border is blue (#3366cc-ish, Wikipedia blue). Button is red/magenta. In Wikipedia's actual UI, the search button is usually blue, not red. So the button color changed from blue to red? That would be a contrast/color defect. But the diff box would highlight the button area.\n\nActually the diff highlight (the outer pink rectangle) is the region of difference. The inner blue rectangle is the input's normal border. The red square is the button. So the difference region = input border + button. This strongly suggests both the input border color and the button color changed, OR the whole search bar's theme changed.\n\nHmm, I'm overanalyzing. Let me give a concise, plausible answer.\n\nI'll state:\n1. Affected element: Search bar / search input + search button (top header search component).\n2. Nature: Color change / contrast issue — the search button background and input border colors differ from baseline (button rendered in red/magenta instead of expected blue; input border color shifted). Possibly also a 1-2px layout shift.\n3. Root cause: CSS color variable / theme change on `.searchbox` button background and input border, or a missing/changed CSS rule for the primary color token.\n4. Fix: Revert the color token, ensure button uses `--color-primary` (blue) and input border uses `--color-border`.\n\nBut wait, maybe the red box IS the actual rendered outline (a focus outline or a debug border) that shouldn't be there. Look: the outer pink rectangle has rounded corners and is offset from the input/button with some padding. That looks like a diff highlight box drawn by the tool (Percy/Chromatic style), which usually has a solid red border and sometimes a semi-transparent fill. Yes that's the diff mask.\n\nOK here's another thought: maybe the only change is that the search bar moved down or its height changed, and the diff box shows the old vs new position. But the box is tight.\n\nI'll commit to: color/contrast change on the search button and input border, plus possible minor padding shift. Provide a fix.\n\nLet me make it concise and direct as instructed. Provide a code snippet.\n\nI'll write the response in English.\n"
+  },
+  "metrics": {
+    "promptTokens": 218,
+    "imageTokens": 80,
+    "completionTokens": 1589,
+    "reasoningTokens": 1130,
+    "totalTokens": 1807,
+    "latencyMs": 74290,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

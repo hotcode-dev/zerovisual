@@ -1,0 +1,46 @@
+{
+  "id": "session-07-real-wikipedia-desktop-without-1792689224713",
+  "timestamp": "2026-10-22T17:13:44.713Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "07-real-wikipedia-desktop",
+  "caseName": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 125273,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\nMain Search Bar / Search Form\n\n**2. Nature of the Visual Defect:**\nBounding box mismatch / Layout shift. The red outline indicates that the position or dimensions of the search bar container have deviated from the expected baseline.\n\n**3. Probable Root Cause in CSS or layout:**\nA change in the width of the search input field, the language dropdown, or the search button. This could be caused by altered padding, a change in `flex-grow`/`flex-shrink` properties, or a shift in the parent container's alignment (e.g., `margin: 0 auto` being affected by a width change).\n\n**4. Suggested Fix or code snippet:**\nVerify the CSS for the search container and its child elements. Ensure that the input field has a stable width and that the container's padding and alignment remain consistent.\n\n```css\n/* Example: Ensure the search container maintains its expected dimensions */\n.search-container {\n  display: flex;\n  justify-content: center;\n  width: 100%;\n  max-width: 600px; /* Ensure a fixed max-width if applicable */\n  padding: 10px;\n}\n\n.search-input {\n  flex-grow: 1;\n  /* Ensure consistent padding */\n  padding: 8px 12px; \n}\n```",
+    "reasoning": "1.  **Analyze the image:** The screenshot shows the main Wikipedia page. There is a prominent red rectangular outline drawn around the search bar area (the input field, the language dropdown, and the search button).\n2.  **Identify the affected element:** The red outline clearly highlights the search form component.\n3.  **Determine the nature of the defect:** The red outline is not a standard UI element; it's a visual regression artifact indicating a bounding box mismatch. The search bar's position, size, or internal layout has shifted compared to the baseline.\n4.  **Deduce the probable root cause:** The search bar is likely centered using flexbox or absolute positioning. A change in the width of the input field, the padding of the container, or the size of the adjacent elements (like the language dropdown or button) could cause the entire component to shift horizontally or vertically.\n5.  **Formulate the suggested fix:** Check the CSS for the search container and its children. Ensure fixed widths or consistent padding are applied to prevent layout shifts.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 519,
+    "reasoningTokens": 223,
+    "totalTokens": 1657,
+    "latencyMs": 20908,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "session-05-dashboard-stat-overflow-without-1792689091917",
+  "timestamp": "2026-10-22T17:11:31.917Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 33568,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nKPI stat card — specifically the `ACTIVE AGENTS` card (value `12,450` and its delta row `↑ 14% this week`), compared against the three sibling cards (`TOKENS SAVED`, `PAYLOAD P95`, `COST PER DIFF`).\n\n**2. Nature of the Visual Defect**\n- The KPI value in `ACTIVE AGENTS` renders at a much larger font size than the other three values, breaking the shared visual hierarchy.\n- This oversized value pushes the delta/sub‑metric row (`↑ 14% this week`) down, so it is **vertically misaligned** with the delta rows of the other cards (which sit higher, ~30px above the card's bottom edge vs. ~40px in card 2).\n- Internal vertical rhythm / spacing is inconsistent: the gap between value and delta, and between delta and the card's bottom border, differs from the other cards.\n- Secondary: the value color is red/pink vs. white on the others (likely an intended alert state, but it compounds the diff).\n\n**3. Probable Root Cause**\nThe KPI value node is not given a fixed/consistent `font-size`. Most likely a conditional class or a `clamp()`/length‑based rule is scaling the value up for the longer/larger number (e.g. `value.length > 4` or a `data-size=\"lg\"` modifier), and the card lacks a stable flex layout, so the extra height cascades to the delta row instead of being absorbed.\n\n**4. Suggested Fix**\nNormalize the value size and lock the internal layout so the delta row aligns across all cards:\n\n```css\n.kpi-card {\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n  gap: 0.5rem;          /* consistent spacing, no collapse */\n  min-height: 120px;    /* uniform card height */\n}\n.kpi-value {\n  font-size: 1.75rem;   /* single size for ALL cards — remove the lg/clamp variant */\n  line-height: 1.1;\n  color: var(--text);   /* keep alert color only via a .is-alert modifier if needed */\n}\n.kpi-delta {\n  margin-top: auto;     /* pin delta row to a consistent baseline */\n}\n```\n\nRemove any conditional `font-size` override on the `ACTIVE AGENTS` value (or the `clamp()` that scales with digit count). Re‑run the snapshot; the four values and their delta rows should now share the same baselines and the diff should clear.",
+    "reasoning": "The user wants a concise visual regression analysis. Let me look carefully at the screenshot.\n\nThere are four cards in a row: \"TOKENS SAVED\" (94.2%), \"ACTIVE AGENTS\" (12,450), \"PAYLOAD P95\" (34 KB), \"COST PER DIFF\" ($0.0002).\n\nLooking at the layout: The first three cards appear to have consistent heights. The \"ACTIVE AGENTS\" card has a very large number (12,450) in red/pink that is significantly larger than the other numbers. This large number is causing the card to be taller than the others, OR the card heights are equal but the content overflows.\n\nLet me look at vertical alignment. The labels at top: \"TOKENS SAVED\", \"ACTIVE AGENTS\", \"PAYLOAD P95\", \"COST PER DIFF\" — they appear roughly aligned at the top. The numbers: 94.2%, 34 KB, $0.0002 are at a certain baseline. The 12,450 is much larger and extends lower. The sub-text: \"↑ 4.1% vs avg\", \"↓ 98% reduced\", \"Zero API Keys\" are at one level, but \"↑ 14% this week\" is lower than the others.\n\nSo the \"ACTIVE AGENTS\" card content is taller because of the oversized number. The card itself — let's check the bottom edges. The first card bottom edge is around y=213. The second card bottom edge is around y=213 too? Let me look. Actually the second card's border bottom seems to be at the same level as the others, but the \"↑ 14% this week\" text is pushed down and is closer to the bottom border, while in other cards the sub-text has more breathing room. Hmm.\n\nActually look: card 1 bottom border ~213, sub-text at ~143. Card 2 bottom border ~213, sub-text at ~173. Card 3 bottom border ~213, sub-text at ~143. Card 4 bottom border ~213, sub-text at ~143.\n\nSo the cards have equal height (good, probably fixed height or stretch), but inside card 2 the large number pushes the sub-text down, reducing the gap between number and sub-text and between sub-text and bottom. This is a vertical rhythm / spacing inconsistency. The number font size in card 2 is much larger than the others, breaking the visual hierarchy consistency and causing the sub-metric to sit at a different vertical position.\n\nAlso the color: 12,450 is red/pink while others are white. That might be intentional (alert color) but in a visual regression it's a difference. But the question is about a \"failed visual test\" — the defect is likely the inconsistent number sizing / vertical misalignment of the delta row.\n\nLet me think about what's the most salient defect. The \"ACTIVE AGENTS\" value uses a much larger font size than the other KPI values, causing: (a) the value baseline to differ, (b) the delta row to be vertically misaligned across cards, (c) the value to nearly touch the card's right edge / overflow risk. Actually 12,450 fits but it's huge.\n\nSo the nature: font-size inconsistency on the KPI value, leading to vertical misalignment of the delta/sub-metric row and uneven internal spacing.\n\nRoot cause: The KPI value element likely has a responsive/auto font-size or a different class applied to the \"ACTIVE AGENTS\" card (e.g., a \"large\" modifier, or a CSS rule targeting the value based on content length / a clamp() that scales with value, or a missing consistent font-size). Possibly the value uses `font-size: clamp(...)` or `text-size-adjust` or the number length triggers a different size. Or the component conditionally applies a bigger size when value > some threshold.\n\nSuggested fix: enforce a consistent font-size on the KPI value across all cards, e.g., `.kpi-value { font-size: 1.75rem; }` and use a flex column with `justify-content: space-between` or fixed gaps so the delta row aligns. Or set the card to a fixed height and use `display:flex; flex-direction:column; gap: 0.5rem;` so the delta sits at a consistent position.\n\nLet me also note the color difference (red vs white) — could be a separate defect but likely intentional alert state. I'll mention as secondary.\n\nI'll keep it concise with the 4 numbered points.\n\nLet me write the response.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 1599,
+    "reasoningTokens": 1014,
+    "totalTokens": 2737,
+    "latencyMs": 72290,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

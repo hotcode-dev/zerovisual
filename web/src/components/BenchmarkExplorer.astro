@@ -1,0 +1,682 @@
+---
+// Interactive Visual Regression & AI Session Benchmark Explorer
+import benchmarkData from '../data/benchmark-sessions.json';
+---
+
+<div class="benchmark-explorer not-content" id="benchmark-explorer-root">
+  <!-- Top Banner / Live Status -->
+  <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl mb-6 backdrop-blur-md">
+    <div class="flex items-center gap-2.5">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <span class="text-xs font-semibold tracking-wide uppercase text-slate-300">Empirical VLM Evaluation</span>
+      <span class="text-slate-600">|</span>
+      <span class="text-xs text-slate-400 font-mono">Model: RadixArk/Qwen3.8-27B-NVFP4</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-medium">
+        11 Benchmark Scenarios (5 Real-World Live Sites)
+      </span>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium">
+        Avg -87% Vision Tokens
+      </span>
+    </div>
+  </div>
+
+  <!-- Filter & Case Selector Carousel -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-semibold text-slate-200">Select Benchmark Scenario:</span>
+        <div class="inline-flex rounded-lg bg-slate-800/80 p-0.5 border border-slate-700/60 text-xs" role="tablist">
+          <button type="button" class="filter-btn active px-3 py-1 rounded-md text-slate-300 font-medium transition-all" data-filter="all">
+            All (11)
+          </button>
+          <button type="button" class="filter-btn px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium transition-all" data-filter="real">
+            🌐 Live Websites (5)
+          </button>
+          <button type="button" class="filter-btn px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 font-medium transition-all" data-filter="synthetic">
+            🧪 Synthetic (6)
+          </button>
+        </div>
+      </div>
+      <span class="text-xs text-slate-400" id="case-counter">Case 1 of 11</span>
+    </div>
+
+    <!-- Case Picker Cards Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="case-picker-grid">
+      {benchmarkData.map((item, index) => {
+        const isReal = item.id.includes('real');
+        return (
+          <button
+            type="button"
+            class={`case-card text-left p-2.5 rounded-lg border transition-all cursor-pointer ${
+              index === 0
+                ? 'active bg-indigo-950/40 border-indigo-500 shadow-sm shadow-indigo-500/20'
+                : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
+            }`}
+            data-case-id={item.id}
+            data-case-index={index}
+            data-is-real={isReal ? 'true' : 'false'}
+          >
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/50">
+                #{String(index + 1).padStart(2, '0')}
+              </span>
+              <span class={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                isReal ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {isReal ? '🌐 Live' : '🧪 Synthetic'}
+              </span>
+            </div>
+            <div class="text-xs font-medium text-slate-200 line-clamp-1 mb-1" title={item.name}>
+              {item.name}
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <span>{item.device.includes('Mobile') ? '📱 Mobile' : '🖥️ Desktop'}</span>
+              <span class="font-semibold text-emerald-400">-{item.savings.imageTokens}</span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Active Case Showcase Main Stage -->
+  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 mb-8 backdrop-blur-md shadow-2xl">
+    <!-- Active Case Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80 mb-6">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 mb-1.5">
+          <span id="active-device-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+            Desktop (1280×800)
+          </span>
+          <span id="active-category-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+            Layout Shift
+          </span>
+          <span class="text-xs text-slate-500 font-mono" id="active-case-id">
+            01-wikipedia-search-offset
+          </span>
+        </div>
+        <h3 id="active-case-name" class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          Wikipedia Portal Search Bar Shift
+        </h3>
+        <p id="active-ground-truth-defect" class="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl">
+          The search box container is shifted right by 60px with red border override.
+        </p>
+      </div>
+
+      <!-- Quick Savings Pill -->
+      <div class="flex items-center gap-3 bg-slate-950/70 border border-slate-800 px-4 py-2.5 rounded-xl self-start md:self-auto">
+        <div class="text-right">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">ViT Token Savings</div>
+          <div class="text-lg font-bold text-emerald-400" id="active-token-savings">-80.8%</div>
+        </div>
+        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="text-right">
+          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Payload Reduction</div>
+          <div class="text-lg font-bold text-cyan-400" id="active-byte-savings">-75.6%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout: Screenshot Viewer (Left) & Metrics/Session Inspector (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left Column: Interactive Screenshot Visualizer (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col">
+        <!-- Browser Chrome Toolbar -->
+        <div class="bg-slate-950 border border-slate-800 rounded-t-xl px-3 py-2 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-slate-900 border border-slate-800 rounded-md text-[11px] text-slate-400 font-mono flex-1 max-w-sm truncate">
+            <svg class="w-3 h-3 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <span id="browser-url-text" class="truncate">https://www.wikipedia.org/</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px] text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+            <span>FAILED</span>
+          </div>
+        </div>
+
+        <!-- View Mode Switcher -->
+        <div class="bg-slate-950/80 border-x border-slate-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80">
+          <div class="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800 text-xs" role="tablist">
+            <button type="button" class="img-view-tab px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all font-medium" data-view="baseline">
+              🟢 Baseline
+            </button>
+            <button type="button" class="img-view-tab px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all font-medium" data-view="actual">
+              🔴 Actual (Defect)
+            </button>
+            <button type="button" class="img-view-tab px-3 py-1 rounded text-slate-400 hover:text-slate-200 transition-all font-medium" data-view="diff">
+              🟣 Pixel Diff
+            </button>
+            <button type="button" class="img-view-tab active px-3 py-1 rounded bg-indigo-600 text-white shadow-sm transition-all font-medium" data-view="crop">
+              ⚡ ZeroVisual Crop (VLM)
+            </button>
+          </div>
+
+          <!-- Bounding Box Overlay Toggle -->
+          <button type="button" id="toggle-bbox-btn" class="text-[11px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-sm bg-rose-500 inline-block"></span>
+            <span id="bbox-toggle-text">Show Diff Bounding Box</span>
+          </button>
+        </div>
+
+        <!-- Image Display Stage Frame -->
+        <div class="relative bg-slate-950 border-x border-b border-slate-800 rounded-b-xl overflow-hidden min-h-[360px] sm:min-h-[420px] flex items-center justify-center p-3 select-none">
+          <div class="relative max-w-full max-h-[460px] flex items-center justify-center" id="image-container">
+            <img
+              id="main-stage-img"
+              src={benchmarkData[0].cropPath}
+              alt="Benchmark screenshot view"
+              class="max-w-full max-h-[440px] w-auto h-auto rounded object-contain transition-opacity duration-200"
+              loading="eager"
+            />
+            
+            <!-- Dynamic Diff Bounding Box Overlay -->
+            <div
+              id="bbox-overlay"
+              class="absolute border-2 border-rose-500 bg-rose-500/15 pointer-events-none transition-all duration-300 hidden rounded-sm"
+              style="left: 0%; top: 0%; width: 0%; height: 0%;"
+            >
+              <span class="absolute -top-5 left-0 text-[10px] font-mono font-bold bg-rose-600 text-white px-1.5 py-0.5 rounded shadow whitespace-nowrap" id="bbox-coord-chip">
+                Diff Box
+              </span>
+            </div>
+          </div>
+
+          <!-- Stage View Floating Badge -->
+          <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-md bg-slate-900/90 border border-slate-700/80 backdrop-blur-sm text-[11px] text-slate-300 flex items-center gap-2">
+            <span class="font-semibold text-white" id="stage-view-label">ZeroVisual ViT Crop (WebP)</span>
+            <span class="text-slate-600">|</span>
+            <span class="font-mono text-slate-400" id="stage-view-dims">504 × 389 px</span>
+            <span class="text-slate-600">|</span>
+            <span class="font-mono text-emerald-400 font-semibold" id="stage-view-bytes">6.0 KB</span>
+          </div>
+        </div>
+
+        <!-- Token Comparison Metrics Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">ViT Image Tokens</div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-base font-bold text-emerald-400" id="metric-opt-img-tokens">192</span>
+              <span class="text-xs text-slate-500 line-through" id="metric-raw-img-tokens">1,000</span>
+            </div>
+            <div class="text-[11px] text-emerald-400 font-medium mt-0.5" id="metric-img-token-saved">-80.8% ViT Tokens</div>
+          </div>
+
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Payload Size</div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-base font-bold text-cyan-400" id="metric-opt-bytes">6.1 KB</span>
+              <span class="text-xs text-slate-500 line-through" id="metric-raw-bytes">25.2 KB</span>
+            </div>
+            <div class="text-[11px] text-cyan-400 font-medium mt-0.5" id="metric-bytes-saved">-75.6% Transfer</div>
+          </div>
+
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Total Tokens</div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-base font-bold text-indigo-400" id="metric-opt-total-tokens">2,378</span>
+              <span class="text-xs text-slate-500 line-through" id="metric-raw-total-tokens">3,186</span>
+            </div>
+            <div class="text-[11px] text-indigo-400 font-medium mt-0.5" id="metric-total-token-saved">-25.4% Tokens</div>
+          </div>
+
+          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3">
+            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Inference Latency</div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-base font-bold text-slate-200" id="metric-opt-latency">96.8s</span>
+              <span class="text-xs text-slate-500 line-through" id="metric-raw-latency">103.4s</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-medium mt-0.5" id="metric-latency-saved">6% Faster</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: AI Session & Reasoning Inspector (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col">
+        <!-- Inspector Top Navigation Bar -->
+        <div class="bg-slate-950 border border-slate-800 rounded-t-xl px-3.5 py-2.5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">AI Session Trace</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800" id="session-model-chip">
+              Qwen3.8-27B
+            </span>
+          </div>
+
+          <!-- Mode Switcher: With vs Without ZeroVisual -->
+          <div class="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800 text-[11px]" role="tablist">
+            <button type="button" id="session-mode-opt" class="session-mode-btn active px-2.5 py-1 rounded bg-indigo-600 text-white font-medium transition-all" data-mode="with">
+              With ZeroVisual
+            </button>
+            <button type="button" id="session-mode-raw" class="session-mode-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium transition-all" data-mode="without">
+              Without (Raw)
+            </button>
+          </div>
+        </div>
+
+        <!-- Session Content Body Frame -->
+        <div class="bg-slate-950 border-x border-b border-slate-800 rounded-b-xl p-4 flex-1 flex flex-col gap-4 overflow-hidden">
+          
+          <!-- Accuracy Score & Triage Status Card -->
+          <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-400">Triage Accuracy Score</div>
+              <div class="text-lg font-bold text-white flex items-center gap-2">
+                <span id="session-accuracy-score">65%</span>
+                <span class="text-xs font-normal text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30" id="session-match-status">
+                  ✓ Defect Identified
+                </span>
+              </div>
+            </div>
+            <div class="text-right text-[11px] text-slate-400">
+              <div>Reasoning: <span class="font-mono text-slate-200" id="session-reasoning-tokens">1,815</span> tok</div>
+              <div>Completion: <span class="font-mono text-slate-200" id="session-completion-tokens">2,048</span> tok</div>
+            </div>
+          </div>
+
+          <!-- AI Model Diagnosis Response (Answer) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Model Triage Diagnosis</span>
+              <span class="text-[10px] text-slate-500 font-mono">Structured Output</span>
+            </div>
+            <div
+              id="model-diagnosis-text"
+              class="p-3 rounded-lg bg-slate-900/60 border border-slate-800/90 text-xs text-slate-300 font-mono leading-relaxed max-h-[160px] overflow-y-auto whitespace-pre-wrap select-text"
+            >
+              1. Affected Element: .search-box
+              2. Defect: Red outline wrapping search box and button
+              3. Root Cause: border: 2px solid #cc0000 on wrapper
+              4. Fix: Scope border to input only
+            </div>
+          </div>
+
+          <!-- Collapsible Reasoning Trace (<think>) -->
+          <div class="flex-1 flex flex-col min-h-0">
+            <div class="flex items-center justify-between mb-1.5">
+              <button
+                type="button"
+                id="toggle-reasoning-btn"
+                class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                <svg id="reasoning-arrow" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+                <span>VLM Chain-of-Thought Reasoning (&lt;think&gt;)</span>
+              </button>
+              <span class="text-[10px] text-slate-500 font-mono" id="think-token-count">1,815 tokens</span>
+            </div>
+
+            <div
+              id="reasoning-trace-box"
+              class="flex-1 p-3 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-400 leading-relaxed overflow-y-auto max-h-[190px] select-text"
+            >
+              <div id="model-reasoning-text" class="whitespace-pre-wrap">
+                Thinking trace loading...
+              </div>
+            </div>
+          </div>
+
+          <!-- Ground Truth Reference Box -->
+          <div class="p-3 rounded-lg bg-slate-900/40 border border-slate-800/60 text-xs">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+              Ground Truth Defect & Suggested Fix
+            </div>
+            <div class="text-slate-300 text-[11px] leading-snug mb-1" id="ground-truth-desc">
+              The .search-box container is shifted right by 60px with red border.
+            </div>
+            <div class="font-mono text-[10px] text-indigo-300 bg-slate-950/60 p-1.5 rounded border border-slate-800" id="ground-truth-fix">
+              Fix: Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .benchmark-explorer {
+    margin: 2rem 0;
+    font-family: inherit;
+  }
+
+  .case-card.active {
+    border-color: #6366f1 !important;
+    background: rgba(30, 27, 75, 0.45) !important;
+  }
+
+  .filter-btn.active {
+    background: #4f46e5;
+    color: #ffffff;
+  }
+
+  .img-view-tab.active {
+    background: #4f46e5;
+    color: #ffffff;
+  }
+
+  .session-mode-btn.active {
+    background: #4f46e5;
+    color: #ffffff;
+  }
+
+  /* Custom scrollbar for reasoning and diagnosis boxes */
+  #model-diagnosis-text::-webkit-scrollbar,
+  #reasoning-trace-box::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #model-diagnosis-text::-webkit-scrollbar-track,
+  #reasoning-trace-box::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6);
+  }
+
+  #model-diagnosis-text::-webkit-scrollbar-thumb,
+  #reasoning-trace-box::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.5);
+    border-radius: 3px;
+  }
+
+  #model-diagnosis-text::-webkit-scrollbar-thumb:hover,
+  #reasoning-trace-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.6);
+  }
+</style>
+
+<script is:inline define:vars={{ benchmarkData }}>
+  (function () {
+    let currentCaseIndex = 0;
+    let currentViewMode = 'crop'; // 'baseline' | 'actual' | 'diff' | 'crop'
+    let currentSessionMode = 'with'; // 'with' | 'without'
+    let showBoundingBox = false;
+
+    // DOM Elements
+    const caseCards = document.querySelectorAll('.case-card');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const imgViewTabs = document.querySelectorAll('.img-view-tab');
+    const sessionModeBtns = document.querySelectorAll('.session-mode-btn');
+    const toggleBboxBtn = document.getElementById('toggle-bbox-btn');
+    const bboxToggleText = document.getElementById('bbox-toggle-text');
+    const toggleReasoningBtn = document.getElementById('toggle-reasoning-btn');
+    const reasoningArrow = document.getElementById('reasoning-arrow');
+    const reasoningTraceBox = document.getElementById('reasoning-trace-box');
+
+    // Header & Meta Elements
+    const activeDeviceBadge = document.getElementById('active-device-badge');
+    const activeCategoryBadge = document.getElementById('active-category-badge');
+    const activeCaseId = document.getElementById('active-case-id');
+    const activeCaseName = document.getElementById('active-case-name');
+    const activeGroundTruthDefect = document.getElementById('active-ground-truth-defect');
+    const activeTokenSavings = document.getElementById('active-token-savings');
+    const activeByteSavings = document.getElementById('active-byte-savings');
+    const browserUrlText = document.getElementById('browser-url-text');
+    const caseCounter = document.getElementById('case-counter');
+
+    // Stage Elements
+    const mainStageImg = document.getElementById('main-stage-img');
+    const bboxOverlay = document.getElementById('bbox-overlay');
+    const bboxCoordChip = document.getElementById('bbox-coord-chip');
+    const stageViewLabel = document.getElementById('stage-view-label');
+    const stageViewDims = document.getElementById('stage-view-dims');
+    const stageViewBytes = document.getElementById('stage-view-bytes');
+
+    // Metric Elements
+    const metricOptImgTokens = document.getElementById('metric-opt-img-tokens');
+    const metricRawImgTokens = document.getElementById('metric-raw-img-tokens');
+    const metricImgTokenSaved = document.getElementById('metric-img-token-saved');
+    const metricOptBytes = document.getElementById('metric-opt-bytes');
+    const metricRawBytes = document.getElementById('metric-raw-bytes');
+    const metricBytesSaved = document.getElementById('metric-bytes-saved');
+    const metricOptTotalTokens = document.getElementById('metric-opt-total-tokens');
+    const metricRawTotalTokens = document.getElementById('metric-raw-total-tokens');
+    const metricTotalTokenSaved = document.getElementById('metric-total-token-saved');
+    const metricOptLatency = document.getElementById('metric-opt-latency');
+    const metricRawLatency = document.getElementById('metric-raw-latency');
+    const metricLatencySaved = document.getElementById('metric-latency-saved');
+
+    // Session Elements
+    const sessionAccuracyScore = document.getElementById('session-accuracy-score');
+    const sessionMatchStatus = document.getElementById('session-match-status');
+    const sessionReasoningTokens = document.getElementById('session-reasoning-tokens');
+    const sessionCompletionTokens = document.getElementById('session-completion-tokens');
+    const modelDiagnosisText = document.getElementById('model-diagnosis-text');
+    const modelReasoningText = document.getElementById('model-reasoning-text');
+    const thinkTokenCount = document.getElementById('think-token-count');
+    const groundTruthDesc = document.getElementById('ground-truth-desc');
+    const groundTruthFix = document.getElementById('ground-truth-fix');
+
+    function getDomainForCase(item) {
+      if (item.id.includes('wikipedia')) return 'https://www.wikipedia.org/';
+      if (item.id.includes('hackernews')) return 'https://news.ycombinator.com/';
+      if (item.id.includes('github-pricing')) return 'https://github.com/pricing';
+      if (item.id.includes('github-pr')) return 'https://github.com/hotcode-dev/zerovisual/pull/42';
+      if (item.id.includes('mdn')) return 'https://developer.mozilla.org/en-US/';
+      if (item.id.includes('saas')) return 'https://cloud-saas.example.com/pricing';
+      if (item.id.includes('ecommerce')) return 'https://store.example.com/cart';
+      if (item.id.includes('dashboard')) return 'https://analytics.internal/dashboard';
+      return 'https://app.example.com/';
+    }
+
+    function renderActiveCase() {
+      const item = benchmarkData[currentCaseIndex];
+      if (!item) return;
+
+      // Update Case Header
+      if (activeDeviceBadge) activeDeviceBadge.textContent = `${item.device} (${item.viewport.width}×${item.viewport.height})`;
+      if (activeCategoryBadge) activeCategoryBadge.textContent = item.category;
+      if (activeCaseId) activeCaseId.textContent = item.id;
+      if (activeCaseName) activeCaseName.textContent = item.name;
+      if (activeGroundTruthDefect) activeGroundTruthDefect.textContent = item.groundTruth.defect;
+      if (activeTokenSavings) activeTokenSavings.textContent = `-${item.savings.imageTokens}`;
+      if (activeByteSavings) activeByteSavings.textContent = `-${item.savings.bytes}`;
+      if (browserUrlText) browserUrlText.textContent = getDomainForCase(item);
+      if (caseCounter) caseCounter.textContent = `Case ${currentCaseIndex + 1} of ${benchmarkData.length}`;
+
+      // Update Metrics Grid
+      if (metricOptImgTokens) metricOptImgTokens.textContent = item.with.imageTokens.toLocaleString();
+      if (metricRawImgTokens) metricRawImgTokens.textContent = item.without.imageTokens.toLocaleString();
+      if (metricImgTokenSaved) metricImgTokenSaved.textContent = `-${item.savings.imageTokens} ViT Tokens`;
+
+      if (metricOptBytes) metricOptBytes.textContent = `${(item.with.imagePayloadBytes / 1024).toFixed(1)} KB`;
+      if (metricRawBytes) metricRawBytes.textContent = `${(item.without.imagePayloadBytes / 1024).toFixed(1)} KB`;
+      if (metricBytesSaved) metricBytesSaved.textContent = `-${item.savings.bytes} Transfer`;
+
+      if (metricOptTotalTokens) metricOptTotalTokens.textContent = item.with.totalTokens.toLocaleString();
+      if (metricRawTotalTokens) metricRawTotalTokens.textContent = item.without.totalTokens.toLocaleString();
+      if (metricTotalTokenSaved) metricTotalTokenSaved.textContent = `-${item.savings.totalTokens} Tokens`;
+
+      if (metricOptLatency) metricOptLatency.textContent = `${(item.with.latencyMs / 1000).toFixed(1)}s`;
+      if (metricRawLatency) metricRawLatency.textContent = `${(item.without.latencyMs / 1000).toFixed(1)}s`;
+      if (metricLatencySaved) metricLatencySaved.textContent = item.savings.latency;
+
+      // Update Ground Truth
+      if (groundTruthDesc) groundTruthDesc.textContent = item.groundTruth.defect;
+      if (groundTruthFix) groundTruthFix.textContent = `Expected: ${item.groundTruth.suggestedFix}`;
+
+      // Update Image Stage
+      renderImageStage(item);
+
+      // Update AI Session Inspector
+      renderSessionInspector(item);
+
+      // Update Active Card in Selector
+      caseCards.forEach((card, idx) => {
+        if (idx === currentCaseIndex) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+    }
+
+    function renderImageStage(item) {
+      if (!mainStageImg) return;
+
+      let src = item.cropPath;
+      let label = 'ZeroVisual ViT Crop (WebP)';
+      let dims = `${item.with.imageResolution.width} × ${item.with.imageResolution.height} px`;
+      let bytes = `${(item.with.imagePayloadBytes / 1024).toFixed(1)} KB`;
+
+      if (currentViewMode === 'baseline') {
+        src = item.baselinePath;
+        label = 'Pristine Baseline (Pre-Bug)';
+        dims = `${item.viewport.width} × ${item.viewport.height} px`;
+        bytes = `${(item.without.imagePayloadBytes / 1024).toFixed(1)} KB`;
+      } else if (currentViewMode === 'actual') {
+        src = item.actualPath;
+        label = 'Actual Viewport (Injected Regression)';
+        dims = `${item.viewport.width} × ${item.viewport.height} px`;
+        bytes = `${(item.without.imagePayloadBytes / 1024).toFixed(1)} KB`;
+      } else if (currentViewMode === 'diff') {
+        src = item.diffPath;
+        label = 'Pixel Diff Overlay';
+        dims = `${item.viewport.width} × ${item.viewport.height} px`;
+        bytes = 'Diff Mask';
+      }
+
+      mainStageImg.src = src;
+      if (stageViewLabel) stageViewLabel.textContent = label;
+      if (stageViewDims) stageViewDims.textContent = dims;
+      if (stageViewBytes) stageViewBytes.textContent = bytes;
+
+      // Update Bounding Box Overlay
+      if (bboxOverlay && bboxCoordChip) {
+        if (showBoundingBox && currentViewMode !== 'crop') {
+          bboxOverlay.classList.remove('hidden');
+          const box = item.cropBox;
+          const leftPct = (box.x / item.viewport.width) * 100;
+          const topPct = (box.y / item.viewport.height) * 100;
+          const widthPct = (box.width / item.viewport.width) * 100;
+          const heightPct = (box.height / item.viewport.height) * 100;
+
+          bboxOverlay.style.left = `${leftPct}%`;
+          bboxOverlay.style.top = `${topPct}%`;
+          bboxOverlay.style.width = `${widthPct}%`;
+          bboxOverlay.style.height = `${heightPct}%`;
+          bboxCoordChip.textContent = `Crop Box: ${box.x},${box.y} (${box.width}×${box.height})`;
+        } else {
+          bboxOverlay.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderSessionInspector(item) {
+      const session = currentSessionMode === 'with' ? item.with : item.without;
+      if (!session) return;
+
+      if (sessionAccuracyScore) sessionAccuracyScore.textContent = `${session.accuracyScore}%`;
+      if (sessionMatchStatus) {
+        if (session.accuracyScore >= 65) {
+          sessionMatchStatus.textContent = '✓ Defect Correctly Identified';
+          sessionMatchStatus.className = 'text-xs font-normal text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30';
+        } else {
+          sessionMatchStatus.textContent = '⚠ Partial / No Match';
+          sessionMatchStatus.className = 'text-xs font-normal text-amber-400 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30';
+        }
+      }
+
+      if (sessionReasoningTokens) sessionReasoningTokens.textContent = session.reasoningTokens.toLocaleString();
+      if (sessionCompletionTokens) sessionCompletionTokens.textContent = session.completionTokens.toLocaleString();
+      if (thinkTokenCount) thinkTokenCount.textContent = `${session.reasoningTokens.toLocaleString()} tokens`;
+
+      if (modelDiagnosisText) {
+        modelDiagnosisText.textContent = session.modelAnswer || 'No structured model answer recorded.';
+      }
+
+      if (modelReasoningText) {
+        modelReasoningText.textContent = session.modelReasoning || 'Reasoning trace not recorded.';
+      }
+    }
+
+    // Attach Event Listeners
+    caseCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.getAttribute('data-case-index') || '0', 10);
+        currentCaseIndex = idx;
+        renderActiveCase();
+      });
+    });
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+        caseCards.forEach((card) => {
+          const isReal = card.getAttribute('data-is-real') === 'true';
+          if (filter === 'all') {
+            card.style.display = '';
+          } else if (filter === 'real') {
+            card.style.display = isReal ? '' : 'none';
+          } else if (filter === 'synthetic') {
+            card.style.display = !isReal ? '' : 'none';
+          }
+        });
+      });
+    });
+
+    imgViewTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        imgViewTabs.forEach((t) => t.classList.remove('active', 'bg-indigo-600', 'text-white'));
+        imgViewTabs.forEach((t) => t.classList.add('text-slate-400'));
+        tab.classList.add('active', 'bg-indigo-600', 'text-white');
+        tab.classList.remove('text-slate-400');
+
+        currentViewMode = tab.getAttribute('data-view') || 'crop';
+        renderActiveCase();
+      });
+    });
+
+    sessionModeBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sessionModeBtns.forEach((b) => b.classList.remove('active', 'bg-indigo-600', 'text-white'));
+        sessionModeBtns.forEach((b) => b.classList.add('text-slate-400'));
+        btn.classList.add('active', 'bg-indigo-600', 'text-white');
+        btn.classList.remove('text-slate-400');
+
+        currentSessionMode = btn.getAttribute('data-mode') || 'with';
+        const item = benchmarkData[currentCaseIndex];
+        renderSessionInspector(item);
+      });
+    });
+
+    if (toggleBboxBtn) {
+      toggleBboxBtn.addEventListener('click', () => {
+        showBoundingBox = !showBoundingBox;
+        if (bboxToggleText) {
+          bboxToggleText.textContent = showBoundingBox ? 'Hide Diff Bounding Box' : 'Show Diff Bounding Box';
+        }
+        toggleBboxBtn.classList.toggle('bg-rose-500/20', showBoundingBox);
+        toggleBboxBtn.classList.toggle('border-rose-500/50', showBoundingBox);
+        renderActiveCase();
+      });
+    }
+
+    let reasoningExpanded = true;
+    if (toggleReasoningBtn && reasoningTraceBox && reasoningArrow) {
+      toggleReasoningBtn.addEventListener('click', () => {
+        reasoningExpanded = !reasoningExpanded;
+        reasoningTraceBox.style.display = reasoningExpanded ? 'block' : 'none';
+        reasoningArrow.style.transform = reasoningExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+      });
+    }
+
+    // Initial Render
+    renderActiveCase();
+  })();
+</script>

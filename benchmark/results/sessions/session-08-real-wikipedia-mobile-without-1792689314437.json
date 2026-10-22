@@ -1,0 +1,46 @@
+{
+  "id": "session-08-real-wikipedia-mobile-without-1792689314437",
+  "timestamp": "2026-10-22T17:15:14.437Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "08-real-wikipedia-mobile",
+  "caseName": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 50042,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\nLanguage Grid / Language List (specifically the \"Русский\" / Russian language block).\n\n**2. Nature of the Visual Defect:**\nText wrapping / Vertical misalignment. The text \"статей\" in the Russian block wraps to a second line, causing the row to expand and breaking the visual alignment of the 3-column grid.\n\n**3. Probable Root Cause in CSS or layout:**\nThe allocated width for the grid columns is insufficient for the Cyrillic text string (\"2 123 000+ статей\") at the current font size, forcing a line break.\n\n**4. Suggested Fix or code snippet:**\nApply `white-space: nowrap;` to the text element to prevent it from wrapping, or slightly increase the column width / decrease the font size.\n\n```css\n/* Option 1: Prevent wrapping */\n.language-count {\n  white-space: nowrap;\n}\n\n/* Option 2: Adjust column width (if using CSS Grid) */\n.language-grid {\n  grid-template-columns: repeat(3, minmax(120px, 1fr)); /* Increase min width */\n}\n```",
+    "reasoning": "1.  **Analyze the image:** The screenshot shows a Wikipedia language selection page. The layout consists of a 3-column grid of language links.\n2.  **Identify the defect:** In the second row, the middle column (\"Русский\") has its text (\"2 123 000+ статей\") wrapping onto two lines, whereas the adjacent columns (\"Français\" and \"Español\") have their text on a single line. This causes a vertical misalignment in the grid.\n3.  **Determine root cause:** The container width for the middle column is slightly too narrow to accommodate the Cyrillic text \"статей\" on the same line as the number, or the font size is slightly too large for the allocated space.\n4.  **Formulate fix:** Increase the column width, reduce the font size, or use `white-space: nowrap` to prevent the text from breaking.\n"
+  },
+  "metrics": {
+    "promptTokens": 390,
+    "imageTokens": 252,
+    "completionTokens": 450,
+    "reasoningTokens": 195,
+    "totalTokens": 840,
+    "latencyMs": 15400,
+    "accuracyScore": 0
+  },
+  "groundTruth": {
+    "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+    "affectedElement": "#js-lang-list-button",
+    "defectType": "button_displacement",
+    "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+    "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+    "expectedBoundingBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  }
+}

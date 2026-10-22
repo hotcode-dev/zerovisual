@@ -1,0 +1,52 @@
+{
+  "id": "session-11-real-mdn-search-mobile-with-1792689817171",
+  "timestamp": "2026-10-22T17:23:37.171Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "11-real-mdn-search-mobile",
+  "caseName": "Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 168
+    },
+    "format": "webp",
+    "bytes": 4774,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\nRight hand cursor graphic and its container.\n\n**2. Nature of the Visual Defect**\nUnintended background block / Element overlap. A light purple/white rectangular box is visible behind the right hand cursor, breaking the solid blue background of the banner.\n\n**3. Probable Root Cause in CSS or layout**\nThe container wrapping the right hand cursor image has an unintended background color (likely defaulting to white or a light theme color) instead of being transparent. Alternatively, it could be a z-index issue where a background layer is incorrectly overlapping the main banner.\n\n**4. Suggested Fix or code snippet**\nEnsure the container for the right hand cursor has a transparent background.\n\n```css\n.right-hand-cursor-container {\n  background: transparent; /* or background: none; */\n}\n```",
+    "reasoning": "1.  **Analyze the image:** The image shows a blue banner with the text \"Build faster.\" and a \"WorkOS\" logo. To the right, there are two hand cursor icons. The right hand cursor is overlapping a light purple/white rectangular block. There is also an \"AD\" badge in the bottom right corner.\n2.  **Identify the defect:** The most glaring issue is the light purple rectangular block behind the right hand cursor. It looks like a placeholder, an unstyled background, or a misaligned container. It breaks the visual continuity of the blue banner.\n3.  **Determine the affected element:** The right hand cursor graphic and its container/background.\n4.  **Determine the nature of the defect:** Element overlap / Unstyled background block / Z-index issue.\n5.  **Determine the probable root cause:** The container for the right hand cursor has an unintended background color (light purple/white) or a missing `background: transparent`. Alternatively, it could be a z-index issue where a background element is bleeding through.\n6.  **Formulate the suggested fix:** Ensure the container for the right hand cursor has a transparent background.\n"
+  },
+  "metrics": {
+    "promptTokens": 216,
+    "imageTokens": 78,
+    "completionTokens": 431,
+    "reasoningTokens": 249,
+    "totalTokens": 647,
+    "latencyMs": 14413,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.",
+    "affectedElement": "input[type=\"search\"]",
+    "defectType": "contrast_violation",
+    "rootCause": "White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)",
+    "suggestedFix": "Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "session-08-real-wikipedia-mobile-with-1792689394573",
+  "timestamp": "2026-10-22T17:16:34.573Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "08-real-wikipedia-mobile",
+  "caseName": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 370,
+      "height": 133
+    },
+    "format": "webp",
+    "bytes": 1574,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  },
+  "output": {
+    "content": "\n\n**Finding 1 — Article counter (`1 711 000+ haseł`)**\n1. **Element:** Stats / article-count label.\n2. **Defect:** Unwanted line wrap — `haseł` breaks to a second line and looks mis‑aligned (indented) under the number.\n3. **Root cause:** Container `max-width` too narrow for the full string at the current `font-size`; combined with `text-align:center`, the shorter wrapped line centers and appears offset. No `nowrap`/flex on the number+label pair.\n4. **Fix:**\n```css\n.counter { white-space: nowrap; }            /* keep on one line */\n/* or, if wrapping is acceptable, align left + use flex: */\n.counter { display: flex; align-items: baseline; gap: .35em; text-align: left; }\n```\nAlso widen the parent or step down `font-size` so the string fits.\n\n**Finding 2 — Language selector (`Read Wikipedia in your language`)**\n1. **Element:** Language / search dropdown (globe icon + placeholder + chevron).\n2. **Defect:** Contrast violation — text, icon and chevron are near‑invisible (very light gray on white).\n3. **Root cause:** Muted‑text color too light (e.g. `#f0f0f0` / `rgba(0,0,0,.05)`), failing WCAG 4.5:1; icon likely not inheriting `currentColor`.\n4. **Fix:**\n```css\n.lang-select { color: #6b7280; }            /* ≥ 4.5:1 on white */\n.lang-select svg { fill: currentColor; }\n```\n\n**Primary regression to fix first:** Finding 1 (layout wrap) — it changes the bounding box and is the most likely pixel‑diff trigger; Finding 2 is a contrast/AA issue to file alongside.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nWhat do I see? There's text \"1 711 000+\" on one line, then \"haseł\" on the next line. This looks like a counter that should read \"1 711 000+ haseł\" (Polish for \"articles\" or \"entries\"). The text is wrapping awkwardly — the number and the word \"haseł\" are on separate lines, with the word indented/centered relative to the number, suggesting the container is too narrow to fit them on one line.\n\nBelow that is a very faint, low-contrast element: a search box or language selector that says \"Read Wikipedia in your language\" with a globe icon and a chevron. The text color is extremely light gray on white — a contrast violation. It's barely visible.\n\nThen there's a horizontal line (border/divider) below.\n\nSo there are potentially two defects here. Let me think about which is the \"failed visual test\" primary defect. The screenshot shows two issues:\n\n1. The text \"1 711 000+ haseł\" is wrapping onto two lines — the word \"haseł\" is on a new line, misaligned. This is a text wrap / line break issue. The container width is too narrow, or there's a `white-space` issue, or the font size is too large for the container.\n\n2. The \"Read Wikipedia in your language\" element has extremely low contrast — the placeholder text and icon are nearly invisible (light gray on white). This is a contrast violation.\n\nBoth are valid. The question asks to identify the affected element, nature of defect, root cause, fix. I should probably address both, but the prompt says \"Identify\" with a single list. I think the most prominent visual regression is the text wrapping of the counter, but the contrast issue is also glaring.\n\nHmm. Let me look at the layout. The number \"1 711 000+\" is left-aligned at the top. \"haseł\" is on the next line but appears centered/indented relative to the number. Actually it looks like the number is left-aligned and \"haseł\" is also left-aligned but the whole block might be centered? Hard to say. The number starts at x~70, \"haseł\" starts at x~110. So they're not aligned. That's odd. Maybe the container is narrow and the text is centered, so the longer line \"1 711 000+\" extends further left, and the shorter line \"haseł\" is centered, hence indented. Yes! That's classic text-align: center on a narrow container. The number line is wider so it sticks out more on both sides; \"haseł\" is shorter so it's centered, appearing indented. So the root cause is the container width is too small to fit \"1 711 000+ haseł\" on one line, causing a wrap, and because of center alignment the second line looks misaligned.\n\nSo defect 1: text wrap / line break in the article counter.\n\nDefect 2: contrast violation on the language selector.\n\nI'll present both but lead with the most likely regression. Actually, the prompt format suggests one element. But a good QA engineer would note both. I'll be concise and list both as two findings, or pick the primary. The instruction: \"Identify: 1. Affected Element / Component name 2. Nature... 3. Root cause 4. Fix\". It's a single set. I think I should give the primary defect clearly, then maybe a secondary note. But to be safe and concise, I'll provide the main one (the counter wrap) and add a brief secondary note about contrast. Actually the contrast issue is also a clear visual defect that a visual regression test would flag (pixel diff on the faint text). Hmm.\n\nLet me think about what a \"failed visual test\" screenshot typically highlights. The whole region is the diff region. Both elements are in it. I'll address both but keep it tight. I'll structure as two findings to be thorough but concise. The user said \"Be concise and direct.\" So I'll do a compact two-item list.\n\nLet me write the response.\n\nFinding A — Article counter (\"1 711 000+ haseł\"):\n- Defect: unwanted line break / text wrap; \"haseł\" drops to second line and appears misaligned (centered) relative to the number.\n- Root cause: container max-width too narrow for the combined string at current font-size; text-align:center makes the shorter wrapped line look indented. Possibly missing `white-space: nowrap` or `flex` layout.\n- Fix: widen container or set `white-space: nowrap` / use flex with gap so number and label stay on one line; or reduce font-size; align with `text-align: left` or use a flex row.\n\nFinding B — Language selector (\"Read Wikipedia in your language\"):\n- Defect: contrast violation — placeholder text + globe icon + chevron are near-invisible (very light gray on white).\n- Root cause: color set too light (e.g., #f0f0f0 / rgba(0,0,0,0.05)) failing WCAG 4.5:1; possibly a CSS variable for muted text not applied / overridden.\n- Fix: increase contrast, e.g., color: #6b7280 or rgba(0,0,0,0.55); ensure icon fill uses currentColor.\n\nI'll present concisely. Provide code snippets.\n\nFormat: I'll use a short numbered structure matching the four points but with two components. Maybe better: give the four points for the primary, then a \"Secondary\" block. The user explicitly enumerated 1-4, so I'll follow that for the primary and add a secondary note. Let me make primary = the counter wrap since it's the most \"layout regression\" type and at the top. Actually the contrast one is also strong. I'll just present both as two compact entries each with the 4 fields, but that's verbose. The instruction \"concise and direct\" — I'll do two short blocks.\n\nLet me write it.\n"
+  },
+  "metrics": {
+    "promptTokens": 208,
+    "imageTokens": 70,
+    "completionTokens": 1790,
+    "reasoningTokens": 1364,
+    "totalTokens": 1998,
+    "latencyMs": 80120,
+    "accuracyScore": 0
+  },
+  "groundTruth": {
+    "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+    "affectedElement": "#js-lang-list-button",
+    "defectType": "button_displacement",
+    "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+    "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+    "expectedBoundingBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  }
+}

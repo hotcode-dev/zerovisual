@@ -1,0 +1,46 @@
+{
+  "id": "session-03-saas-pricing-contrast-without-1792688861430",
+  "timestamp": "2026-10-22T17:07:41.430Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 35106,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n1. **Affected Element / Component name:** \"Get Pro\" button in the \"Pro\" pricing card.\n2. **Nature of the Visual Defect:** Contrast violation. The text \"Get Pro\" is light gray on a light gray background, making it nearly illegible.\n3. **Probable Root Cause in CSS or layout:** The button's text color is set to a light shade (e.g., `color: #9ca3af;`) that does not provide sufficient contrast against its background color (e.g., `background-color: #e5e7eb;`). This could be due to a disabled state style being applied incorrectly, or a CSS specificity issue overriding the intended text color.\n4. **Suggested Fix or code snippet:** \n   - If the button is meant to be active: Change the text color to a darker shade (e.g., `color: #1f2937;`).\n   - If the button is meant to be disabled: Ensure the contrast ratio still meets accessibility standards, or use a more distinct disabled style (e.g., `opacity: 0.5;` on a normally styled button).\n   ```css\n   /* Example fix for active state */\n   .btn-pro {\n     background-color: #e5e7eb;\n     color: #1f2937; /* Darker text for contrast */\n   }\n   ```",
+    "reasoning": "1.  **Analyze the image:** The image shows a pricing table with three columns: Starter, Pro, and Enterprise.\n2.  **Identify the defect:** The \"Pro\" column has a blue border. Inside this column, the \"Get Pro\" button has very low contrast. The text \"Get Pro\" is a light gray color on a light gray background, making it nearly unreadable.\n3.  **Determine the affected element:** The \"Get Pro\" button in the \"Pro\" pricing card.\n4.  **Nature of the defect:** Contrast violation / unreadable text.\n5.  **Probable root cause:** The button likely has a disabled state or a specific class applied that sets the text color to a light gray (e.g., `#9ca3af` or similar) while the background is also a light gray (e.g., `#e5e7eb`). Alternatively, it might be a hover state that wasn't captured correctly, or a CSS specificity issue overriding the default text color.\n6.  **Suggested fix:** Ensure the text color has sufficient contrast against the background. If it's a disabled state, it might be acceptable, but usually, disabled states still need some readability. If it's an active state, the text color needs to be darker.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 572,
+    "reasoningTokens": 275,
+    "totalTokens": 1710,
+    "latencyMs": 20706,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

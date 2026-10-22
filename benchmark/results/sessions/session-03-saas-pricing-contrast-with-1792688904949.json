@@ -1,0 +1,52 @@
+{
+  "id": "session-03-saas-pricing-contrast-with-1792688904949",
+  "timestamp": "2026-10-22T17:08:24.949Z",
+  "benchmarkRunTimestamp": "2026-10-22T17:02:08.728Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 274,
+      "height": 103
+    },
+    "format": "webp",
+    "bytes": 572,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 503,
+      "y": 262,
+      "width": 274,
+      "height": 103
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`Get Pro` CTA button (the inner rounded pill inside the bordered card).\n\n**2. Nature of the Visual Defect**\nSevere **contrast violation / color mismatch** on the button label. The text \"Get Pro\" is rendered in a near‑background light gray (~`#C8CED8`) on a pale blue‑gray fill (~`#DCE2EC`), making it almost illegible. The button also lacks its expected solid brand fill and reads as a flat, washed‑out block.\n\n**3. Probable Root Cause**\nCSS token/variable mismatch on the button class. Most likely the `background-color` token resolved to a light surface value (or the rule was dropped, falling back to a default gray) while `color` resolved to a light \"muted text\" token intended for dark backgrounds. A secondary possibility: an unintended `opacity` / `:disabled` / `:focus` state is being applied, washing out both fill and label.\n\n**4. Suggested Fix**\nPin explicit, high‑contrast values (and verify no stray opacity/disabled rule is overriding them):\n\n```css\n.btn-pro {\n  background-color: var(--brand-500, #4F46E5); /* solid indigo, matches card border */\n  color: #FFFFFF;                              /* WCAG AA+ contrast */\n  border: 1px solid transparent;\n  opacity: 1;\n}\n.btn-pro:hover { background-color: var(--brand-600, #4338CA); }\n```\n\nIf the pale fill is intentional, change only the label to a dark token:\n```css\n.btn-pro { color: var(--text-strong, #1F2937); }\n```\nRe‑run the snapshot after the change and confirm the label passes a 4.5:1 contrast check.",
+    "reasoning": "The user wants a concise, direct analysis of a failed visual regression screenshot. Let me look carefully at the image.\n\nWhat I see: A rounded rectangle container with a thin purple/indigo border. Inside, there's a button labeled \"Get Pro\". The button has a light gray/blue background, but the text \"Get Pro\" is extremely low contrast—it's a very light gray on a slightly darker light gray background. The text is barely legible. The button also appears to have no visible border or distinct styling that would make it pop; it's just a flat pale rectangle.\n\nLet me look at the contrast. The button background is roughly #DDE3EC (light blue-gray). The text color appears to be roughly #C5CBD5 or similar—very close to the background. This is a contrast violation. The text is washed out.\n\nSo the affected element is the \"Get Pro\" button (CTA button).\n\nNature of defect: Low text contrast / color mismatch. The button label text color is too close to the button background color, making it nearly invisible. Possibly also the button background color is wrong (should be a solid brand color like indigo/purple to match the border, but it's rendered as a pale gray—maybe a missing background color or a wrong CSS variable, or a disabled state being applied incorrectly).\n\nActually, look again: the border of the outer container is purple/indigo. The button inside is pale gray. This suggests the button's intended background (probably indigo) failed to apply, falling back to a default light gray, OR the text color variable resolved to a near-background value.\n\nTwo plausible root causes:\n1. The button background color CSS variable is undefined/overridden, defaulting to a light gray, while the text color is also light (maybe intended for a dark background).\n2. A disabled/opacity state is being applied (opacity: 0.5 or similar) washing out both.\n\nBut the most salient visual defect is the contrast violation on the label.\n\nProbable root cause: CSS color variable mismatch—`.btn-pro` background set to a light neutral (`--surface-2` or similar) while `color` is set to a light text token (`--text-muted`), or a missing `background-color` causing fallback. Could also be an `opacity` or `filter` applied.\n\nSuggested fix: Set explicit high-contrast colors. E.g., background indigo, text white. Provide snippet.\n\nLet me be concise. The instruction says be concise and direct. I'll provide the four numbered items.\n\nI'll write the response in English.\n"
+  },
+  "metrics": {
+    "promptTokens": 208,
+    "imageTokens": 70,
+    "completionTokens": 959,
+    "reasoningTokens": 549,
+    "totalTokens": 1167,
+    "latencyMs": 43489,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

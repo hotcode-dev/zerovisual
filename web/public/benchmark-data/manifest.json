@@ -1,0 +1,541 @@
+[
+  {
+    "id": "01-wikipedia-search-offset",
+    "name": "Wikipedia Portal Search Bar Shift",
+    "category": "Layout Shift / Component Offset",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 25172,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/01-wikipedia-search-offset/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 389,
+      "bytes": 6134,
+      "tokens": 252,
+      "box": {
+        "x": 338,
+        "y": 160,
+        "width": 634,
+        "height": 489
+      },
+      "imagePath": "/benchmark-data/01-wikipedia-search-offset/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/01-wikipedia-search-offset/baseline.png",
+    "diffPath": "/benchmark-data/01-wikipedia-search-offset/diff.png",
+    "savings": {
+      "tokens": "81.1%",
+      "bytes": "75.6%"
+    },
+    "groundTruth": {
+      "defect": "The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.",
+      "affectedElement": ".search-box",
+      "defectType": "layout_shift",
+      "rootCause": "Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS",
+      "suggestedFix": "Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c",
+      "expectedBoundingBox": {
+        "x": 370,
+        "y": 460,
+        "width": 600,
+        "height": 90
+      }
+    }
+  },
+  {
+    "id": "02-github-pr-merge",
+    "name": "GitHub Pull Request Merge Card Regression",
+    "category": "Button Layout Shift / Sizing",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 27720,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/02-github-pr-merge/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 92,
+      "bytes": 3420,
+      "tokens": 72,
+      "box": {
+        "x": 8,
+        "y": 106,
+        "width": 864,
+        "height": 158
+      },
+      "imagePath": "/benchmark-data/02-github-pr-merge/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/02-github-pr-merge/baseline.png",
+    "diffPath": "/benchmark-data/02-github-pr-merge/diff.png",
+    "savings": {
+      "tokens": "94.6%",
+      "bytes": "87.7%"
+    },
+    "groundTruth": {
+      "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+      "affectedElement": ".btn-merge",
+      "defectType": "button_styling_regression",
+      "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+      "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+      "expectedBoundingBox": {
+        "x": 550,
+        "y": 110,
+        "width": 280,
+        "height": 90
+      }
+    }
+  },
+  {
+    "id": "03-saas-pricing-contrast",
+    "name": "SaaS Pricing Card Contrast Violation",
+    "category": "Accessibility / Color Contrast Failure",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 35106,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/03-saas-pricing-contrast/actual.png"
+    },
+    "opt": {
+      "width": 274,
+      "height": 103,
+      "bytes": 572,
+      "tokens": 40,
+      "box": {
+        "x": 503,
+        "y": 262,
+        "width": 274,
+        "height": 103
+      },
+      "imagePath": "/benchmark-data/03-saas-pricing-contrast/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/03-saas-pricing-contrast/baseline.png",
+    "diffPath": "/benchmark-data/03-saas-pricing-contrast/diff.png",
+    "savings": {
+      "tokens": "97.0%",
+      "bytes": "98.4%"
+    },
+    "groundTruth": {
+      "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+      "affectedElement": ".cta-pro",
+      "defectType": "accessibility_contrast_violation",
+      "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+      "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+      "expectedBoundingBox": {
+        "x": 508,
+        "y": 310,
+        "width": 212,
+        "height": 48
+      }
+    }
+  },
+  {
+    "id": "04-ecommerce-checkout-collision",
+    "name": "E-Commerce Checkout Total & Button Collision",
+    "category": "Layout Collision / Margin Collapse",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 22948,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/04-ecommerce-checkout-collision/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 328,
+      "bytes": 7156,
+      "tokens": 216,
+      "box": {
+        "x": 388,
+        "y": 247,
+        "width": 504,
+        "height": 328
+      },
+      "imagePath": "/benchmark-data/04-ecommerce-checkout-collision/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/04-ecommerce-checkout-collision/baseline.png",
+    "diffPath": "/benchmark-data/04-ecommerce-checkout-collision/diff.png",
+    "savings": {
+      "tokens": "83.8%",
+      "bytes": "68.8%"
+    },
+    "groundTruth": {
+      "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+      "affectedElement": ".total-row and .btn-pay",
+      "defectType": "layout_element_collision",
+      "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+      "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+      "expectedBoundingBox": {
+        "x": 420,
+        "y": 440,
+        "width": 440,
+        "height": 100
+      }
+    }
+  },
+  {
+    "id": "05-dashboard-stat-overflow",
+    "name": "Dashboard KPI Metric Overflow and Clipping",
+    "category": "Text Overflow / Component Clipping",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 33568,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/05-dashboard-stat-overflow/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 66,
+      "bytes": 3452,
+      "tokens": 54,
+      "box": {
+        "x": 8,
+        "y": 109,
+        "width": 1264,
+        "height": 166
+      },
+      "imagePath": "/benchmark-data/05-dashboard-stat-overflow/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/05-dashboard-stat-overflow/baseline.png",
+    "diffPath": "/benchmark-data/05-dashboard-stat-overflow/diff.png",
+    "savings": {
+      "tokens": "96.0%",
+      "bytes": "89.7%"
+    },
+    "groundTruth": {
+      "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+      "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+      "defectType": "typography_overflow_clipping",
+      "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+      "suggestedFix": "Restore font-size: 28px and color: #fff",
+      "expectedBoundingBox": {
+        "x": 345,
+        "y": 90,
+        "width": 285,
+        "height": 130
+      }
+    }
+  },
+  {
+    "id": "06-mobile-nav-overflow",
+    "name": "Mobile Safari Navigation Drawer Overflow",
+    "category": "Mobile Responsive / Viewport Overflow",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "device": "iPhone 14",
+    "raw": {
+      "width": 390,
+      "height": 664,
+      "bytes": 5612,
+      "tokens": 336,
+      "imagePath": "/benchmark-data/06-mobile-nav-overflow/actual.png"
+    },
+    "opt": {
+      "width": 194,
+      "height": 121,
+      "bytes": 1482,
+      "tokens": 35,
+      "box": {
+        "x": 0,
+        "y": 0,
+        "width": 194,
+        "height": 121
+      },
+      "imagePath": "/benchmark-data/06-mobile-nav-overflow/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/06-mobile-nav-overflow/baseline.png",
+    "diffPath": "/benchmark-data/06-mobile-nav-overflow/diff.png",
+    "savings": {
+      "tokens": "89.6%",
+      "bytes": "73.6%"
+    },
+    "groundTruth": {
+      "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+      "affectedElement": ".hamburger",
+      "defectType": "mobile_viewport_overflow",
+      "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+      "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+      "expectedBoundingBox": {
+        "x": 330,
+        "y": 10,
+        "width": 60,
+        "height": 50
+      }
+    }
+  },
+  {
+    "id": "07-real-wikipedia-desktop",
+    "name": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+    "category": "Real Website / Layout Shift",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 125273,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/07-real-wikipedia-desktop/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 145,
+      "bytes": 6070,
+      "tokens": 108,
+      "box": {
+        "x": 0,
+        "y": 432,
+        "width": 1280,
+        "height": 368
+      },
+      "imagePath": "/benchmark-data/07-real-wikipedia-desktop/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/07-real-wikipedia-desktop/baseline.png",
+    "diffPath": "/benchmark-data/07-real-wikipedia-desktop/diff.png",
+    "savings": {
+      "tokens": "91.9%",
+      "bytes": "95.2%"
+    },
+    "groundTruth": {
+      "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+      "affectedElement": "#search-form",
+      "defectType": "layout_shift",
+      "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+      "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+      "expectedBoundingBox": {
+        "x": 0,
+        "y": 432,
+        "width": 1280,
+        "height": 368
+      }
+    }
+  },
+  {
+    "id": "08-real-wikipedia-mobile",
+    "name": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+    "category": "Real Website / Mobile Regression",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "device": "iPhone 13",
+    "raw": {
+      "width": 390,
+      "height": 664,
+      "bytes": 50042,
+      "tokens": 336,
+      "imagePath": "/benchmark-data/08-real-wikipedia-mobile/actual.png"
+    },
+    "opt": {
+      "width": 370,
+      "height": 133,
+      "bytes": 1574,
+      "tokens": 70,
+      "box": {
+        "x": 10,
+        "y": 425,
+        "width": 370,
+        "height": 133
+      },
+      "imagePath": "/benchmark-data/08-real-wikipedia-mobile/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/08-real-wikipedia-mobile/baseline.png",
+    "diffPath": "/benchmark-data/08-real-wikipedia-mobile/diff.png",
+    "savings": {
+      "tokens": "79.2%",
+      "bytes": "96.9%"
+    },
+    "groundTruth": {
+      "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+      "affectedElement": "#js-lang-list-button",
+      "defectType": "button_displacement",
+      "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+      "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+      "expectedBoundingBox": {
+        "x": 10,
+        "y": 425,
+        "width": 370,
+        "height": 133
+      }
+    }
+  },
+  {
+    "id": "09-real-hackernews-desktop",
+    "name": "Real-World Hacker News (Desktop 1280×800) Header Navigation Collapse",
+    "category": "Real Website / Flex & Font Collapse",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 157851,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/09-real-hackernews-desktop/actual.png"
+    },
+    "opt": {
+      "width": 504,
+      "height": 354,
+      "bytes": 18386,
+      "tokens": 234,
+      "box": {
+        "x": 71,
+        "y": 0,
+        "width": 1138,
+        "height": 800
+      },
+      "imagePath": "/benchmark-data/09-real-hackernews-desktop/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/09-real-hackernews-desktop/baseline.png",
+    "diffPath": "/benchmark-data/09-real-hackernews-desktop/diff.png",
+    "savings": {
+      "tokens": "82.5%",
+      "bytes": "88.4%"
+    },
+    "groundTruth": {
+      "defect": "Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.",
+      "affectedElement": ".pagetop",
+      "defectType": "navigation_collapse",
+      "rootCause": "Overridden padding and red background on main header td with font-size: 0px on .pagetop links",
+      "suggestedFix": "Restore default 2px padding, #ff6600 background, and remove font-size: 0px",
+      "expectedBoundingBox": {
+        "x": 71,
+        "y": 0,
+        "width": 1138,
+        "height": 800
+      }
+    }
+  },
+  {
+    "id": "10-real-github-pricing-desktop",
+    "name": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+    "category": "Real Website / Z-Index Collision",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "device": "Desktop",
+    "raw": {
+      "width": 1280,
+      "height": 800,
+      "bytes": 114551,
+      "tokens": 1334,
+      "imagePath": "/benchmark-data/10-real-github-pricing-desktop/actual.png"
+    },
+    "opt": {
+      "width": 498,
+      "height": 504,
+      "bytes": 20538,
+      "tokens": 324,
+      "box": {
+        "x": 429,
+        "y": 0,
+        "width": 790,
+        "height": 800
+      },
+      "imagePath": "/benchmark-data/10-real-github-pricing-desktop/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/10-real-github-pricing-desktop/baseline.png",
+    "diffPath": "/benchmark-data/10-real-github-pricing-desktop/diff.png",
+    "savings": {
+      "tokens": "75.7%",
+      "bytes": "82.1%"
+    },
+    "groundTruth": {
+      "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+      "affectedElement": ".btn-mktg",
+      "defectType": "zindex_collision",
+      "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+      "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+      "expectedBoundingBox": {
+        "x": 429,
+        "y": 0,
+        "width": 790,
+        "height": 800
+      }
+    }
+  },
+  {
+    "id": "11-real-mdn-search-mobile",
+    "name": "Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure",
+    "category": "Real Website / Accessibility Contrast Failure",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "device": "iPhone 13",
+    "raw": {
+      "width": 390,
+      "height": 664,
+      "bytes": 56411,
+      "tokens": 336,
+      "imagePath": "/benchmark-data/11-real-mdn-search-mobile/actual.png"
+    },
+    "opt": {
+      "width": 390,
+      "height": 168,
+      "bytes": 4774,
+      "tokens": 84,
+      "box": {
+        "x": 0,
+        "y": 496,
+        "width": 390,
+        "height": 168
+      },
+      "imagePath": "/benchmark-data/11-real-mdn-search-mobile/crop.webp"
+    },
+    "baselinePath": "/benchmark-data/11-real-mdn-search-mobile/baseline.png",
+    "diffPath": "/benchmark-data/11-real-mdn-search-mobile/diff.png",
+    "savings": {
+      "tokens": "75.0%",
+      "bytes": "91.5%"
+    },
+    "groundTruth": {
+      "defect": "Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.",
+      "affectedElement": "input[type=\"search\"]",
+      "defectType": "contrast_violation",
+      "rootCause": "White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)",
+      "suggestedFix": "Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border",
+      "expectedBoundingBox": {
+        "x": 0,
+        "y": 496,
+        "width": 390,
+        "height": 168
+      }
+    }
+  }
+]
