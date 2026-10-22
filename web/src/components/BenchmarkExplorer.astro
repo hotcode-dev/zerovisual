@@ -41,7 +41,7 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
   <!-- Filter & Case Selector Carousel -->
   <div class="mb-6">
-    <div class="flex items-center justify-between mb-3">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
       <div class="flex items-center gap-2">
         <span class="text-sm font-semibold text-slate-200">Select Benchmark Scenario:</span>
         <div class="inline-flex rounded-lg bg-slate-800/80 p-0.5 border border-slate-700/60 text-xs" role="tablist">
@@ -56,11 +56,10 @@ import benchmarkData from '../data/benchmark-sessions.json';
           </button>
         </div>
       </div>
-      <span class="text-xs text-slate-400" id="case-counter">Case 1 of 11</span>
     </div>
 
-    <!-- Case Picker Cards Grid: Fixed active classes without hardcoded glow on card 0 -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2" id="case-picker-grid">
+    <!-- Case Picker Cards Grid: Max 4 a row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5" id="case-picker-grid">
       {benchmarkData.map((item, index) => {
         const isReal = item.id.includes('real');
         return (
@@ -500,7 +499,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const activeTokenSavings = document.getElementById('active-token-savings');
     const activeByteSavings = document.getElementById('active-byte-savings');
     const browserUrlText = document.getElementById('browser-url-text');
-    const caseCounter = document.getElementById('case-counter');
     const currentViewportDims = document.getElementById('current-viewport-dims');
 
     // Stage Elements
@@ -566,7 +564,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
       if (activeTokenSavings) activeTokenSavings.textContent = `-${item.savings.imageTokens}`;
       if (activeByteSavings) activeByteSavings.textContent = `-${item.savings.bytes}`;
       if (browserUrlText) browserUrlText.textContent = getDomainForCase(item);
-      if (caseCounter) caseCounter.textContent = `Case ${currentCaseIndex + 1} of ${benchmarkData.length}`;
       if (currentViewportDims) currentViewportDims.textContent = `${item.viewport.width} × ${item.viewport.height} px`;
 
       // Update Metrics Grid
