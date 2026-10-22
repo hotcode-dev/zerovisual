@@ -3,8 +3,6 @@ title: Empirical LLM Benchmarks
 description: Real-world empirical benchmark comparing Vision LLM visual regression triage with and without ZeroVisual on local Qwen 3.8-27B.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-
 ## 🌟 Executive Summary
 
 To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using a real local Vision-Language Model (`RadixArk/Qwen3.8-27B-NVFP4` served via SGLang) across 6 diverse web UI visual regression scenarios.
