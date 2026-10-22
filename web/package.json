@@ -14,5 +14,10 @@
     "@astrojs/starlight": "^0.42.6",
     "astro": "^7.2.10",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "daisyui": "^5.7.50",
+    "tailwindcss": "^4.3.3"
   }
 }

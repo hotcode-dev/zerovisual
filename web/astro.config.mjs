@@ -1,9 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+	vite: {
+		plugins: [tailwindcss()],
+	},
 	site: process.env.SITE_URL || 'https://zerovisual.pages.dev',
 	base: process.env.DOCS_BASE_PATH || (process.env.GITHUB_PAGES ? '/zerovisual' : '/'),
 	integrations: [
