@@ -8,9 +8,12 @@ hero:
     - text: Get Started
       link: /guides/getting-started/
       icon: right-arrow
+    - text: Benchmarks (-87.7% ViT)
+      link: /guides/benchmarks/
+      variant: secondary
     - text: How It Works
       link: /guides/how-it-works/
-      variant: secondary
+      variant: minimal
     - text: View on GitHub
       link: https://github.com/hotcode-dev/zerovisual
       icon: external
@@ -66,6 +69,16 @@ import TokenCalculator from '../../components/TokenCalculator.astro';
 > **Why Both Token Count and Network Bytes Matter:**
 > 1. **Vision Tokens (Pixel Dimensions):** Vision Transformers (ViTs) calculate tokens based on geometric patch grids (e.g. Anthropic's 28×28px patches, OpenAI's 512×512px tiles)—not file bytes. Cropping and downscaling ensures failure diffs fit inside a **single vision tile**.
 > 2. **Network Bytes (Payload Size):** MCP over `stdio` and HTTP API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB prevents Node.js JSON serialization bottlenecks and keeps your AI coding agent snappy.
+
+### 🧪 Live Empirical Validation (Qwen 3.8-27B)
+
+Tested against a local LLM endpoint (`RadixArk/Qwen3.8-27B-NVFP4` via SGLang) across 6 real-world UI visual regression scenarios:
+- **Vision Image Tokens:** 5,252 tokens ➔ **644 tokens** (**-87.7% ViT Token Reduction**)
+- **Total Prompt + Reasoning Tokens:** 11,556 tokens ➔ **5,421 tokens** (**-53.1% Total Tokens Saved**)
+- **Average Latency:** 53.3s ➔ **36.4s** (**32% Faster Roundtrips**)
+- **Diagnostic Triage Accuracy:** 76.7% ➔ **82.5%** (**+5.8% Accuracy**)
+
+👉 [Read the full Empirical LLM Benchmark Report →](/guides/benchmarks/)
 
 ---
 
