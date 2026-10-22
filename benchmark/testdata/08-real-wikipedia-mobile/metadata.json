@@ -1,0 +1,24 @@
+{
+  "id": "08-real-wikipedia-mobile",
+  "name": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+  "category": "Real Website / Mobile Regression",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "device": "iPhone 13",
+  "diffPixels": 3046,
+  "groundTruth": {
+    "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+    "affectedElement": "#js-lang-list-button",
+    "defectType": "button_displacement",
+    "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+    "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+    "expectedBoundingBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  }
+}

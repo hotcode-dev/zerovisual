@@ -1,0 +1,23 @@
+{
+  "id": "09-real-hackernews-desktop",
+  "name": "Real-World Hacker News (Desktop 1280×800) Header Navigation Collapse",
+  "category": "Real Website / Flex & Font Collapse",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 270599,
+  "groundTruth": {
+    "defect": "Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.",
+    "affectedElement": ".pagetop",
+    "defectType": "navigation_collapse",
+    "rootCause": "Overridden padding and red background on main header td with font-size: 0px on .pagetop links",
+    "suggestedFix": "Restore default 2px padding, #ff6600 background, and remove font-size: 0px",
+    "expectedBoundingBox": {
+      "x": 71,
+      "y": 0,
+      "width": 1138,
+      "height": 800
+    }
+  }
+}

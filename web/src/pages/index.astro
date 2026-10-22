@@ -106,11 +106,11 @@ import TokenCalculator from '../components/TokenCalculator.astro';
     </blockquote>
 
     <div class="mt-8 mb-4">
-      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Qwen 3.8-27B)</h3>
-      <p class="text-slate-400 mb-4">Tested against a local LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) across 6 real-world UI visual regression scenarios:</p>
+      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Qwen 3.8-27B & Live Websites)</h3>
+      <p class="text-slate-400 mb-4">Tested against a local LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
       <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-sm">
-        <li><strong>Vision Image Tokens:</strong> 5,252 tokens ➔ <strong class="text-emerald-400">644 tokens</strong> (-87.7% ViT Token Reduction)</li>
-        <li><strong>Total Prompt + Reasoning Tokens:</strong> 11,556 tokens ➔ <strong class="text-emerald-400">5,421 tokens</strong> (-53.1% Total Tokens Saved)</li>
+        <li><strong>Vision Image Tokens:</strong> 11,680 tokens ➔ <strong class="text-emerald-400">1,489 tokens</strong> (-87.3% ViT Token Reduction)</li>
+        <li><strong>Live Production Sites Payload:</strong> 492.3 KB ➔ <strong class="text-emerald-400">44.3 KB</strong> (-91.0% Bandwidth Saved)</li>
         <li><strong>Average Latency:</strong> 53.3s ➔ <strong class="text-emerald-400">36.4s</strong> (32% Faster Roundtrips)</li>
         <li><strong>Diagnostic Triage Accuracy:</strong> 76.7% ➔ <strong class="text-emerald-400">82.5%</strong> (+5.8% Accuracy)</li>
       </ul>

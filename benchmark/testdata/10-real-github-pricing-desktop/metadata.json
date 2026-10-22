@@ -1,0 +1,23 @@
+{
+  "id": "10-real-github-pricing-desktop",
+  "name": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+  "category": "Real Website / Z-Index Collision",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 2693,
+  "groundTruth": {
+    "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+    "affectedElement": ".btn-mktg",
+    "defectType": "zindex_collision",
+    "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+    "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+    "expectedBoundingBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  }
+}

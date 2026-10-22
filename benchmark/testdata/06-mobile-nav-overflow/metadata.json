@@ -6,6 +6,7 @@
     "width": 390,
     "height": 844
   },
+  "device": "iPhone 14",
   "diffPixels": 1700,
   "groundTruth": {
     "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",

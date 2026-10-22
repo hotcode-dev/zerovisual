@@ -1,0 +1,23 @@
+{
+  "id": "07-real-wikipedia-desktop",
+  "name": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "category": "Real Website / Layout Shift",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "diffPixels": 34864,
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

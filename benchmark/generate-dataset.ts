@@ -2,6 +2,7 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import { detectDiffBoundingBox } from '../dist/index.js';
 
 interface BenchmarkCaseConfig {
   id: string;
@@ -9,15 +10,17 @@ interface BenchmarkCaseConfig {
   category: string;
   viewport: { width: number; height: number };
   device?: string;
-  baselineHtml: string;
-  actualHtml: string;
+  url?: string;
+  injectCss?: string;
+  baselineHtml?: string;
+  actualHtml?: string;
   groundTruth: {
     defect: string;
     affectedElement: string;
     defectType: string;
     rootCause: string;
     suggestedFix: string;
-    expectedBoundingBox: { x: number; y: number; width: number; height: number };
+    expectedBoundingBox?: { x: number; y: number; width: number; height: number };
   };
 }
 
@@ -519,6 +522,105 @@ const cases: BenchmarkCaseConfig[] = [
       suggestedFix: 'Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d',
       expectedBoundingBox: { x: 330, y: 10, width: 60, height: 50 }
     }
+  },
+
+  // CASE 7: Real Wikipedia Portal Desktop - Search Box Shift & Color Override
+  {
+    id: '07-real-wikipedia-desktop',
+    name: 'Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift',
+    category: 'Real Website / Layout Shift',
+    viewport: { width: 1280, height: 800 },
+    url: 'https://www.wikipedia.org/',
+    injectCss: `
+      #search-form { margin-left: 60px !important; border: 2px solid #e11d48 !important; }
+      .pure-button-primary-progressive { background-color: #e11d48 !important; }
+    `,
+    groundTruth: {
+      defect: 'The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.',
+      affectedElement: '#search-form',
+      defectType: 'layout_shift',
+      rootCause: 'Accidental CSS override applying margin-left: 60px and #e11d48 background color',
+      suggestedFix: 'Remove margin-left on #search-form and restore button background color to progressive blue #36c'
+    }
+  },
+
+  // CASE 8: Real Wikipedia Portal Mobile - Language Switcher Collapse & Opacity Drop
+  {
+    id: '08-real-wikipedia-mobile',
+    name: 'Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement',
+    category: 'Real Website / Mobile Regression',
+    viewport: { width: 390, height: 844 },
+    device: 'iPhone 13',
+    url: 'https://www.wikipedia.org/',
+    injectCss: `
+      #js-lang-list-button { transform: translateY(-36px) scale(0.65) !important; opacity: 0.15 !important; }
+    `,
+    groundTruth: {
+      defect: 'The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.',
+      affectedElement: '#js-lang-list-button',
+      defectType: 'button_displacement',
+      rootCause: 'Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override',
+      suggestedFix: 'Remove transform and restore opacity: 1 on #js-lang-list-button'
+    }
+  },
+
+  // CASE 9: Real Hacker News Desktop - Top Bar Padding Bloat & Navigation Font Collapse
+  {
+    id: '09-real-hackernews-desktop',
+    name: 'Real-World Hacker News (Desktop 1280×800) Header Navigation Collapse',
+    category: 'Real Website / Flex & Font Collapse',
+    viewport: { width: 1280, height: 800 },
+    url: 'https://news.ycombinator.com/',
+    injectCss: `
+      #hnmain > tbody > tr:first-child td { padding: 36px 20px !important; background-color: #dc2626 !important; }
+      .pagetop a { font-size: 0px !important; }
+    `,
+    groundTruth: {
+      defect: 'Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.',
+      affectedElement: '.pagetop',
+      defectType: 'navigation_collapse',
+      rootCause: 'Overridden padding and red background on main header td with font-size: 0px on .pagetop links',
+      suggestedFix: 'Restore default 2px padding, #ff6600 background, and remove font-size: 0px'
+    }
+  },
+
+  // CASE 10: Real GitHub Pricing Desktop - Primary CTA Z-Index Collision & Button Shift
+  {
+    id: '10-real-github-pricing-desktop',
+    name: 'Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision',
+    category: 'Real Website / Z-Index Collision',
+    viewport: { width: 1280, height: 800 },
+    url: 'https://github.com/pricing',
+    injectCss: `
+      a[href*="/join"], .btn-mktg.btn-primary-mktg { position: relative !important; z-index: -1 !important; transform: translateY(-30px) !important; background: #ea580c !important; }
+    `,
+    groundTruth: {
+      defect: 'Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.',
+      affectedElement: '.btn-mktg',
+      defectType: 'zindex_collision',
+      rootCause: 'Negative z-index: -1 and translateY(-30px) causing button collision and occlusion',
+      suggestedFix: 'Remove z-index: -1, remove translateY transform, and restore canonical green button styling'
+    }
+  },
+
+  // CASE 11: Real MDN Web Docs Mobile - Search Input Contrast & Padding Collapse
+  {
+    id: '11-real-mdn-search-mobile',
+    name: 'Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure',
+    category: 'Real Website / Accessibility Contrast Failure',
+    viewport: { width: 390, height: 844 },
+    device: 'iPhone 13',
+    url: 'https://developer.mozilla.org/en-US/',
+    injectCss: `
+      .search-input-field, input[type="search"] { background-color: #f1f5f9 !important; color: #ffffff !important; padding: 2px 4px !important; border: 2px solid #ef4444 !important; }
+    `,
+    groundTruth: {
+      defect: 'Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.',
+      affectedElement: 'input[type="search"]',
+      defectType: 'contrast_violation',
+      rootCause: 'White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)',
+      suggestedFix: 'Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border'
+    }
   }
 ];
 
@@ -538,38 +640,68 @@ async function generateBenchmarkDataset() {
 
     const page = await context.newPage();
 
-    // 1. Render Baseline
-    await page.setContent(c.baselineHtml);
-    const baselinePng = await page.screenshot({ scale: 'css' });
-    fs.writeFileSync(path.join(caseDir, 'baseline.png'), baselinePng);
+    let baselinePng: Buffer;
+    let actualPng: Buffer;
 
-    // 2. Render Actual with Regression
-    await page.setContent(c.actualHtml);
-    const actualPng = await page.screenshot({ scale: 'css' });
-    fs.writeFileSync(path.join(caseDir, 'actual.png'), actualPng);
+    if (c.url) {
+      console.log(`  Fetching live URL for [${c.id}]: ${c.url}...`);
+      await page.goto(c.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForTimeout(1000);
+      baselinePng = await page.screenshot({ scale: 'css' });
+      fs.writeFileSync(path.join(caseDir, 'baseline.png'), baselinePng);
+
+      if (c.injectCss) {
+        await page.addStyleTag({ content: c.injectCss });
+        await page.waitForTimeout(500);
+      }
+      actualPng = await page.screenshot({ scale: 'css' });
+      fs.writeFileSync(path.join(caseDir, 'actual.png'), actualPng);
+    } else {
+      // 1. Render Baseline
+      await page.setContent(c.baselineHtml!);
+      baselinePng = await page.screenshot({ scale: 'css' });
+      fs.writeFileSync(path.join(caseDir, 'baseline.png'), baselinePng);
+
+      // 2. Render Actual with Regression
+      await page.setContent(c.actualHtml!);
+      actualPng = await page.screenshot({ scale: 'css' });
+      fs.writeFileSync(path.join(caseDir, 'actual.png'), actualPng);
+    }
 
     // 3. Compute Diff
+    const diffPath = path.join(caseDir, 'diff.png');
     const diffCount = await createPixelDiff(
       baselinePng,
       actualPng,
-      path.join(caseDir, 'diff.png')
+      diffPath
     );
 
-    // 4. Write Metadata
+    // 4. Compute or verify expectedBoundingBox
+    let boundingBox = c.groundTruth.expectedBoundingBox;
+    if (!boundingBox || boundingBox.width === 0) {
+      const detected = await detectDiffBoundingBox(diffPath, { padding: 32 });
+      boundingBox = detected.boundingBox;
+    }
+
+    // 5. Write Metadata
     const metadata = {
       id: c.id,
       name: c.name,
       category: c.category,
       viewport: c.viewport,
+      device: c.device,
       diffPixels: diffCount,
-      groundTruth: c.groundTruth
+      groundTruth: {
+        ...c.groundTruth,
+        expectedBoundingBox: boundingBox
+      }
     };
     fs.writeFileSync(
       path.join(caseDir, 'metadata.json'),
       JSON.stringify(metadata, null, 2)
     );
 
-    console.log(`✓ [${c.id}] ${c.name} (Diff Pixels: ${diffCount})`);
+    console.log(`✓ [${c.id}] ${c.name} (Diff Pixels: ${diffCount}, Box: ${boundingBox.x},${boundingBox.y} ${boundingBox.width}x${boundingBox.height})`);
     await context.close();
   }
 

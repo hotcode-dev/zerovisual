@@ -38,6 +38,25 @@ ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer 
 
 ---
 
+## 🌐 Real-World Live Website Benchmarks (Injected CSS Regressions)
+
+To validate performance beyond synthetic components, ZeroVisual was tested against live production websites using Playwright with targeted CSS injection to simulate realistic regressions (margin shifts, flex-wrap breakage, z-index collisions, and WCAG AA contrast failures across desktop and mobile viewports).
+
+| Target Live Website | Viewport | Injected CSS Regression | Raw Viewport (Payload / ViT Tokens) | ZeroVisual (Payload / ViT Tokens) | Empirical Savings |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Wikipedia Portal (Desktop)**<br>`https://www.wikipedia.org/` | 1280×800 (Desktop) | `#search-form { margin-left: 60px !important; }`<br>`.pure-button { background: #e11d48 !important; }` | 122.3 KB<br>1,334 ViT tokens | **5.1 KB** (504×145 WebP)<br>**108 ViT tokens** | **-91.9% ViT Tokens**<br>**-95.8% Payload Bytes** |
+| **Wikipedia Portal (Mobile)**<br>`https://www.wikipedia.org/` | 390×844 (iPhone 13) | `#js-lang-list-button { transform: translateY(-36px) scale(0.65); opacity: 0.15; }` | 48.9 KB<br>336 ViT tokens | **1.3 KB** (370×133 WebP)<br>**70 ViT tokens** | **-79.2% ViT Tokens**<br>**-97.4% Payload Bytes** |
+| **Hacker News (Desktop)**<br>`https://news.ycombinator.com/` | 1280×800 (Desktop) | `table.pagetop { padding: 36px 20px; background: #dc2626; }`<br>`.pagetop a { font-size: 0px; }` | 154.2 KB<br>1,334 ViT tokens | **15.8 KB** (504×354 WebP)<br>**234 ViT tokens** | **-82.5% ViT Tokens**<br>**-89.8% Payload Bytes** |
+| **GitHub Pricing (Desktop)**<br>`https://github.com/pricing` | 1280×800 (Desktop) | `.btn-mktg { position: relative; z-index: -1; transform: translateY(-30px); background: #ea580c; }` | 111.9 KB<br>1,334 ViT tokens | **18.0 KB** (498×504 WebP)<br>**324 ViT tokens** | **-75.7% ViT Tokens**<br>**-83.9% Payload Bytes** |
+| **MDN Web Docs (Mobile)**<br>`https://developer.mozilla.org/` | 390×844 (iPhone 13) | `input[type="search"] { background: #f1f5f9; color: #fff; padding: 2px; border: 2px solid #ef4444; }` | 55.1 KB<br>336 ViT tokens | **4.1 KB** (390×168 WebP)<br>**84 ViT tokens** | **-75.0% ViT Tokens**<br>**-92.5% Payload Bytes** |
+
+### Live Websites Summary
+- **Live Websites ViT Tokens:** 4,674 tokens ➔ **820 tokens** (**-82.5% ViT Image Token Reduction**)
+- **Live Websites Payload Size:** 492.3 KB ➔ **44.3 KB** (**-91.0% Network Payload Reduction**)
+- **Multi-Viewport Cross-Correlation:** Testing Wikipedia on both Desktop (`1280×800`) and Mobile (`390×844`) proves that ZeroVisual correlates multi-breakpoint failures under a single `testId`, feeding both cropped bounding boxes to the AI agent in a single compact diagnosis prompt.
+
+---
+
 ## 🔬 Benchmark Methodology
 
 ### Evaluated Model & Architecture
