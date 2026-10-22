@@ -1,0 +1,20 @@
+---
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+
+<nav class="hidden md:flex items-center gap-6 mr-2">
+  <a
+    href="/guides/getting-started/"
+    class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-150 no-underline"
+  >
+    Getting Started
+  </a>
+  <a
+    href="/guides/how-it-works/"
+    class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-150 no-underline"
+  >
+    How It Works
+  </a>
+</nav>
+
+<Default><slot /></Default>
