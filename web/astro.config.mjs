@@ -4,8 +4,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://hotcode-dev.github.io',
-	base: process.env.GITHUB_ACTIONS ? '/zerovisual' : '/',
+	site: process.env.SITE_URL || 'https://zerovisual.pages.dev',
+	base: process.env.DOCS_BASE_PATH || (process.env.GITHUB_PAGES ? '/zerovisual' : '/'),
 	integrations: [
 		starlight({
 			title: 'ZeroVisual',
