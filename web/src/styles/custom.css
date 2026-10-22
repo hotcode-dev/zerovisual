@@ -1,7 +1,6 @@
 /* Premium typography & modern design system tokens for ZeroVisual */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
-@plugin "daisyui";
 
 @theme {
 	--font-system: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -65,9 +64,9 @@ body {
 	@apply text-slate-400 text-lg max-w-2xl mx-auto mt-4 mb-8 leading-relaxed;
 }
 
-/* Hero Action Buttons using DaisyUI & Tailwind */
+/* Hero Action Buttons using Tailwind */
 .action.primary {
-	@apply btn btn-primary font-bold shadow-lg shadow-indigo-500/50 rounded-xl transition-all duration-200 border border-indigo-300/40;
+	@apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/50 rounded-xl transition-all duration-200 border border-indigo-300/40 cursor-pointer no-underline text-sm;
 }
 
 .action.primary:hover {
@@ -75,16 +74,12 @@ body {
 }
 
 .action.secondary {
-	@apply btn btn-outline border-slate-600/70 bg-slate-800/70 backdrop-blur-md text-slate-200 font-semibold rounded-xl transition-all duration-200;
+	@apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-slate-600/70 bg-slate-800/70 hover:bg-slate-700/90 hover:border-indigo-400 hover:text-white backdrop-blur-md text-slate-200 font-semibold rounded-xl transition-all duration-200 cursor-pointer no-underline text-sm;
 }
 
-.action.secondary:hover {
-	@apply bg-slate-700/90 border-indigo-400 text-white;
-}
-
-/* Glassmorphism cards using DaisyUI & Tailwind */
+/* Glassmorphism cards using Tailwind */
 .card {
-	@apply card bg-slate-900/50 backdrop-blur-xl border border-indigo-500/20 rounded-2xl shadow-xl transition-all duration-200;
+	@apply bg-slate-900/50 backdrop-blur-xl border border-indigo-500/20 rounded-2xl shadow-xl transition-all duration-200;
 }
 
 .card:hover {
@@ -92,16 +87,16 @@ body {
 }
 
 .card .title {
-	@apply card-title text-slate-50 font-bold text-lg;
+	@apply text-slate-50 font-bold text-lg;
 }
 
 .card .body {
 	@apply text-slate-400 text-sm leading-relaxed;
 }
 
-/* Modern tables using DaisyUI & Tailwind */
+/* Modern tables using Tailwind */
 table {
-	@apply table w-full my-6 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md;
+	@apply w-full my-6 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md text-left;
 	border-collapse: separate;
 	border-spacing: 0;
 }
