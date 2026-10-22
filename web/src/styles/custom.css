@@ -199,3 +199,17 @@ pre {
 ::-webkit-scrollbar-thumb:hover {
 	background: #6366f1;
 }
+
+/* Prevent Starlight markdown sibling spacing rules from altering custom interactive components */
+.not-content,
+.not-content *,
+.compare-wrapper,
+.compare-wrapper * {
+	box-sizing: border-box;
+}
+
+.compare-wrapper .scenario-nav > *,
+.not-content .scenario-nav > * {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
