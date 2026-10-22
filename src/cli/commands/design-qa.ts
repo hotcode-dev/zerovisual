@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
-import { chromium, type Browser } from '@playwright/test';
+import type { Browser } from '@playwright/test';
 import {
   TriagePayloadSchema,
   TargetProviderSchema,
@@ -46,6 +46,15 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   let ownBrowser = false;
 
   if (!browser) {
+    let chromium: (typeof import('@playwright/test'))['chromium'];
+    try {
+      const pw = await import('@playwright/test');
+      chromium = pw.chromium;
+    } catch {
+      throw new Error(
+        '[@playwright/test is required to run design-qa]. Please install it via: npm install --save-dev @playwright/test'
+      );
+    }
     browser = await chromium.launch({ headless: true });
     ownBrowser = true;
   }
