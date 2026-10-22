@@ -8,7 +8,7 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 	},
-	site: process.env.SITE_URL || 'https://zerovisual.pages.dev',
+	site: process.env.SITE_URL || 'https://zerovisual.hotcode.dev/',
 	base: process.env.DOCS_BASE_PATH || (process.env.GITHUB_PAGES ? '/zerovisual' : '/'),
 	integrations: [
 		starlight({
