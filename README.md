@@ -1,4 +1,4 @@
-# ZeroVisual 👁️⚡️
+# ZeroVisual
 
 **Zero-waste, zero-API-key visual regression and automated UI design QA pre-processor for AI Agents.**
 

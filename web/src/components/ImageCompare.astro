@@ -22,26 +22,26 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     </p>
   </div>
 
-  <!-- Scenario Tabs -->
+  <!-- Scenario Tabs: All 3 on the same line -->
   <div class="scenario-nav">
     <button type="button" id="btn-tab-desktop" class="scenario-tab active" data-scenario="desktop">
       <span class="tab-icon">🖥️</span>
-      <span class="tab-title">Desktop Chrome (1280×800)</span>
-      <span class="tab-badge-emerald">-77.1% Tokens</span>
+      <span class="tab-title">Desktop (1280×800)</span>
+      <span class="tab-badge-emerald">-77.1%</span>
     </button>
     <button type="button" id="btn-tab-mobile" class="scenario-tab" data-scenario="mobile">
       <span class="tab-icon">📱</span>
-      <span class="tab-title">Mobile Safari (390×844)</span>
-      <span class="tab-badge-emerald">-29.2% to -92% Tokens</span>
+      <span class="tab-title">Mobile (390×844)</span>
+      <span class="tab-badge-emerald">-92.0%</span>
     </button>
     <button type="button" id="btn-tab-aggregation" class="scenario-tab" data-scenario="aggregation">
       <span class="tab-icon">⚡️</span>
-      <span class="tab-title">Multi-Viewport Aggregation</span>
-      <span class="tab-badge-cyan">1 Single Prompt</span>
+      <span class="tab-title">Multi-Viewport</span>
+      <span class="tab-badge-cyan">1 Prompt</span>
     </button>
   </div>
 
-  <!-- View 1: Desktop Wikipedia -->
+  <!-- View 1: Desktop Wikipedia (Side by Side Same Line) -->
   <div id="scenario-desktop" class="scenario-content active">
     <div class="browser-window">
       <div class="browser-toolbar">
@@ -97,7 +97,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
             </div>
             <div class="metric-cell">
               <span class="cell-label">Visual Noise</span>
-              <span class="cell-value text-red">66% Irrelevant Footer & Margins</span>
+              <span class="cell-value text-red">66% Irrelevant Content</span>
             </div>
           </div>
         </div>
@@ -136,7 +136,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
             </div>
             <div class="metric-cell">
               <span class="cell-label">Model Focus</span>
-              <span class="cell-value text-emerald">100% on Wikipedia Search Defect</span>
+              <span class="cell-value text-emerald">100% on Search Defect</span>
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     </div>
   </div>
 
-  <!-- View 2: Mobile Wikipedia (iPhone 14) -->
+  <!-- View 2: Mobile Wikipedia (Side by Side Same Line) -->
   <div id="scenario-mobile" class="scenario-content">
     <div class="browser-window">
       <div class="browser-toolbar">
@@ -154,21 +154,25 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
           <span class="dot green"></span>
         </div>
         <div class="url-bar">
+          <svg class="lock-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
           <span class="url-text">https://www.wikipedia.org/ [iPhone 14 Safari]</span>
         </div>
         <div class="test-status-badge fail">
-          <span>● Playwright: FAILED</span>
+          <span>● Playwright: FAILED (Mobile Viewport)</span>
         </div>
       </div>
 
-      <div class="comparison-grid mobile-comparison-grid">
+      <div class="comparison-grid">
         <!-- Left: Full Mobile Screen -->
         <div class="compare-card raw-card">
           <div class="card-top-bar">
             <div class="card-badge raw">Before: Full Mobile Viewport</div>
             <div class="card-token-counter text-red">336 – 3,024 Tokens</div>
           </div>
-          <div class="image-stage mobile-stage-wrap">
+          <div class="image-stage">
             <div class="phone-frame">
               <img
                 src={wikiDiffMobile.src}
@@ -202,7 +206,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
         <div class="compare-card opt-card">
           <div class="card-top-bar">
             <div class="card-badge opt">After: ZeroVisual Mobile Crop</div>
-            <div class="card-token-counter text-emerald">238 Tokens (-29.2% to -92%)</div>
+            <div class="card-token-counter text-emerald">238 Tokens (-92.0%)</div>
           </div>
           <div class="image-stage crop-stage">
             <div class="crop-focus-frame">
@@ -232,7 +236,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
             </div>
             <div class="metric-cell">
               <span class="cell-label">Visual Focus</span>
-              <span class="cell-value text-emerald">100% on Mobile Search Defect</span>
+              <span class="cell-value text-emerald">100% on Mobile Defect</span>
             </div>
           </div>
         </div>
@@ -240,11 +244,11 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     </div>
   </div>
 
-  <!-- View 3: Multi-Viewport Aggregation -->
+  <!-- View 3: Multi-Viewport Aggregation (All elements on the same line) -->
   <div id="scenario-aggregation" class="scenario-content">
     <div class="aggregation-card">
       <div class="agg-header">
-        <div class="agg-badge">Feature 5: Multi-Viewport Correlation</div>
+        <div class="agg-badge">Feature: Multi-Viewport Correlation</div>
         <h4>One Single Prompt Diagnoses Responsive Breakpoints</h4>
         <p>
           Instead of triggering separate AI reviews with disconnected full-page screenshots, ZeroVisual correlates Desktop Chrome and Mobile Safari under a single normalized <code>testId</code> in <code>triage-ready.json</code>:
@@ -260,7 +264,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
           <div class="box-tokens">306 Tokens (21.0 KB)</div>
         </div>
 
-        <div class="agg-plus">+</div>
+        <div class="agg-operator">+</div>
 
         <div class="agg-box">
           <div class="box-title">Mobile Safari (390×844)</div>
@@ -270,13 +274,13 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
           <div class="box-tokens">238 Tokens (17.3 KB)</div>
         </div>
 
-        <div class="agg-equals">=</div>
+        <div class="agg-operator">=</div>
 
         <div class="agg-bundle-result">
-          <div class="bundle-tag">Normalized testId: "tests/wikipedia.spec.ts:search-input"</div>
-          <div class="bundle-stat">Total: 544 Tokens (38.3 KB Payload)</div>
-          <div class="bundle-compare">Without ZeroVisual: 1,670 to 4,358 Tokens (3.7 MB)</div>
-          <div class="bundle-savings">67.4% to 87.5% Total Token Savings across Viewports!</div>
+          <div class="bundle-tag">Normalized testId: "tests/wikipedia.spec.ts:search"</div>
+          <div class="bundle-stat">544 Total Tokens (38.3 KB Payload)</div>
+          <div class="bundle-compare">Without ZeroVisual: 1,670 to 4,358 Tokens</div>
+          <div class="bundle-savings">⚡️ Up to 87.5% Token Savings Across Viewports</div>
         </div>
       </div>
 
@@ -366,27 +370,39 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     max-width: 850px;
   }
 
-  /* Scenario Tabs Navigation */
+  /* Scenario Tabs: Always on the Same Line in 3 Equal Columns */
   .scenario-nav {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  @media (max-width: 680px) {
+    .scenario-nav {
+      grid-template-columns: 1fr;
+    }
   }
 
   .scenario-tab {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.1rem;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.75rem 0.6rem;
     background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgba(71, 85, 105, 0.3);
-    border-radius: 10px;
+    border: 1px solid rgba(71, 85, 105, 0.35);
+    border-radius: 12px;
     color: #cbd5e1;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
   }
 
   .scenario-tab:hover {
@@ -480,16 +496,17 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     border-radius: 6px;
   }
 
-  /* Comparison Grid */
+  /* Comparison Grid: Side by Side on the Same Line with Equal Height */
   .comparison-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     padding: 1.5rem;
     background: rgba(11, 15, 25, 0.8);
+    align-items: stretch;
   }
 
-  @media (max-width: 960px) {
+  @media (max-width: 900px) {
     .comparison-grid {
       grid-template-columns: 1fr;
     }
@@ -502,6 +519,7 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    height: 100%;
   }
 
   .compare-card.opt-card {
@@ -513,9 +531,11 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.25rem;
     background: rgba(30, 41, 59, 0.4);
     border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+    min-height: 52px;
+    box-sizing: border-box;
   }
 
   .card-badge { font-size: 0.8rem; font-weight: 700; }
@@ -525,15 +545,24 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
   .text-red { color: #f87171; }
   .text-emerald { color: #34d399; }
 
+  /* Equal-Height Image Stage (Always 380px) */
   .image-stage {
     position: relative;
     background: #020617;
-    padding: 1rem;
+    padding: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 280px;
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
     overflow: hidden;
+    flex: 1;
+    box-sizing: border-box;
+  }
+
+  .crop-stage {
+    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.9), #040812);
   }
 
   .canvas-viewport-frame {
@@ -542,6 +571,11 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     background: #ffffff;
+    max-height: 330px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .stage-image {
@@ -550,7 +584,14 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     display: block;
   }
 
-  /* Red bounding box around Wikipedia Search component on the 1280x800 canvas */
+  .stage-image.full-canvas {
+    max-height: 320px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
   .wiki-desktop-indicator {
     position: absolute;
     left: 28.5%;
@@ -584,44 +625,55 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
   }
 
-  .crop-stage {
-    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.9), #040812);
-    padding: 1.5rem;
-  }
-
   .crop-focus-frame {
     padding: 6px;
     border: 2px solid rgba(52, 211, 153, 0.6);
     border-radius: 10px;
     background: #ffffff;
     box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.3);
+    max-height: 330px;
     max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
 
-  .crop-focus-frame img {
+  .crop-focus-frame img.crop-result {
+    max-height: 310px;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
     border-radius: 6px;
+    display: block;
   }
 
   .patch-info-pill {
     position: absolute;
     bottom: 12px;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(52, 211, 153, 0.5);
     color: #a7f3d0;
     font-size: 0.72rem;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 3px 12px;
     border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 5;
   }
 
+  /* Equal-Height Metrics Grid: Aligned on the exact same baseline */
   .card-metrics-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    padding: 1rem;
+    gap: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid rgba(51, 65, 85, 0.3);
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 23, 42, 0.75);
+    margin-top: auto;
+    min-height: 115px;
+    box-sizing: border-box;
   }
 
   .metric-cell { display: flex; flex-direction: column; }
@@ -634,21 +686,26 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
   }
   .cell-value { font-size: 0.92rem; font-weight: 700; color: #f1f5f9; }
 
-  /* Mobile Phone Frame */
-  .mobile-stage-wrap {
-    padding: 1rem;
-  }
+  /* Mobile Phone Frame: Perfectly Proportioned Inside 380px Stage */
   .phone-frame {
-    max-width: 220px;
+    height: 330px;
+    max-height: 330px;
+    width: auto;
+    aspect-ratio: 390 / 664;
     border: 4px solid #334155;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
   .phone-screen {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
   }
 
@@ -686,22 +743,30 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     line-height: 1.5;
   }
 
+  /* Aggregation Flow: All Elements Aligned on the Exact Same Line */
   .agg-visual-flow {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1.3fr;
     align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-bottom: 1.75rem;
+    width: 100%;
+  }
+
+  @media (max-width: 800px) {
+    .agg-visual-flow {
+      grid-template-columns: 1fr;
+    }
   }
 
   .agg-box {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(71, 85, 105, 0.4);
     border-radius: 10px;
-    padding: 1rem;
+    padding: 0.85rem;
     text-align: center;
-    width: 220px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .box-title {
@@ -718,11 +783,12 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 75px;
   }
 
   .box-crop img {
     max-width: 100%;
-    height: 75px;
+    max-height: 70px;
     object-fit: contain;
     border-radius: 4px;
   }
@@ -734,42 +800,44 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
     margin-top: 0.5rem;
   }
 
-  .agg-plus, .agg-equals {
-    font-size: 1.6rem;
+  .agg-operator {
+    font-size: 1.5rem;
     font-weight: 800;
     color: #6366f1;
+    text-align: center;
   }
 
   .agg-bundle-result {
     background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.9));
     border: 1px solid rgba(52, 211, 153, 0.5);
     border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    min-width: 290px;
+    padding: 1rem 1.25rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .bundle-tag {
     font-family: var(--sl-font-mono);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: #94a3b8;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.3rem;
   }
 
   .bundle-stat {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 800;
     color: #34d399;
   }
 
   .bundle-compare {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: #f87171;
     text-decoration: line-through;
-    margin: 0.2rem 0;
+    margin: 0.15rem 0;
   }
 
   .bundle-savings {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: #6ee7b7;
   }
