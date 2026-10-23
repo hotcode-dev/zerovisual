@@ -1,0 +1,52 @@
+{
+  "id": "session-11-real-mdn-search-mobile-with-1792733964837",
+  "timestamp": "2026-10-23T05:39:24.837Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "11-real-mdn-search-mobile",
+  "caseName": "Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 168
+    },
+    "format": "webp",
+    "bytes": 4774,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element / Component name**: Hero Banner / Call-to-Action (CTA) Graphic.\n\n2. **Nature of the Visual Defect**: Element overlap and clipping. The \"motion blur\" effect/graphic is overlapping the text \"Build faster.\" and lacks proper containment within its intended container.\n\n3. **Probable Root Cause in CSS or layout**: \n   - Incorrect `z-index` layering causing the graphic to sit above the text.\n   - Lack of `overflow: hidden` on the parent container.\n   - Absolute positioning of the motion graphic without sufficient padding/margin on the text element.\n\n4. **Suggested Fix or code snippet**:\n   - **Option A (Fix Layering):** Ensure text has a higher `z-index`.\n     ```css\n     .hero-text { position: relative; z-index: 2; }\n     .motion-graphic { position: absolute; z-index: 1; }\n     ```\n   - **Option B (Fix Containment):** Add padding to the text container to prevent overlap.\n     ```css\n     .banner-container { padding-right: 200px; } /* Adjust based on graphic width */\n     ```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 347,
+    "imageTokens": 0,
+    "completionTokens": 262,
+    "reasoningTokens": 0,
+    "totalTokens": 609,
+    "latencyMs": 6677,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.",
+    "affectedElement": "input[type=\"search\"]",
+    "defectType": "contrast_violation",
+    "rootCause": "White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)",
+    "suggestedFix": "Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  }
+}

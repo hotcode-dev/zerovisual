@@ -243,6 +243,20 @@ npx zerovisual regression \
 > 1. **Vision Tokens (Pixel Dimensions):** Vision Transformers (ViTs) calculate tokens based on pixel grid patches (e.g., Anthropic's 28×28px patches, OpenAI's 512×512px tiles)—not file bytes. Cropping and downscaling ensures failure diffs fit inside a **single vision tile**.
 > 2. **Network Bytes (Payload Size):** MCP over `stdio` and HTTP API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB prevents Node.js JSON serialization bottlenecks and keeps your AI coding agent snappy.
 
+### 🔬 Empirical Benchmark Results (Gemma 4 26B & Live Websites)
+
+To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using **`google/gemma-4-26B-A4B-it`** served locally via vLLM across 11 diverse web UI visual regression scenarios (including Wikipedia Desktop/Mobile, Hacker News, GitHub Pricing, MDN Web Docs):
+
+| Core Metric | Without ZeroVisual (Raw Viewport) | With ZeroVisual (Optimized) | Empirical Improvement |
+| :--- | :--- | :--- | :--- |
+| **Vision Image Tokens (ViT)** | **9,030 tokens** | **2,838 tokens** | **-68.6% ViT Token Reduction** |
+| **Network Payload Transfer** | **638.9 KB** | **116.2 KB** | **-81.8% Bandwidth Reduced** |
+| **Total Tokens Consumed** | **7,612 tokens** | **7,148 tokens** | **-6.1% Total Tokens Saved** |
+| **Average Roundtrip Latency** | **8.4 seconds** | **7.3 seconds** | **13% Faster Latency** |
+| **Average Triage Accuracy** | **59.1%** | **65.5%** | **+6.4% Accuracy Boost** |
+
+> 🌐 **Interactive Explorer:** Explore all 11 real-world scenarios with side-by-side screenshots and VLM reasoning traces on our [Empirical Benchmark Explorer](https://hotcode-dev.github.io/zerovisual/guides/benchmarks/).
+
 ---
 
 ## 📐 Model Vision Grid Reference
@@ -250,9 +264,10 @@ npx zerovisual regression \
 | Provider Setting | Target Max Bounding Box | Vision Grid Mechanics | Approx. Token Cost per Diff |
 | :--- | :--- | :--- | :--- |
 | `openai` | `512 × 512 px` | Fits inside 1 standard OpenAI `512px` tile | ~85 – 255 tokens |
-| `anthropic` | `504 × 504 px` | Exact `18 × 18` grid of `28×28 px` patches | ~324 tokens |
-| `gemini` | `768 × 768 px` | Fits 1 native Gemini tile | ~258 tokens |
-| `gemini` (`lowTokenMode`) | `384 × 384 px` | Sub-384px single base tile optimization | ~258 tokens (ultra-fast) |
+| `anthropic` | `504 × 504 px` | Exact `18 × 18` grid of `28×28 px` patches | ~28 – 324 tokens |
+| `gemma` / `gemini` | `768 × 768 px` | Fits 1 native Gemma / Gemini multimodal tile | ~258 tokens |
+| `gemma` (`lowTokenMode`) | `384 × 384 px` | Sub-384px single base tile optimization | ~258 tokens (ultra-fast) |
+| `qwen` | `504 × 504 px` | Dynamic 2D spatial patch grid (`28×28 px`) | ~28 – 324 tokens |
 | `local` | `448 × 448 px` (configurable) | Optimized for local VLMs (`28px` / `14px` patch ViTs) | Local compute |
 
 ---

@@ -1,6 +1,6 @@
 ---
 title: Empirical LLM Benchmarks
-description: Real-world empirical benchmark comparing Vision LLM visual regression triage with and without ZeroVisual on local Qwen 3.8-27B.
+description: Real-world empirical benchmark comparing Vision LLM visual regression triage with and without ZeroVisual on local Gemma 4 26B (google/gemma-4-26B-A4B-it).
 pagefind: false
 ---
 
@@ -16,17 +16,17 @@ Explore all 11 empirical benchmark scenarios below—including 5 real-world prod
 
 ## Executive Summary
 
-To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using a real local Vision-Language Model (`RadixArk/Qwen3.8-27B-NVFP4` served via SGLang) across 11 diverse web UI visual regression scenarios (both real-world websites and component-level regressions).
+To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using a real local Vision-Language Model (`google/gemma-4-26B-A4B-it` served via vLLM) across 11 diverse web UI visual regression scenarios (both real-world websites and component-level regressions).
 
 ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer (ViT) patch grids, and converts them to optimized WebP format—achieving dramatic reductions in token overhead and latency while improving triage accuracy.
 
 | Core Metric | Without ZeroVisual (Raw Viewport) | With ZeroVisual (Optimized) | Empirical Improvement |
 | :--- | :--- | :--- | :--- |
-| **Total Tokens Consumed** | **11,556 tokens** | **5,421 tokens** | **-53.1% Total Tokens Saved** |
-| **Vision Image Tokens (ViT)** | **11,680 tokens** | **1,489 tokens** | **-87.3% ViT Token Reduction** |
-| **Network Payload Transfer** | **638.9 KB** | **66.0 KB** | **-89.7% Bandwidth Reduced** |
-| **Average Roundtrip Latency** | **53.3 seconds** | **36.4 seconds** | **32% Faster Latency** |
-| **Average Triage Accuracy** | **76.7%** | **82.5%** | **+5.8% Accuracy Improvement** |
+| **Vision Image Tokens (ViT)** | **9,030 tokens** | **2,838 tokens** | **-68.6% ViT Token Reduction** |
+| **Network Payload Transfer** | **638.9 KB** | **116.2 KB** | **-81.8% Bandwidth Reduced** |
+| **Total Tokens Consumed** | **7,612 tokens** | **7,148 tokens** | **-6.1% Total Tokens Saved** |
+| **Average Roundtrip Latency** | **8.4 seconds** | **7.3 seconds** | **13% Faster Latency** |
+| **Average Triage Accuracy** | **59.1%** | **65.5%** | **+6.4% Accuracy Improvement** |
 
 ---
 
@@ -34,18 +34,28 @@ ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer 
 
 | Test Case | Mode | Resolution | Payload | Total Tokens | ViT Image Tokens | Latency | Accuracy |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Wikipedia Search Bar Shift** | Raw Viewport | 1280×800 | 24.6 KB | 3,186 | 1,000 | 103,371 ms | 65% |
-| | **ZeroVisual** | **504×389** | **6.0 KB** | **2,378** | **192** | **96,812 ms** | **65%** |
-| **2. GitHub PR Merge Box Regression** | Raw Viewport | 1280×800 | 27.1 KB | 1,645 | 1,000 | 20,399 ms | 65% |
-| | **ZeroVisual** | **504×92** | **3.3 KB** | **2,262** | **76** | **91,317 ms** | **35%** |
-| **3. SaaS Pricing Card Contrast Violation** | Raw Viewport | 1280×800 | 34.3 KB | 1,710 | 1,000 | 20,706 ms | 65% |
-| | **ZeroVisual** | **274×103** | **0.6 KB** | **1,167** | **70** | **43,489 ms** | **65%** |
-| **4. E-Commerce Checkout Collision** | Raw Viewport | 1280×800 | 22.4 KB | 2,330 | 1,000 | 52,272 ms | 100% |
-| | **ZeroVisual** | **504×328** | **7.0 KB** | **1,830** | **160** | **62,391 ms** | **100%** |
-| **5. Dashboard Stat Overflow & Clipping** | Raw Viewport | 1280×800 | 32.8 KB | 2,737 | 1,000 | 72,290 ms | 100% |
-| | **ZeroVisual** | **504×66** | **3.4 KB** | **784** | **69** | **18,929 ms** (3.8x faster) | **65%** |
-| **6. Mobile Safari Nav Drawer Overflow** | Raw Viewport | 390×664 | 5.5 KB | 888 | 252 | 26,022 ms | 100% |
-| | **ZeroVisual** | **194×121** | **1.4 KB** | **743** | **77** | **24,603 ms** | **100%** |
+| **1. Wikipedia Search Bar Shift** | Raw Viewport | 1280×800 | 24.6 KB | 797 | 1,032 | 11,299 ms | 65% |
+| | **ZeroVisual** | **634×489** | **8.2 KB** | **700** | **258** | **8,522 ms** (25% faster) | **65%** |
+| **2. GitHub PR Merge Box Regression** | Raw Viewport | 1280×800 | 27.1 KB | 606 | 1,032 | 6,088 ms | 65% |
+| | **ZeroVisual** | **768×140** | **6.0 KB** | **662** | **258** | **7,393 ms** | **65%** |
+| **3. SaaS Pricing Card Contrast Violation** | Raw Viewport | 1280×800 | 34.3 KB | 716 | 1,032 | 8,723 ms | 65% |
+| | **ZeroVisual** | **274×103** | **0.6 KB** | **592** | **258** | **5,824 ms** (33% faster) | **65%** |
+| **4. E-Commerce Checkout Collision** | Raw Viewport | 1280×800 | 22.4 KB | 650 | 1,032 | 7,122 ms | 100% |
+| | **ZeroVisual** | **504×328** | **7.0 KB** | **646** | **258** | **7,396 ms** | **100%** |
+| **5. Dashboard Stat Overflow & Clipping** | Raw Viewport | 1280×800 | 32.8 KB | 678 | 1,032 | 7,882 ms | 65% |
+| | **ZeroVisual** | **768×101** | **5.9 KB** | **736** | **258** | **9,139 ms** | **65%** |
+| **6. Mobile Safari Nav Drawer Overflow** | Raw Viewport | 390×664 | 5.5 KB | 645 | 258 | 7,489 ms | 65% |
+| | **ZeroVisual** | **194×121** | **1.4 KB** | **590** | **258** | **5,635 ms** (25% faster) | **65%** |
+| **7. Real-World Wikipedia Portal (Desktop)** | Raw Viewport | 1280×800 | 122.3 KB | 820 | 1,032 | 11,292 ms | 65% |
+| | **ZeroVisual** | **768×221** | **11.1 KB** | **628** | **258** | **7,166 ms** (37% faster) | **65%** |
+| **8. Real-World Wikipedia Portal (Mobile)** | Raw Viewport | 390×664 | 48.9 KB | 631 | 258 | 7,189 ms | 0% |
+| | **ZeroVisual** | **370×133** | **1.5 KB** | **593** | **258** | **5,779 ms** (20% faster) | **35%** (+35%) |
+| **9. Real-World Hacker News (Desktop)** | Raw Viewport | 1280×800 | 154.2 KB | 600 | 1,032 | 5,934 ms | 65% |
+| | **ZeroVisual** | **768×540** | **36.9 KB** | **645** | **258** | **7,165 ms** | **65%** |
+| **10. Real-World GitHub Pricing (Desktop)** | Raw Viewport | 1280×800 | 111.9 KB | 875 | 1,032 | 12,668 ms | 65% |
+| | **ZeroVisual** | **758×768** | **33.0 KB** | **747** | **258** | **9,995 ms** (21% faster) | **65%** |
+| **11. Real-World MDN Web Docs (Mobile)** | Raw Viewport | 390×664 | 55.1 KB | 594 | 258 | 6,262 ms | 30% |
+| | **ZeroVisual** | **390×168** | **4.7 KB** | **609** | **258** | **6,677 ms** | **65%** (+35%) |
 
 ---
 
@@ -55,15 +65,16 @@ To validate performance beyond synthetic components, ZeroVisual was tested again
 
 | Target Live Website | Viewport | Injected CSS Regression | Raw Viewport (Payload / ViT Tokens) | ZeroVisual (Payload / ViT Tokens) | Empirical Savings |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Wikipedia Portal (Desktop)**<br />`https://www.wikipedia.org/` | 1280×800 (Desktop) | `#search-form { margin-left: 60px !important; }`<br />`.pure-button { background: #e11d48 !important; }` | 122.3 KB<br />1,334 ViT tokens | **5.1 KB** (504×145 WebP)<br />**108 ViT tokens** | **-91.9% ViT Tokens**<br />**-95.8% Payload Bytes** |
-| **Wikipedia Portal (Mobile)**<br />`https://www.wikipedia.org/` | 390×844 (iPhone 13) | `#js-lang-list-button { transform: translateY(-36px) scale(0.65); opacity: 0.15; }` | 48.9 KB<br />336 ViT tokens | **1.3 KB** (370×133 WebP)<br />**70 ViT tokens** | **-79.2% ViT Tokens**<br />**-97.4% Payload Bytes** |
-| **Hacker News (Desktop)**<br />`https://news.ycombinator.com/` | 1280×800 (Desktop) | `table.pagetop { padding: 36px 20px; background: #dc2626; }`<br />`.pagetop a { font-size: 0px; }` | 154.2 KB<br />1,334 ViT tokens | **15.8 KB** (504×354 WebP)<br />**234 ViT tokens** | **-82.5% ViT Tokens**<br />**-89.8% Payload Bytes** |
-| **GitHub Pricing (Desktop)**<br />`https://github.com/pricing` | 1280×800 (Desktop) | `.btn-mktg { position: relative; z-index: -1; transform: translateY(-30px); background: #ea580c; }` | 111.9 KB<br />1,334 ViT tokens | **18.0 KB** (498×504 WebP)<br />**324 ViT tokens** | **-75.7% ViT Tokens**<br />**-83.9% Payload Bytes** |
-| **MDN Web Docs (Mobile)**<br />`https://developer.mozilla.org/` | 390×844 (iPhone 13) | `input[type="search"] { background: #f1f5f9; color: #fff; padding: 2px; border: 2px solid #ef4444; }` | 55.1 KB<br />336 ViT tokens | **4.1 KB** (390×168 WebP)<br />**84 ViT tokens** | **-75.0% ViT Tokens**<br />**-92.5% Payload Bytes** |
+| **Wikipedia Portal (Desktop)**<br />`https://www.wikipedia.org/` | 1280×800 (Desktop) | `#search-form { margin-left: 60px !important; }`<br />`.pure-button { background: #e11d48 !important; }` | 122.3 KB<br />1,032 ViT tokens | **11.1 KB** (768×221 WebP)<br />**258 ViT tokens** | **-75.0% ViT Tokens**<br />**-91.0% Payload Bytes** |
+| **Wikipedia Portal (Mobile)**<br />`https://www.wikipedia.org/` | 390×844 (iPhone 13) | `#js-lang-list-button { transform: translateY(-36px) scale(0.65); opacity: 0.15; }` | 48.9 KB<br />258 ViT tokens | **1.5 KB** (370×133 WebP)<br />**258 ViT tokens** | **-96.9% Payload Bytes**<br />**Accuracy: 0% ➔ 35%** |
+| **Hacker News (Desktop)**<br />`https://news.ycombinator.com/` | 1280×800 (Desktop) | `table.pagetop { padding: 36px 20px; background: #dc2626; }`<br />`.pagetop a { font-size: 0px; }` | 154.2 KB<br />1,032 ViT tokens | **36.9 KB** (768×540 WebP)<br />**258 ViT tokens** | **-75.0% ViT Tokens**<br />**-76.1% Payload Bytes** |
+| **GitHub Pricing (Desktop)**<br />`https://github.com/pricing` | 1280×800 (Desktop) | `.btn-mktg { position: relative; z-index: -1; transform: translateY(-30px); background: #ea580c; }` | 111.9 KB<br />1,032 ViT tokens | **33.0 KB** (758×768 WebP)<br />**258 ViT tokens** | **-75.0% ViT Tokens**<br />**-70.5% Payload Bytes** |
+| **MDN Web Docs (Mobile)**<br />`https://developer.mozilla.org/` | 390×844 (iPhone 13) | `input[type="search"] { background: #f1f5f9; color: #fff; padding: 2px; border: 2px solid #ef4444; }` | 55.1 KB<br />258 ViT tokens | **4.7 KB** (390×168 WebP)<br />**258 ViT tokens** | **-91.5% Payload Bytes**<br />**Accuracy: 30% ➔ 65%** |
 
 ### Live Websites Summary
-- **Live Websites ViT Tokens:** 4,674 tokens ➔ **820 tokens** (**-82.5% ViT Image Token Reduction**)
-- **Live Websites Payload Size:** 492.3 KB ➔ **44.3 KB** (**-91.0% Network Payload Reduction**)
+- **Live Websites ViT Tokens:** 3,612 tokens ➔ **1,290 tokens** (**-64.3% ViT Image Token Reduction**)
+- **Live Websites Payload Size:** 492.3 KB ➔ **87.2 KB** (**-82.3% Network Payload Reduction**)
+- **Live Websites Triage Accuracy:** 45.0% ➔ **59.0%** (**+14.0% Diagnostic Accuracy Boost**)
 - **Multi-Viewport Cross-Correlation:** Testing Wikipedia on both Desktop (`1280×800`) and Mobile (`390×844`) proves that ZeroVisual correlates multi-breakpoint failures under a single `testId`, feeding both cropped bounding boxes to the AI agent in a single compact diagnosis prompt.
 
 ---
@@ -71,9 +82,9 @@ To validate performance beyond synthetic components, ZeroVisual was tested again
 ## Benchmark Methodology
 
 ### Evaluated Model & Architecture
-- **Model:** `RadixArk/Qwen3.8-27B-NVFP4` running locally via SGLang
+- **Model:** `google/gemma-4-26B-A4B-it` running locally via vLLM
 - **API Protocol:** Standard OpenAI-compatible `/v1/chat/completions` endpoint
-- **Vision Grid:** Qwen native 28×28 pixel merged patches
+- **Vision Grid:** Gemma 4 multimodal native patch grid / model-aligned tiles (768px native tile)
 
 ### Evaluation Rubric
 Each response is scored against ground-truth metadata across three dimensions:
@@ -86,13 +97,13 @@ Each response is scored against ground-truth metadata across three dimensions:
 ## Key Architectural Insights
 
 ### 1. Vision Token Allocation (ViT Patch Math)
-Without ZeroVisual, full-viewport screenshots (1280×800) consume **1,000 – 1,334 image tokens** per query on Qwen ViT. With ZeroVisual's bounding-box isolation and patch-aligned downscaling, image tokens drop to **69 – 234 tokens**—an **87.3% reduction**.
+Without ZeroVisual, full-viewport screenshots (1280×800) consume **1,032 image tokens** (a 2×2 grid of 768px tiles) per query. With ZeroVisual's bounding-box isolation and patch-aligned downscaling, image tokens drop to a single native tile (**258 tokens**)—a **75.0% reduction** on every desktop screenshot.
 
 ### 2. Eliminating Canvas Hallucinations
-In complex pages like the GitHub PR view, feeding the full viewport caused the model to hallucinate issues in peripheral sidebars. Isolating the merge card with 32px padding eliminated peripheral noise, increasing diagnostic accuracy from **65% to 100%**.
+In complex mobile pages like MDN Web Docs, feeding the full viewport caused the model to struggle with low-contrast elements amidst page clutter (scoring only 30%). Isolating the search input with 32px padding boosted diagnostic accuracy to **65%**. On mobile Wikipedia, accuracy jumped from **0% to 35%**.
 
 ### 3. Reasoning Latency
-Full-size images impose substantial overhead during multi-head cross-attention. In Case 5 (Dashboard Metric Overflow), response latency dropped from **72.3s to 18.9s** (a **3.8x speedup**), preventing client request timeouts and token exhaustion.
+Full-size images impose substantial overhead during multi-head cross-attention. On Real-World Wikipedia Desktop, response latency dropped from **11.3s to 7.2s** (a **37% speedup**), preventing client request timeouts and token exhaustion.
 
 ---
 
@@ -112,5 +123,5 @@ Configuration is handled via `benchmark/.env`:
 
 ```bash
 OPENAI_BASE_URL=https://spark.ntsd.dev:8001/v1
-AGENT_MODEL=RadixArk/Qwen3.8-27B-NVFP4
+AGENT_MODEL=google/gemma-4-26B-A4B-it
 ```

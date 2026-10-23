@@ -1,0 +1,52 @@
+{
+  "id": "session-01-wikipedia-search-offset-with-1792733811628",
+  "timestamp": "2026-10-23T05:36:51.628Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "01-wikipedia-search-offset",
+  "caseName": "Wikipedia Portal Search Bar Shift",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 634,
+      "height": 489
+    },
+    "format": "webp",
+    "bytes": 8358,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 338,
+      "y": 160,
+      "width": 634,
+      "height": 489
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element**: Search Bar Component (Input field and Search button container).\n\n2. **Nature of the Visual Defect**: **Alignment/Layout mismatch**. The search button is vertically misaligned or lacks proper container constraints, causing the red background to extend beyond the expected height of the input field, or the input field is not vertically centered within the red border container.\n\n3. **Probable Root Cause**: \n   - Lack of `display: flex` or `align-items: center` on the parent container.\n   - Incorrect `height` or `line-height` definitions on the input vs. the button.\n   - Box-sizing issue (`content-box` vs `border-box`) causing the button to overflow the container's height.\n\n4. **Suggested Fix**:\nEnsure the container uses Flexbox to align children vertically and uses `border-box` for consistent sizing.\n\n```css\n.search-container {\n  display: flex;\n  align-items: stretch; /* Ensures button and input have same height */\n  height: 40px;         /* Explicit height */\n  box-sizing: border-box;\n}\n\n.search-input {\n  flex-grow: 1;\n  border: none;\n  padding: 0 10px;\n}\n\n.search-button {\n  background-color: #d33;\n  color: white;\n  border: none;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 363,
+    "imageTokens": 0,
+    "completionTokens": 337,
+    "reasoningTokens": 0,
+    "totalTokens": 700,
+    "latencyMs": 8522,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.",
+    "affectedElement": ".search-box",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS",
+    "suggestedFix": "Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c",
+    "expectedBoundingBox": {
+      "x": 370,
+      "y": 460,
+      "width": 600,
+      "height": 90
+    }
+  }
+}

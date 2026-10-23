@@ -1,12 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { detectDiffBoundingBox, optimizeImageForProvider } from '../dist/index.js';
+import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
 
-function calculateQwenTokens(width: number, height: number): number {
-  const patchesW = Math.ceil(width / 28);
-  const patchesH = Math.ceil(height / 28);
-  return patchesW * patchesH;
+function calculateVisionTokens(width: number, height: number): number {
+  return estimateVisionTokens(width, height, 'gemini');
 }
 
 interface CaseSessionExport {
@@ -103,7 +101,7 @@ export async function exportWebData() {
 
     // Optimize
     const optResult = await optimizeImageForProvider(actualBuffer, {
-      provider: 'qwen',
+      provider: 'gemini',
       cropBox,
       quality: 85
     });
@@ -141,8 +139,8 @@ export async function exportWebData() {
       } catch {}
     }
 
-    const rawTokensCalc = calculateQwenTokens(rawWidth, rawHeight);
-    const optTokensCalc = calculateQwenTokens(optResult.width, optResult.height);
+    const rawTokensCalc = calculateVisionTokens(rawWidth, rawHeight);
+    const optTokensCalc = calculateVisionTokens(optResult.width, optResult.height);
 
     const isMobile = meta.viewport.width < 500;
     const device = isMobile ? 'Mobile (iPhone 13)' : 'Desktop';
@@ -153,7 +151,7 @@ export async function exportWebData() {
       imageResolution: sessionWithout?.inputImage?.resolution || { width: rawWidth, height: rawHeight },
       imagePayloadBytes: sessionWithout?.inputImage?.bytes || actualBuffer.length,
       promptTokens: sessionWithout?.metrics?.promptTokens || (rawTokensCalc + 120),
-      imageTokens: sessionWithout?.metrics?.imageTokens || rawTokensCalc,
+      imageTokens: sessionWithout?.metrics?.imageTokens > 0 ? sessionWithout.metrics.imageTokens : rawTokensCalc,
       completionTokens: sessionWithout?.metrics?.completionTokens || 1400,
       reasoningTokens: sessionWithout?.metrics?.reasoningTokens || 1200,
       totalTokens: sessionWithout?.metrics?.totalTokens || (rawTokensCalc + 1520),
@@ -169,7 +167,7 @@ export async function exportWebData() {
       imageResolution: sessionWith?.inputImage?.resolution || { width: optResult.width, height: optResult.height },
       imagePayloadBytes: sessionWith?.inputImage?.bytes || optResult.buffer.length,
       promptTokens: sessionWith?.metrics?.promptTokens || (optTokensCalc + 120),
-      imageTokens: sessionWith?.metrics?.imageTokens || optTokensCalc,
+      imageTokens: sessionWith?.metrics?.imageTokens > 0 ? sessionWith.metrics.imageTokens : optTokensCalc,
       completionTokens: sessionWith?.metrics?.completionTokens || 1100,
       reasoningTokens: sessionWith?.metrics?.reasoningTokens || 950,
       totalTokens: sessionWith?.metrics?.totalTokens || (optTokensCalc + 1220),

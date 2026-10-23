@@ -1,0 +1,52 @@
+{
+  "id": "session-03-saas-pricing-contrast-with-1792733839738",
+  "timestamp": "2026-10-23T05:37:19.738Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 274,
+      "height": 103
+    },
+    "format": "webp",
+    "bytes": 572,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 503,
+      "y": 262,
+      "width": 274,
+      "height": 103
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element**: \"Get Pro\" Button.\n\n2. **Nature of the Visual Defect**: **Contrast Violation (Accessibility failure)**. The text color is too similar to the button background color, making it nearly unreadable.\n\n3. **Probable Root Cause**: Insufficient color contrast ratio between the `color` property (text) and the `background-color` property of the button component.\n\n4. **Suggested Fix**: Increase the contrast by darkening the text color or lightening the background.\n\n**Code Snippet Example:**\n```css\n/* Current (Failing) */\n.button-get-pro {\n  background-color: #e0e7ff; /* Light lavender */\n  color: #cbd5e1;            /* Low contrast grey/blue */\n}\n\n/* Suggested Fix (Passing) */\n.button-get-pro {\n  background-color: #e0e7ff; \n  color: #1e3a8a;            /* Darker blue for WCAG compliance */\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 367,
+    "imageTokens": 0,
+    "completionTokens": 225,
+    "reasoningTokens": 0,
+    "totalTokens": 592,
+    "latencyMs": 5824,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

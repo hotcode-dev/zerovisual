@@ -1,0 +1,46 @@
+{
+  "id": "session-03-saas-pricing-contrast-without-1792733833890",
+  "timestamp": "2026-10-23T05:37:13.890Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 35106,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "1. **Affected Element / Component name**: Pricing Card - \"Pro\" Plan.\n\n2. **Nature of the Visual Defect**: \n   - **Color/Contrast Violation**: The \"Get Pro\" button text and background color have insufficient contrast, making it nearly unreadable.\n   - **Visual Inconsistency**: The \"Pro\" card lacks the distinct border/shadow treatment seen in the \"Starter\" and \"Enterprise\" cards, appearing washed out.\n\n3. **Probable Root Cause in CSS or layout**: \n   - The button is likely using a `disabled` state style or a low-opacity background color (`rgba` or `opacity`) applied incorrectly to the active state.\n   - The card container is missing the standard `border` or `box-shadow` properties applied to sibling components.\n\n4. **Suggested Fix or code snippet**:\n   - **Fix Button Contrast**: Ensure the button background and text meet WCAG AA standards.\n   ```css\n   /* Suggested fix for Pro button */\n   .pro-card .button {\n     background-color: #4F46E5; /* High contrast primary color */\n     color: #FFFFFF;\n   }\n   ```\n   - **Fix Card Consistency**: Apply the standard card border/shadow to the Pro card.\n   ```css\n   /* Ensure Pro card matches siblings */\n   .pro-card {\n     border: 1px solid #E5E7EB; \n     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);\n   }\n   ```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 346,
+    "reasoningTokens": 0,
+    "totalTokens": 716,
+    "latencyMs": 8723,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

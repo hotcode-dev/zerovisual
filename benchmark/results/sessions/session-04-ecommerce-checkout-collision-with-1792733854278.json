@@ -1,0 +1,52 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-with-1792733854278",
+  "timestamp": "2026-10-23T05:37:34.278Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 328
+    },
+    "format": "webp",
+    "bytes": 7156,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 388,
+      "y": 247,
+      "width": 504,
+      "height": 328
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element / Component name**: Order Summary Footer / Total Due Bar.\n\n2. **Nature of the Visual Defect**: Element overlap and text clipping. The \"Pay $53.41 Now\" call-to-action text is colliding with the \"$53.41\" price amount on the right.\n\n3. **Probable Root Cause in CSS or layout**: \n   - Lack of flexible spacing (e.g., `justify-content: space-between`) in a flex container.\n   - Fixed width on the container or child elements preventing proper reflow.\n   - Absence of `gap` property or sufficient padding to handle varying text lengths.\n\n4. **Suggested Fix or code snippet**:\nUse Flexbox with `justify-content: space-between` and ensure the container has adequate padding.\n\n```css\n.total-due-bar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 24px; /* Ensure internal breathing room */\n  width: 100%;\n  box-sizing: border-box;\n}\n\n/* If using a nested structure for the CTA */\n.cta-text {\n  margin-right: auto; /* Pushes the price to the far right */\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 357,
+    "imageTokens": 0,
+    "completionTokens": 289,
+    "reasoningTokens": 0,
+    "totalTokens": 646,
+    "latencyMs": 7396,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

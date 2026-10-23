@@ -1,0 +1,46 @@
+{
+  "id": "session-08-real-wikipedia-mobile-without-1792733910189",
+  "timestamp": "2026-10-23T05:38:30.189Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "08-real-wikipedia-mobile",
+  "caseName": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 50042,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "**1. Affected Element / Component name**\nLanguage Selection Grid / Main Content Area.\n\n**2. Nature of the Visual Defect**\n**Layout Alignment / Spacing Issue:** The language grid is improperly centered or lacks sufficient horizontal padding/margin, causing an asymmetrical distribution of elements relative to the search bar above and the footer below.\n\n**3. Probable Root Cause in CSS or layout**\n*   **Container Width/Alignment:** The parent container for the language list likely lacks `margin: 0 auto;` or has an incorrect `max-width` setting.\n*   **Grid/Flexbox Configuration:** If using CSS Grid, the `grid-template-columns` or `justify-content` property may be misconfigured, causing the items to cluster or align incorrectly within the viewport.\n\n**4. Suggested Fix or code snippet**\nEnsure the container is centered and uses a consistent grid layout:\n\n```css\n.language-grid-container {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr); /* Adjust based on design */\n  gap: 20px;\n  max-width: 800px; /* Or appropriate design width */\n  margin: 0 auto;    /* Centers the container */\n  text-align: center;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 349,
+    "imageTokens": 0,
+    "completionTokens": 282,
+    "reasoningTokens": 0,
+    "totalTokens": 631,
+    "latencyMs": 7189,
+    "accuracyScore": 0
+  },
+  "groundTruth": {
+    "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+    "affectedElement": "#js-lang-list-button",
+    "defectType": "button_displacement",
+    "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+    "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+    "expectedBoundingBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  }
+}

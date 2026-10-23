@@ -1,0 +1,52 @@
+{
+  "id": "session-02-github-pr-merge-with-1792733825160",
+  "timestamp": "2026-10-23T05:37:05.160Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "02-github-pr-merge",
+  "caseName": "GitHub Pull Request Merge Card Regression",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 768,
+      "height": 140
+    },
+    "format": "webp",
+    "bytes": 6104,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 8,
+      "y": 106,
+      "width": 864,
+      "height": 158
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element**: `Merge pull request` Button.\n\n2. **Nature of the Visual Defect**: Border/Outline misalignment and potential padding inconsistency. The dashed border is not perfectly centered around the button's bounding box and appears to be clipping or misaligned with the button's edge.\n\n3. **Probable Root Cause**: \n   - Use of `outline` instead of `border` with an offset that doesn't account for the element's box model.\n   - An incorrect `outline-offset` value.\n   - A `box-shadow` being used to simulate a border without proper spread/radius alignment.\n\n4. **Suggested Fix**:\nUse `box-shadow` for a cleaner, non-layout-shifting \"dashed\" effect, or ensure `outline-offset` is correctly calculated.\n\n```css\n/* Recommended approach using box-shadow to avoid layout shifts */\n.merge-button:focus {\n  outline: none;\n  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #ff8c00; /* Creates a double ring effect */\n}\n\n/* If using outline, ensure offset is applied */\n.merge-button:focus {\n  outline: 2px dashed #ffffff;\n  outline-offset: 4px;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 292,
+    "reasoningTokens": 0,
+    "totalTokens": 662,
+    "latencyMs": 7393,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+    "affectedElement": ".btn-merge",
+    "defectType": "button_styling_regression",
+    "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+    "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+    "expectedBoundingBox": {
+      "x": 550,
+      "y": 110,
+      "width": 280,
+      "height": 90
+    }
+  }
+}

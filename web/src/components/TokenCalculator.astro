@@ -15,8 +15,9 @@
         <select id="provider-select" class="calc-select">
           <option value="anthropic" selected>Anthropic Claude 3.5 / 3.7 Sonnet (504×504 max tile)</option>
           <option value="openai">OpenAI GPT-4o / GPT-4o-mini (512×512 tile grid)</option>
-          <option value="gemini">Google Gemini 2.0 / 1.5 Pro (768×768 tile)</option>
-          <option value="gemini-low">Google Gemini Low-Token Mode (384×384 tile)</option>
+          <option value="gemma">Google Gemma 4 / Gemini 2.0 (768×768 tile)</option>
+          <option value="gemma-low">Google Gemma / Gemini Low-Token Mode (384×384 tile)</option>
+          <option value="qwen">Qwen 2.5 / 3.8-VL (504×504 patch grid)</option>
           <option value="local">Local VLM (448×448 grid)</option>
         </select>
       </div>
@@ -240,12 +241,12 @@
         const tilesW = Math.ceil(width / 512);
         const tilesH = Math.ceil(height / 512);
         return 85 + (tilesW * tilesH * 170);
-      } else if (provider === 'anthropic') {
+      } else if (provider === 'anthropic' || provider === 'qwen') {
         const patchesW = Math.ceil(width / 28);
         const patchesH = Math.ceil(height / 28);
         return patchesW * patchesH;
-      } else if (provider === 'gemini' || provider === 'gemini-low') {
-        const tileDim = provider === 'gemini-low' ? 384 : 768;
+      } else if (provider === 'gemini' || provider === 'gemma' || provider === 'gemini-low' || provider === 'gemma-low') {
+        const tileDim = (provider === 'gemini-low' || provider === 'gemma-low') ? 384 : 768;
         const tilesW = Math.ceil(width / tileDim);
         const tilesH = Math.ceil(height / tileDim);
         return tilesW * tilesH * 258;
@@ -272,8 +273,8 @@
       // Provider dimensions limit
       let maxTile = 504;
       if (provider === 'openai') maxTile = 512;
-      else if (provider === 'gemini') maxTile = 768;
-      else if (provider === 'gemini-low') maxTile = 384;
+      else if (provider === 'gemini' || provider === 'gemma') maxTile = 768;
+      else if (provider === 'gemini-low' || provider === 'gemma-low') maxTile = 384;
       else if (provider === 'local') maxTile = 448;
 
       // Model-aware downscale with withoutEnlargement: true

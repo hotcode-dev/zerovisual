@@ -1,0 +1,46 @@
+{
+  "id": "session-07-real-wikipedia-desktop-without-1792733895785",
+  "timestamp": "2026-10-23T05:38:15.785Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "07-real-wikipedia-desktop",
+  "caseName": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 125273,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "**1. Affected Element / Component name**\nLanguage Selection Search Input (Search Bar)\n\n**2. Nature of the Visual Defect**\nElement Overlap / Layout Misalignment. The language selector dropdown (`EN ⌵`) is overlapping the input field's internal padding/boundary, and the search button (magnifying glass icon) appears disproportionately large or misaligned relative to the input container's height.\n\n**3. Probable Root Cause in CSS or layout**\n*   **Flexbox/Grid misalignment:** The container holding the input, the dropdown, and the button likely lacks proper `align-items: center` or has conflicting `height` properties.\n*   **Absolute Positioning:** The language selector might be using `position: absolute` without a correctly defined parent container, causing it to drift into the input area.\n*   **Box-sizing issue:** The input field may not be using `box-sizing: border-box`, causing padding to push the internal elements out of alignment.\n\n**4. Suggested Fix or code snippet**\nEnsure the container uses Flexbox to align children vertically and ensure the input has consistent padding.\n\n```css\n/* Ensure the container aligns all children in a single row */\n.search-container {\n  display: flex;\n  align-items: stretch; /* Ensures button and input have same height */\n  border: 1px solid #a2a9b1;\n  border-radius: 2px;\n  overflow: hidden;\n}\n\n/* Ensure the input doesn't overlap the dropdown */\n.search-input {\n  flex-grow: 1;\n  padding: 0 10px;\n  border: none;\n  box-sizing: border-box;\n}\n\n/* Ensure the language selector is treated as a distinct flex item */\n.language-selector {\n  display: flex;\n  align-items: center;\n  padding: 0 8px;\n  border-right: 1px solid #a2a9b1;\n  background: #f8f9fa;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 450,
+    "reasoningTokens": 0,
+    "totalTokens": 820,
+    "latencyMs": 11292,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

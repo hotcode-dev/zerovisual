@@ -46,6 +46,7 @@ export function getProviderDimensions(
     case 'qwen':
       return { maxWidth: 504, maxHeight: 504 };
     case 'gemini':
+    case 'gemma':
       return lowTokenMode
         ? { maxWidth: 384, maxHeight: 384 }
         : { maxWidth: 768, maxHeight: 768 };
@@ -234,7 +235,7 @@ export function estimateVisionTokens(
     return patchesW * patchesH;
   }
 
-  if (provider === 'gemini') {
+  if (provider === 'gemini' || provider === 'gemma') {
     const tileDim = lowTokenMode ? 384 : 768;
     const tilesW = Math.ceil(width / tileDim);
     const tilesH = Math.ceil(height / tileDim);

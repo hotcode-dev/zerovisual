@@ -21,6 +21,11 @@ describe('Model-Aware Image Optimizer', () => {
       expect(getProviderDimensions('gemini', true)).toEqual({ maxWidth: 384, maxHeight: 384 });
     });
 
+    it('should return 768x768 for gemma standard and 384x384 for lowTokenMode', () => {
+      expect(getProviderDimensions('gemma', false)).toEqual({ maxWidth: 768, maxHeight: 768 });
+      expect(getProviderDimensions('gemma', true)).toEqual({ maxWidth: 384, maxHeight: 384 });
+    });
+
     it('should return 448x448 default for local and respect custom dimensions', () => {
       expect(getProviderDimensions('local')).toEqual({ maxWidth: 448, maxHeight: 448 });
       expect(getProviderDimensions('local', false, { maxWidth: 640, maxHeight: 480 })).toEqual({

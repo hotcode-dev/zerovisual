@@ -1,0 +1,46 @@
+{
+  "id": "session-11-real-mdn-search-mobile-without-1792733958137",
+  "timestamp": "2026-10-23T05:39:18.137Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "11-real-mdn-search-mobile",
+  "caseName": "Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 56411,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "**1. Affected Element / Component name**\nHero Section Heading (`<h1>` / \"Resources for Developers, by Developers _\")\n\n**2. Nature of the Visual Defect**\nText wrapping / Layout reflow. The heading is breaking into multiple lines in a way that creates excessive vertical whitespace and disrupts the intended visual hierarchy.\n\n**3. Probable Root Cause in CSS or layout**\nThe container width is likely too narrow for the font size, or the `max-width` property on the heading element is set too low. Alternatively, a lack of `white-space: nowrap` or improper use of `flexbox/grid` on the parent container is causing premature line breaks.\n\n**4. Suggested Fix or code snippet**\nIncrease the container width or adjust the font size for smaller viewports using media queries.\n\n```css\n/* Option A: Increase container width */\n.hero-content {\n  max-width: 800px; /* Increase from current value */\n}\n\n/* Option B: Responsive font scaling */\nh1 {\n  font-size: clamp(2rem, 8vw, 4rem);\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 349,
+    "imageTokens": 0,
+    "completionTokens": 245,
+    "reasoningTokens": 0,
+    "totalTokens": 594,
+    "latencyMs": 6262,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.",
+    "affectedElement": "input[type=\"search\"]",
+    "defectType": "contrast_violation",
+    "rootCause": "White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)",
+    "suggestedFix": "Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  }
+}

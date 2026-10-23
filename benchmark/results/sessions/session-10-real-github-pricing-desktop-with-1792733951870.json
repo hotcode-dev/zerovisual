@@ -1,0 +1,52 @@
+{
+  "id": "session-10-real-github-pricing-desktop-with-1792733951870",
+  "timestamp": "2026-10-23T05:39:11.870Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "10-real-github-pricing-desktop",
+  "caseName": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 758,
+      "height": 768
+    },
+    "format": "webp",
+    "bytes": 33808,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "Based on the provided screenshot, here is the visual regression analysis:\n\n1.  **Affected Element / Component name:** Global Navigation Header (specifically the top utility bar/banner).\n2.  **Nature of the Visual Defect:** Element overlap and layout breakage. The colorful decorative pattern/banner is overlapping the main navigation links and the \"Save your seat\" text, causing a visual collision.\n3.  **Probable Root Cause in CSS or layout:** \n    *   **Z-index issue:** The decorative element has a higher `z-index` than the navigation container without proper clearance.\n    *   **Positioning error:** The banner likely uses `position: absolute` or `fixed` without a defined container height, causing it to float over the content instead of pushing it down.\n    *   **Flexbox/Grid failure:** A failure in the parent container's layout flow (e.g., missing `flex-direction: column` or improper `margin-bottom` on the top bar).\n4.  **Suggested Fix or code snippet:**\n    Ensure the top utility bar occupies its own space in the document flow and manage stacking contexts.\n\n    ```css\n    /* Ensure the top bar pushes content down rather than floating over it */\n    .top-utility-bar {\n      position: relative; /* Change from absolute if applicable */\n      display: block;\n      width: 100%;\n    }\n\n    /* Ensure navigation stays below the utility bar */\n    .main-nav {\n      position: relative;\n      z-index: 10; /* Ensure nav is above decorative elements if overlap is intended */\n    }\n\n    /* If the colorful pattern is a background element, ensure it doesn't bleed */\n    .decorative-pattern {\n      z-index: -1; \n    }\n    ```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 353,
+    "imageTokens": 0,
+    "completionTokens": 394,
+    "reasoningTokens": 0,
+    "totalTokens": 747,
+    "latencyMs": 9995,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+    "affectedElement": ".btn-mktg",
+    "defectType": "zindex_collision",
+    "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+    "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+    "expectedBoundingBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  }
+}

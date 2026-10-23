@@ -37,7 +37,7 @@ import TokenCalculator from '../components/TokenCalculator.astro';
       </div>
       <h3 class="text-xl font-bold text-white tracking-tight">Interactive Benchmark & AI Session Explorer</h3>
       <p class="text-sm text-slate-300 mt-1 max-w-2xl">
-        Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on Qwen 3.8-27B.
+        Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on Gemma 4 26B (<code>google/gemma-4-26B-A4B-it</code>).
       </p>
     </div>
     <a href="/guides/benchmarks/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-md shadow-indigo-500/25 whitespace-nowrap">
@@ -128,13 +128,13 @@ import TokenCalculator from '../components/TokenCalculator.astro';
     </blockquote>
 
     <div class="mt-8 mb-4">
-      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Qwen 3.8-27B & Live Websites)</h3>
-      <p class="text-slate-400 mb-4">Tested against a local LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
+      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Gemma 4 26B & Live Websites)</h3>
+      <p class="text-slate-400 mb-4">Tested against a local LLM endpoint (<code>google/gemma-4-26B-A4B-it</code> via vLLM) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
       <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-sm">
-        <li><strong>Vision Image Tokens:</strong> 11,680 tokens ➔ <strong class="text-emerald-400">1,489 tokens</strong> (-87.3% ViT Token Reduction)</li>
-        <li><strong>Live Production Sites Payload:</strong> 492.3 KB ➔ <strong class="text-emerald-400">44.3 KB</strong> (-91.0% Bandwidth Saved)</li>
-        <li><strong>Average Latency:</strong> 53.3s ➔ <strong class="text-emerald-400">36.4s</strong> (32% Faster Roundtrips)</li>
-        <li><strong>Diagnostic Triage Accuracy:</strong> 76.7% ➔ <strong class="text-emerald-400">82.5%</strong> (+5.8% Accuracy)</li>
+        <li><strong>Vision Image Tokens:</strong> 9,030 tokens ➔ <strong class="text-emerald-400">2,838 tokens</strong> (-68.6% ViT Token Reduction)</li>
+        <li><strong>Live Production Sites Payload:</strong> 492.3 KB ➔ <strong class="text-emerald-400">87.2 KB</strong> (-82.3% Bandwidth Saved)</li>
+        <li><strong>Average Latency:</strong> 8.4s ➔ <strong class="text-emerald-400">7.3s</strong> (13% Faster Roundtrips, up to 37% on desktop)</li>
+        <li><strong>Diagnostic Triage Accuracy:</strong> 59.1% ➔ <strong class="text-emerald-400">65.5%</strong> (+6.4% Accuracy Boost)</li>
       </ul>
       <div class="mt-4">
         <a href="/guides/benchmarks/" class="text-indigo-400 hover:text-indigo-300 underline font-semibold inline-flex items-center gap-1.5">
@@ -172,16 +172,22 @@ import TokenCalculator from '../components/TokenCalculator.astro';
             <td class="text-emerald-400 font-semibold">~28 – 324 tokens</td>
           </tr>
           <tr>
-            <td><code>gemini</code></td>
+            <td><code>gemma</code> / <code>gemini</code></td>
             <td><code>768 × 768 px</code></td>
-            <td>Fits 1 native Gemini tile</td>
+            <td>Fits 1 native Gemma / Gemini multimodal tile</td>
             <td class="text-emerald-400 font-semibold">~258 tokens</td>
           </tr>
           <tr>
-            <td><code>gemini</code> (<code>lowTokenMode</code>)</td>
+            <td><code>gemma</code> (<code>lowTokenMode</code>)</td>
             <td><code>384 × 384 px</code></td>
             <td>Sub-384px single base tile optimization</td>
             <td class="text-emerald-400 font-semibold">~258 tokens (ultra-fast)</td>
+          </tr>
+          <tr>
+            <td><code>qwen</code></td>
+            <td><code>504 × 504 px</code></td>
+            <td>Dynamic 2D spatial patch grid (<code>28×28 px</code>)</td>
+            <td class="text-emerald-400 font-semibold">~28 – 324 tokens</td>
           </tr>
           <tr>
             <td><code>local</code></td>

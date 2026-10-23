@@ -1,0 +1,46 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-without-1792733846863",
+  "timestamp": "2026-10-23T05:37:26.863Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 22948,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "1. **Affected Element**: \"Pay $53.41 Now\" Button / Footer Bar.\n\n2. **Nature of the Visual Defect**: Text alignment/overflow issue. The button text is improperly centered or lacks sufficient padding, causing the label \"Total Due\" and the action \"Pay $53.41 Now\" to appear crowded, while the final amount \"$53.41\" is pushed against the right edge.\n\n3. **Probable Root Cause**: \n   - Use of `justify-content: space-between` without adequate horizontal padding on the container.\n   - Fixed width on the button container that does not account for the combined length of the text elements.\n   - Lack of `flex-grow` or proper margin distribution between the text nodes.\n\n4. **Suggested Fix**:\nApply consistent padding and use `justify-content: space-between` with a defined container padding, or use a flexbox layout with specific gaps.\n\n```css\n.button-container {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 12px 20px; /* Ensure adequate breathing room on sides */\n  width: 100%;\n  box-sizing: border-box;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 280,
+    "reasoningTokens": 0,
+    "totalTokens": 650,
+    "latencyMs": 7122,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

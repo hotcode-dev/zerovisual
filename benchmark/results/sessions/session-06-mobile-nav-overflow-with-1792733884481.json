@@ -1,0 +1,52 @@
+{
+  "id": "session-06-mobile-nav-overflow-with-1792733884481",
+  "timestamp": "2026-10-23T05:38:04.481Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "with_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 194,
+      "height": 121
+    },
+    "format": "webp",
+    "bytes": 1482,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 194,
+      "height": 121
+    }
+  },
+  "output": {
+    "content": "1. **Affected Element**: Navigation Header / Menu Button.\n\n2. **Nature of the Visual Defect**: Element overlap and alignment issue. The red menu button is overlapping the header container's boundary and is not vertically centered relative to the \"ZeroVisual\" logo.\n\n3. **Probable Root Cause**: \n   - Lack of `align-items: center` on the header flex container.\n   - The menu button likely has a fixed position, absolute positioning, or excessive `margin-top` that pushes it outside the header's intended bounding box.\n\n4. **Suggested Fix**:\nEnsure the header uses Flexbox for alignment:\n```css\nheader {\n  display: flex;\n  justify-content: space-between;\n  align-items: center; /* Vertically centers logo and button */\n  padding: 0 16px;     /* Ensures spacing from edges */\n}\n\n.menu-button {\n  margin: 0;           /* Remove any offset margins causing the overlap */\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 220,
+    "reasoningTokens": 0,
+    "totalTokens": 590,
+    "latencyMs": 5635,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

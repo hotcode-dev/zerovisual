@@ -1,0 +1,46 @@
+{
+  "id": "session-05-dashboard-stat-overflow-without-1792733862163",
+  "timestamp": "2026-10-23T05:37:42.163Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 33568,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "Based on the provided screenshot, here is the visual regression analysis:\n\n1. **Affected Element / Component name**\n   `Active Agents` Card (Telemetry Stat Card)\n\n2. **Nature of the Visual Defect**\n   **Color/Contrast Violation & Visual Inconsistency.** The \"Active Agents\" card uses a bright red color for the primary metric (`12,450`) and the trend indicator (`↑ 14% this week`), which deviates from the established semantic color pattern seen in the \"Tokens Saved\" card (Green = positive/success).\n\n3. **Probable Root Cause in CSS or layout**\n   Hardcoded color value or an incorrect semantic theme class applied to the `Active Agents` component. It appears the developer used a \"danger\" or \"error\" color variable (e.g., `--color-red`) instead of a \"success\" or \"neutral\" variable for a positive growth metric.\n\n4. **Suggested Fix or code snippet**\n   Ensure the component uses the consistent success color variable for positive trends.\n\n   **CSS Fix:**\n   ```css\n   /* Change from error/red to success/green to match 'Tokens Saved' */\n   .stat-card--active-agents .metric-value,\n   .stat-card--active-agents .trend-indicator {\n     color: var(--color-success-green); /* Instead of var(--color-error-red) */\n   }\n   ```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 308,
+    "reasoningTokens": 0,
+    "totalTokens": 678,
+    "latencyMs": 7882,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

@@ -46,7 +46,7 @@ interface BenchmarkRunResult {
 function loadEnv(): { baseUrl: string; model: string } {
   const envPath = path.resolve(process.cwd(), 'benchmark/.env');
   let baseUrl = 'https://spark.ntsd.dev:8001/v1';
-  let model = 'RadixArk/Qwen3.8-27B-NVFP4';
+  let model = 'google/gemma-4-26B-A4B-it';
 
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf8').split('\n');
@@ -297,9 +297,14 @@ Identify:
     // Detect diff bounding box with ZeroVisual
     const diffResult = await detectDiffBoundingBox(diffPng, { padding: 32 });
     
-    // Optimize image for qwen provider (504px max tile)
+    // Determine target provider based on model architecture
+    const targetProvider = model.toLowerCase().includes('gemma') 
+      ? 'gemini' 
+      : (model.toLowerCase().includes('qwen') ? 'qwen' : 'local');
+
+    // Optimize image for target provider
     const optResult = await optimizeImageForProvider(actualPng, {
-      provider: 'qwen',
+      provider: targetProvider,
       cropBox: diffResult.boundingBox,
       quality: 85
     });

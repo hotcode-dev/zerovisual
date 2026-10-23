@@ -1,0 +1,46 @@
+{
+  "id": "session-10-real-github-pricing-desktop-without-1792733941821",
+  "timestamp": "2026-10-23T05:39:01.821Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "10-real-github-pricing-desktop",
+  "caseName": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 114551,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "Since no \"baseline\" (expected) image was provided to compare against, I am analyzing the provided screenshot for **internal visual inconsistencies** and **layout anomalies** that typically trigger regression failures.\n\n### 1. Affected Element / Component name\n**Pricing Cards Container** (specifically the \"Enterprise\" card).\n\n### 2. Nature of the Visual Defect\n**Layout Overflow / Clipping:** The blue \"RECOMMENDED\" header bar on the Enterprise card is misaligned or improperly contained, and the card itself appears to be clipping or bleeding into the right edge of the viewport/container.\n\n### 3. Probable Root Cause in CSS or layout\n*   **Overflow Issue:** The parent container likely lacks `overflow: hidden` or has a fixed width that is too narrow for the child card's width/margins.\n*   **Box Model Miscalculation:** The Enterprise card may have a `width: 100%` or a large `margin-right` combined with a `flex-basis` that exceeds the parent container's width.\n*   **Positioning:** The blue header might be using `position: absolute` without a properly defined `position: relative` parent, causing it to shift relative to the viewport rather than the card.\n\n### 4. Suggested Fix or code snippet\nEnsure the card container uses a proper grid or flexbox layout with gap management, and ensure the card itself handles its internal header correctly.\n\n**Suggested CSS Fix:**\n```css\n/* Ensure the parent container manages children without overflow */\n.pricing-container {\n  display: flex;\n  justify-content: center;\n  gap: 20px;\n  overflow: hidden; /* Prevents horizontal scroll/clipping */\n  padding: 20px;\n}\n\n/* Ensure the card is contained and the header is relative to the card */\n.pricing-card-enterprise {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  /* Avoid fixed widths that cause overflow; use flex-basis or percentages */\n  flex: 1; \n  max-width: 400px; \n}\n\n.recommended-badge {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0; /* Ensures it spans exactly the width of the card */\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 505,
+    "reasoningTokens": 0,
+    "totalTokens": 875,
+    "latencyMs": 12668,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+    "affectedElement": ".btn-mktg",
+    "defectType": "zindex_collision",
+    "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+    "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+    "expectedBoundingBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  }
+}

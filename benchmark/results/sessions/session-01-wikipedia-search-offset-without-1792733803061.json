@@ -1,0 +1,46 @@
+{
+  "id": "session-01-wikipedia-search-offset-without-1792733803061",
+  "timestamp": "2026-10-23T05:36:43.062Z",
+  "benchmarkRunTimestamp": "2026-10-23T05:36:31.753Z",
+  "caseId": "01-wikipedia-search-offset",
+  "caseName": "Wikipedia Portal Search Bar Shift",
+  "mode": "without_zerovisual",
+  "model": "google/gemma-4-26B-A4B-it",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 25172,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "**1. Affected Element / Component name**\nSearch Bar Component (Input field and Search button container).\n\n**2. Nature of the Visual Defect**\n**Element Overlap / Layout Breakage:** The search button is overlapping the input field's boundary, and the input field's border is inconsistent with the container's height. There is a lack of proper spacing/alignment between the text input and the action button.\n\n**3. Probable Root Cause in CSS or layout**\n*   **Flexbox/Grid Misconfiguration:** The container likely lacks `display: flex` or has incorrect `align-items` properties, causing elements to stack or overlap rather than sit side-by-side.\n*   **Box-sizing issue:** The input field might be using `box-sizing: content-box` instead of `border-box`, causing it to expand beyond its intended width/height.\n*   **Fixed Widths:** Hardcoded widths on the input or button are preventing them from fitting within the parent container's constraints.\n\n**4. Suggested Fix or code snippet**\nEnsure the container uses Flexbox to manage the children and set `box-sizing: border-box` to prevent padding from affecting dimensions.\n\n```css\n.search-container {\n  display: flex;\n  width: 100%;\n  max-width: 600px; /* or desired width */\n  border: 1px solid #ccc;\n  overflow: hidden; /* prevents children from bleeding out */\n}\n\n.search-input {\n  flex-grow: 1;\n  border: none;\n  padding: 10px;\n  box-sizing: border-box; /* critical */\n  outline: none;\n}\n\n.search-button {\n  background-color: #ff0000;\n  color: white;\n  border: none;\n  padding: 0 20px;\n  cursor: pointer;\n}\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "promptTokens": 370,
+    "imageTokens": 0,
+    "completionTokens": 427,
+    "reasoningTokens": 0,
+    "totalTokens": 797,
+    "latencyMs": 11299,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.",
+    "affectedElement": ".search-box",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS",
+    "suggestedFix": "Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c",
+    "expectedBoundingBox": {
+      "x": 370,
+      "y": 460,
+      "width": 600,
+      "height": 90
+    }
+  }
+}

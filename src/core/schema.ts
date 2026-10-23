@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const TargetProviderSchema = z.enum(['openai', 'anthropic', 'gemini', 'local', 'qwen']);
+export const TargetProviderSchema = z.enum(['openai', 'anthropic', 'gemini', 'local', 'qwen', 'gemma']);
 export type TargetProvider = z.infer<typeof TargetProviderSchema>;
 
 export const TileDimensionsSchema = z.object({
