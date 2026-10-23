@@ -36,7 +36,7 @@ OpenAI uses a two-tier resolution system:
      $$\text{Tokens} = 85 + (\text{Tiles}_W \times \text{Tiles}_H \times 170)$$
 
 ### Why ZeroVisual targets `512 × 512 px`
-By bounding the failure diff to 512×512, it guarantees that OpenAI evaluates the high-resolution image in exactly **1 single tile**, keeping the cost at $85 + 170 = \mathbf{255\text{ tokens}}$, rather than spanning multiple tiles ($600–2,100\text{ tokens}$).
+By bounding the failure diff to 512×512, it guarantees that OpenAI evaluates the high-resolution image in exactly **1 single tile**, keeping the cost at $85 + 170 = \mathbf{255\text{ tokens}}$, rather than spanning multiple tiles (600–2,100 tokens).
 
 ---
 

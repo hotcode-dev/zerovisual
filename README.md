@@ -70,117 +70,43 @@ queries ZeroVisual MCP Server + Skill          reads JSON & posts PR Verdict
 
 ---
 
-## 📦 Prerequisites & Installation
+## 📦 Installation & Integration Matrix
 
-### Prerequisites
-* **Node.js:** `v20.0.0` or higher
-* **Playwright:** `@playwright/test` (`v1.49.0+` recommended for `ariaSnapshot` support)
+ZeroVisual supports two seamless integration paths depending on your workflow:
 
-### Install via npm / pnpm / yarn
-
-```bash
-npm install -D zerovisual @playwright/test sharp
-```
+| Workflow | Use Case | Installation Command | Dependencies Required |
+| :--- | :--- | :--- | :--- |
+| **🤖 AI Agent Mode** *(Zero Install)* | Cursor, Claude Code, Windsurf, Antigravity | `npx skills add hotcode-dev/zerovisual`<br>`claude mcp add zerovisual -- npx -y zerovisual-mcp` | **None** (runs on-demand via `npx` with zero project dependencies) |
+| **🧪 Playwright & CI Mode** *(Project DevDep)* | Visual regression suites, CI/CD runners, local scripts | `npm install -D zerovisual @playwright/test sharp` | Node.js `>=20.0.0`, `@playwright/test` |
 
 ---
 
 ## 🚀 Usage Guide
 
-### 1. Playwright Custom Reporter (Automated Visual Regression)
+Follow the recommended **Agent-First** sequence to equip your AI coding assistant in seconds, then connect your automated browser tests.
 
-Add ZeroVisual to your `playwright.config.ts`. Passing tests run at native speed with zero overhead; failing visual tests automatically generate `./test-results/triage-ready.json`.
+### 1. Install Agent Skills (`npx skills add`)
 
-```typescript
-// playwright.config.ts
-import { defineConfig, devices } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests',
-  projects: [
-    { name: 'Desktop Chrome', use: { ...devices['Desktop Chrome'] } },
-    { name: 'Mobile Safari', use: { ...devices['iPhone 14'] } },
-  ],
-  reporter: [
-    ['list'],
-    ['zerovisual/reporter', {
-      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local'
-      padding: 32,                 // Context pixels around the diff bounding box
-      outputDir: './test-results'
-    }]
-  ],
-});
-```
-
-### 2. CLI Commands (`regression` & `design-qa`)
-
-ZeroVisual provides two separate CLI commands so regression testing and UI design auditing never collide:
-
-#### Mode A: Process Visual Regressions (`zerovisual regression`)
-Run standalone optimization on an existing Playwright `test-results` directory in CI/CD:
-
-```bash
-npx zerovisual regression \
-  --input ./test-results \
-  --provider openai \
-  --output ./test-results/triage-ready.json
-```
-
-#### Mode B: Audit Live UI Design for Engineers (`zerovisual design-qa`)
-Audit a live local or staging URL against objective UI/UX heuristics (8pt spacing grid, WCAG contrast, tap target size, font scale) and optional open-source **Penpot** design exports:
-
-```bash
-# Standalone Engineer UI Audit (No design file needed!)
-npx zerovisual design-qa \
-  --url http://localhost:3000 \
-  --provider gemini \
-  --low-token
-
-# Compare Live UI against an Open-Source Penpot Export
-npx zerovisual design-qa \
-  --url http://localhost:3000/checkout \
-  --penpot ./designs/checkout-artboard.svg \
-  --provider anthropic
-```
-
-#### Mode C: Optimize Screenshots & UI Images (`zerovisual optimize` / `zerovisual-optimize`)
-Optimize any local screenshot (e.g. `Cmd + Shift + 4` Retina captures) or folder of images before sending to a Vision LLM—saving up to 90% tokens and 99% network payload:
-
-```bash
-# Optimize a single UI screenshot for Anthropic (504x504 max tile):
-npx zerovisual optimize ./screenshot.png --provider anthropic
-
-# Or use the direct alias:
-npx zerovisual-optimize ./bug-report.png --provider openai
-
-# Batch optimize an entire directory of UI screenshots:
-npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
-```
-
-
----
-
-### 3. Install Agent Skills (`npx skills add`)
-
-Install the isolated ZeroVisual Agent Skills (`zerovisual-regression`, `zerovisual-design-qa`, and `zerovisual-optimize`) into your project or IDE agent workspace using `npx skills`:
+Equip your AI coding agent (Cursor, Claude Code, Windsurf, Antigravity) with ZeroVisual's isolated domain skills without modifying `package.json`:
 
 ```bash
 # Install all ZeroVisual Agent Skills from the repository
 npx skills add hotcode-dev/zerovisual
 
 # Or install individually:
-npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
-npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-optimize
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
+npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 ```
 
 This installs:
-* **`skills/zerovisual-regression`**: Teaches agents strict code-to-code regression triage (cross-viewport correlation, semantic AOM validation, anti-aliasing noise filtering).
-* **`skills/zerovisual-design-qa`**: Teaches agents objective UI/UX mentoring guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind fixes).
 * **`skills/zerovisual-optimize`**: Teaches agents how and when to optimize user screenshots and UI images to eliminate token waste and payload latency.
+* **`skills/zerovisual-design-qa`**: Teaches agents objective UI/UX mentoring guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind fixes).
+* **`skills/zerovisual-regression`**: Teaches agents strict code-to-code regression triage (cross-viewport correlation, semantic AOM validation, anti-aliasing noise filtering).
 
 ---
 
-### 4. MCP Server Integration (Cursor, Claude Code, Antigravity)
+### 2. MCP Server Integration (Cursor, Claude Code, Antigravity)
 
 Connect ZeroVisual directly to your AI IDE over `stdio` so your coding agent can inspect visual failures, optimize screenshots, and critique your UI on demand.
 
@@ -211,14 +137,94 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 ```
 
 #### Available MCP Tools
+* `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns token savings and byte reductions.
+* `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot diff, and returns a token-optimized design critique bundle.
 * `list_visual_failures`: Lists all failed Playwright visual tests and affected viewports.
 * `get_visual_failure_bundle`: Fetches the resized WebP images, `ariaSnapshot` YAML, and computed styles for a specific `testId`.
-* `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot diff, and returns a token-optimized design critique bundle.
-* `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns token savings and byte reductions.
 
 #### Available MCP Prompts (Skills)
-* `triage-regression`: Loads `skills/zerovisual-regression/SKILL.md` and enforces strict pass/fail JSON triage.
 * `critique-ui-design`: Loads `skills/zerovisual-design-qa/SKILL.md` and outputs actionable CSS/Tailwind improvements.
+* `triage-regression`: Loads `skills/zerovisual-regression/SKILL.md` and enforces strict pass/fail JSON triage.
+
+---
+
+### 3. Playwright Custom Reporter (Automated Visual Regression)
+
+For automated test suites and CI/CD pipelines, install the project devDependencies:
+
+```bash
+npm install -D zerovisual @playwright/test sharp
+```
+
+Add ZeroVisual to your `playwright.config.ts`. Passing tests run at native speed with zero overhead (0 tokens); failing visual tests automatically crop diffs, scope accessibility trees, and generate `./test-results/triage-ready.json`.
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  projects: [
+    { name: 'Desktop Chrome', use: { ...devices['Desktop Chrome'] } },
+    { name: 'Mobile Safari', use: { ...devices['iPhone 14'] } },
+  ],
+  reporter: [
+    ['list'],
+    ['zerovisual/reporter', {
+      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local'
+      padding: 32,                 // Context pixels around the diff bounding box
+      outputDir: './test-results'  // Output folder for triage-ready.json
+    }]
+  ],
+});
+```
+
+---
+
+### 4. Standalone CLI Commands (`optimize`, `design-qa`, `regression`)
+
+ZeroVisual provides dedicated CLI commands for terminal and CI/CD workflows:
+
+#### Mode A: Optimize Screenshots & UI Images (`zerovisual optimize` / `zerovisual-optimize`)
+Optimize any local screenshot (e.g. `Cmd + Shift + 4` Retina captures) or folder of images before sending to a Vision LLM—saving up to 90% tokens and 99% network payload:
+
+```bash
+# Optimize a single UI screenshot for Anthropic (504x504 max tile):
+npx zerovisual optimize ./screenshot.png --provider anthropic
+
+# Or use the direct alias:
+npx zerovisual-optimize ./bug-report.png --provider openai
+
+# Batch optimize an entire directory of UI screenshots:
+npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
+```
+
+#### Mode B: Audit Live UI Design for Engineers (`zerovisual design-qa`)
+Audit a live local or staging URL against objective UI/UX heuristics (8pt spacing grid, WCAG contrast, tap target size, font scale) and optional open-source **Penpot** design exports:
+
+```bash
+# Standalone Engineer UI Audit (No design file needed!)
+npx zerovisual design-qa \
+  --url http://localhost:3000 \
+  --provider gemini \
+  --low-token
+
+# Compare Live UI against an Open-Source Penpot Export
+npx zerovisual design-qa \
+  --url http://localhost:3000/checkout \
+  --penpot ./designs/checkout-artboard.svg \
+  --provider anthropic
+```
+
+#### Mode C: Process Visual Regressions in CI (`zerovisual regression`)
+Run standalone optimization on an existing Playwright `test-results` directory in CI/CD:
+
+```bash
+npx zerovisual regression \
+  --input ./test-results \
+  --provider openai \
+  --output ./test-results/triage-ready.json
+```
 
 ---
 
