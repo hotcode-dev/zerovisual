@@ -16,7 +16,10 @@ export const ALLOWED_STYLE_PROPS = [
   'color',
   'backgroundColor',
   'borderRadius',
-  'boxShadow'
+  'boxShadow',
+  'outline',
+  'outlineStyle',
+  'outlineWidth'
 ] as const;
 
 export type AllowedStyleProp = (typeof ALLOWED_STYLE_PROPS)[number];
@@ -34,7 +37,7 @@ export interface CaptureDomOptions {
 }
 
 /**
- * Captures localized AOM ariaSnapshot and the 14 allowed CSS computed styles,
+ * Captures localized AOM ariaSnapshot and the allowed CSS computed styles,
  * plus deterministic UI heuristic violations for a target element or bounding box.
  */
 export async function captureDomContext(
@@ -86,6 +89,23 @@ export async function captureDomContext(
         return tagName;
       }
 
+      function getEffectiveBg(element: Element | null): string {
+        let cur = element;
+        while (cur) {
+          const bg = window.getComputedStyle(cur).backgroundColor;
+          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+            return bg;
+          }
+          cur = cur.parentElement;
+        }
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)') {
+          return bodyBg;
+        }
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return isDark ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+      }
+
       const resolvedSelector = el ? getCssSelector(el) : 'body';
       const tagName = el ? el.tagName.toLowerCase() : 'body';
       const styles = el ? window.getComputedStyle(el) : null;
@@ -95,6 +115,11 @@ export async function captureDomContext(
         for (const prop of allowedProps) {
           computed[prop] = styles[prop as any] || '';
         }
+      }
+
+      const effectiveBg = getEffectiveBg(el);
+      if (computed.backgroundColor === 'transparent' || computed.backgroundColor === 'rgba(0, 0, 0, 0)' || !computed.backgroundColor) {
+        computed.backgroundColor = effectiveBg;
       }
 
       const rect = el ? el.getBoundingClientRect() : null;
@@ -107,11 +132,34 @@ export async function captureDomContext(
           }
         : undefined;
 
+      const ariaLabel = el?.getAttribute('aria-label') || undefined;
+      const ariaLabelledBy = el?.getAttribute('aria-labelledby') || undefined;
+      const alt = el?.getAttribute('alt') || undefined;
+      const innerText = el ? ((el as HTMLElement).innerText || el.textContent || '').trim() || undefined : undefined;
+      const inputType = el ? (el as HTMLInputElement).type || undefined : undefined;
+      let hasAssociatedLabel = false;
+      if (el && ['input', 'select', 'textarea'].includes(tagName)) {
+        if (el.id && document.querySelector(`label[for="${el.id}"]`)) hasAssociatedLabel = true;
+        if (el.closest('label')) hasAssociatedLabel = true;
+        if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
+      }
+
       return {
         resolvedSelector,
         tagName,
         computedStyles: computed,
-        boundingBox
+        boundingBox,
+        viewportWidth: window.innerWidth,
+        effectiveBg,
+        accessibility: {
+          role: el?.getAttribute('role') || undefined,
+          ariaLabel,
+          ariaLabelledBy,
+          alt,
+          innerText,
+          inputType,
+          hasAssociatedLabel
+        }
       };
     },
     { selector: targetSelector, point, allowedProps: ALLOWED_STYLE_PROPS }
@@ -142,8 +190,11 @@ export async function captureDomContext(
     selector: evalResult.resolvedSelector,
     tagName: evalResult.tagName,
     isMobileViewport: isMobile,
+    viewportWidth: evalResult.viewportWidth,
+    canvasBackground: evalResult.effectiveBg,
     computedStyles: evalResult.computedStyles,
-    boundingBox: evalResult.boundingBox
+    boundingBox: evalResult.boundingBox,
+    accessibility: evalResult.accessibility
   });
 
   return {
@@ -156,7 +207,7 @@ export async function captureDomContext(
 }
 
 /**
- * Audits all interactive and body text elements on the page for design-qa mode.
+ * Audits all interactive, text, and visual elements on the page for design-qa mode.
  */
 export async function auditPageHeuristics(
   page: Page,
@@ -168,7 +219,9 @@ export async function auditPageHeuristics(
   const elementsData = await page.evaluate(
     ({ allowedProps }) => {
       const candidates = Array.from(
-        document.querySelectorAll('button, a, input, select, textarea, [role="button"], p, h1, h2, h3, h4, h5, h6, li')
+        document.querySelectorAll(
+          'button, a, input, select, textarea, [role="button"], img, p, h1, h2, h3, h4, h5, h6, li'
+        )
       );
 
       function getCssSelector(el: Element): string {
@@ -178,23 +231,72 @@ export async function auditPageHeuristics(
         return tag;
       }
 
-      return candidates.slice(0, 50).map((el) => {
+      function getEffectiveBg(element: Element | null): string {
+        let cur = element;
+        while (cur) {
+          const bg = window.getComputedStyle(cur).backgroundColor;
+          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+            return bg;
+          }
+          cur = cur.parentElement;
+        }
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)') {
+          return bodyBg;
+        }
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return isDark ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+      }
+
+      const viewportWidth = window.innerWidth;
+
+      return candidates.slice(0, 75).map((el) => {
         const styles = window.getComputedStyle(el);
         const computed: Record<string, string> = {};
         for (const prop of allowedProps) {
           computed[prop] = styles[prop as any] || '';
         }
+
+        const effectiveBg = getEffectiveBg(el);
+        if (computed.backgroundColor === 'transparent' || computed.backgroundColor === 'rgba(0, 0, 0, 0)' || !computed.backgroundColor) {
+          computed.backgroundColor = effectiveBg;
+        }
+
         const rect = el.getBoundingClientRect();
+        const tag = el.tagName.toLowerCase();
+        const ariaLabel = el.getAttribute('aria-label') || undefined;
+        const ariaLabelledBy = el.getAttribute('aria-labelledby') || undefined;
+        const alt = el.getAttribute('alt') || undefined;
+        const innerText = ((el as HTMLElement).innerText || el.textContent || '').trim() || undefined;
+        const inputType = (el as HTMLInputElement).type || undefined;
+        let hasAssociatedLabel = false;
+        if (['input', 'select', 'textarea'].includes(tag)) {
+          if (el.id && document.querySelector(`label[for="${el.id}"]`)) hasAssociatedLabel = true;
+          if (el.closest('label')) hasAssociatedLabel = true;
+          if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
+        }
+
         return {
           selector: getCssSelector(el),
-          tagName: el.tagName.toLowerCase(),
-          isInteractive: ['button', 'a', 'input', 'select', 'textarea'].includes(el.tagName.toLowerCase()),
+          tagName: tag,
+          isInteractive: ['button', 'a', 'input', 'select', 'textarea'].includes(tag) || el.getAttribute('role') === 'button',
           computedStyles: computed,
+          effectiveBg,
+          viewportWidth,
           boundingBox: {
             x: Math.round(rect.x),
             y: Math.round(rect.y),
             width: Math.max(1, Math.round(rect.width)),
             height: Math.max(1, Math.round(rect.height))
+          },
+          accessibility: {
+            role: el.getAttribute('role') || undefined,
+            ariaLabel,
+            ariaLabelledBy,
+            alt,
+            innerText,
+            inputType,
+            hasAssociatedLabel
           }
         };
       });
@@ -212,8 +314,11 @@ export async function auditPageHeuristics(
       tagName: item.tagName,
       isInteractive: item.isInteractive,
       isMobileViewport,
+      viewportWidth: item.viewportWidth,
+      canvasBackground: item.effectiveBg,
       computedStyles: item.computedStyles,
-      boundingBox: item.boundingBox
+      boundingBox: item.boundingBox,
+      accessibility: item.accessibility
     });
     allViolations.push(...v);
   }

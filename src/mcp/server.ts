@@ -5,7 +5,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { TriagePayloadSchema, TargetProviderSchema, type TriagePayload } from '../core/schema.js';
 import { runDesignQaCommand } from '../cli/commands/design-qa.js';
-import { optimizeImageStandalone } from '../core/image-optimizer.js';
+import {
+  optimizeImageStandalone,
+  getProviderDimensions,
+  estimateVisionTokens
+} from '../core/image-optimizer.js';
 
 export interface McpServerOptions {
   baseDir?: string;
@@ -98,7 +102,7 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
   // -------------------------------------------------------------
   server.tool(
     'get_visual_failure_bundle',
-    'Returns the complete multi-viewport failure bundle (Base64 WebP diffs, AOM snapshot, computed styles) for a specific testId',
+    'Returns the complete multi-viewport failure bundle with native MCP ImageContent blocks for each viewport diff',
     {
       testId: z.string().describe('Normalized test identifier'),
       triagePath: z.string().optional().describe('Optional custom path to triage-ready.json')
@@ -130,25 +134,39 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
         };
       }
 
+      const contentBlocks: any[] = [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            {
+              testId: failure.testId,
+              testTitle: failure.testTitle,
+              filePath: failure.filePath,
+              selector: failure.selector,
+              tileDimensions: payload.tileDimensions,
+              viewports: failure.viewports,
+              designContext: failure.designContext
+            },
+            null,
+            2
+          )
+        }
+      ];
+
+      // Attach native MCP ImageContent block for each viewport diff
+      for (const vp of failure.viewports) {
+        if (vp.images.diffBase64) {
+          const rawBase64 = vp.images.diffBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+          contentBlocks.push({
+            type: 'image',
+            data: rawBase64,
+            mimeType: 'image/webp'
+          });
+        }
+      }
+
       return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(
-              {
-                testId: failure.testId,
-                testTitle: failure.testTitle,
-                filePath: failure.filePath,
-                selector: failure.selector,
-                tileDimensions: payload.tileDimensions,
-                viewports: failure.viewports,
-                designContext: failure.designContext
-              },
-              null,
-              2
-            )
-          }
-        ]
+        content: contentBlocks
       };
     }
   );
@@ -177,29 +195,45 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
 
         const audit = payload.failures[0];
 
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(
-                {
-                  status: 'success',
-                  url,
-                  heuristicViolationsCount: audit?.designContext?.heuristicViolations.length ?? 0,
-                  penpotDeltasCount: audit?.designContext?.penpotDeltas.length ?? 0,
-                  heuristicViolations: audit?.designContext?.heuristicViolations,
-                  penpotDeltas: audit?.designContext?.penpotDeltas,
-                  viewports: audit?.viewports.map((v) => ({
-                    project: v.project,
-                    viewport: v.viewport,
-                    screenshotBase64: v.images.diffBase64
-                  }))
-                },
-                null,
-                2
-              )
+        const contentBlocks: any[] = [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                status: 'success',
+                url,
+                heuristicViolationsCount: audit?.designContext?.heuristicViolations.length ?? 0,
+                penpotDeltasCount: audit?.designContext?.penpotDeltas.length ?? 0,
+                heuristicViolations: audit?.designContext?.heuristicViolations,
+                penpotDeltas: audit?.designContext?.penpotDeltas,
+                viewports: audit?.viewports.map((v) => ({
+                  project: v.project,
+                  viewport: v.viewport,
+                  diffPixelRatio: v.diffPixelRatio
+                }))
+              },
+              null,
+              2
+            )
+          }
+        ];
+
+        // Attach native MCP ImageContent blocks for captured viewports
+        if (audit) {
+          for (const vp of audit.viewports) {
+            if (vp.images.diffBase64) {
+              const rawBase64 = vp.images.diffBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+              contentBlocks.push({
+                type: 'image',
+                data: rawBase64,
+                mimeType: 'image/webp'
+              });
             }
-          ]
+          }
+        }
+
+        return {
+          content: contentBlocks
         };
       } catch (err: any) {
         return {
@@ -219,14 +253,11 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
   // -------------------------------------------------------------
   server.tool(
     'optimize_image',
-    'Optimizes an arbitrary screenshot or UI image file for Vision LLM token grids (OpenAI, Anthropic, Gemini, Local) and reports token and byte savings',
+    'Optimizes an arbitrary screenshot or UI image file for Vision LLM token grids and returns native MCP ImageContent plus token savings stats',
     {
       imagePath: z.string().optional().describe('Local file path to the image to optimize'),
       imageBase64: z.string().optional().describe('Base64-encoded image string to optimize'),
-      provider: z
-        .enum(['openai', 'anthropic', 'gemini', 'local'])
-        .optional()
-        .describe('Target Vision LLM provider (default: anthropic)'),
+      provider: TargetProviderSchema.optional().describe('Target Vision LLM provider (default: anthropic)'),
       lowTokenMode: z
         .boolean()
         .optional()
@@ -272,6 +303,8 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
           quality: quality ?? 80
         });
 
+        const rawBase64 = result.dataUri.replace(/^data:image\/[a-z]+;base64,/, '');
+
         return {
           content: [
             {
@@ -298,6 +331,11 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
                 null,
                 2
               )
+            },
+            {
+              type: 'image',
+              data: rawBase64,
+              mimeType: 'image/webp'
             }
           ]
         };
@@ -311,6 +349,51 @@ export function createMcpServer(options: McpServerOptions = {}): McpServer {
           ]
         };
       }
+    }
+  );
+
+  // -------------------------------------------------------------
+  // Tool 5: estimate_token_cost
+  // -------------------------------------------------------------
+  server.tool(
+    'estimate_token_cost',
+    'Calculates estimated Vision LLM tokens for raw vs optimized image resolutions across providers',
+    {
+      width: z.number().int().positive().describe('Image pixel width'),
+      height: z.number().int().positive().describe('Image pixel height'),
+      provider: TargetProviderSchema.optional().describe('Target VLM provider (default: anthropic)'),
+      lowTokenMode: z.boolean().optional().describe('Enable aggressive token reduction')
+    },
+    async ({ width, height, provider = 'anthropic', lowTokenMode = false }) => {
+      const tileDims = getProviderDimensions(provider, lowTokenMode);
+      const rawTokens = estimateVisionTokens(width, height, provider, lowTokenMode);
+
+      const scale = Math.min(1, Math.min(tileDims.maxWidth / width, tileDims.maxHeight / height));
+      const optWidth = Math.max(1, Math.round(width * scale));
+      const optHeight = Math.max(1, Math.round(height * scale));
+      const optTokens = estimateVisionTokens(optWidth, optHeight, provider, lowTokenMode);
+      const savingsPct = rawTokens > 0 ? Number((((rawTokens - optTokens) / rawTokens) * 100).toFixed(1)) : 0;
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                provider,
+                originalResolution: `${width}x${height}`,
+                originalTokens: rawTokens,
+                tileDimensions: tileDims,
+                optimizedResolution: `${optWidth}x${optHeight}`,
+                optimizedTokens: optTokens,
+                tokenSavingsPercent: `${savingsPct}%`
+              },
+              null,
+              2
+            )
+          }
+        ]
+      };
     }
   );
 

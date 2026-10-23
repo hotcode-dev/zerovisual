@@ -104,6 +104,35 @@ export class ZeroVisualReporter implements Reporter {
       }
     }
 
+    // Check for optional authentic DOM context captured by ZeroVisual fixture
+    let realAriaSnapshot: string | undefined;
+    let realComputedStyles: Record<string, string> | undefined;
+    let realSelector: string | undefined;
+    let realHeuristics: any[] | undefined;
+
+    const contextAttachment = result.attachments.find(
+      (att) => att.name === 'zerovisual-context.json' || att.name.includes('zerovisual-context')
+    );
+    if (contextAttachment) {
+      try {
+        let contentStr = '';
+        if (contextAttachment.body) {
+          contentStr = contextAttachment.body.toString('utf-8');
+        } else if (contextAttachment.path && fs.existsSync(contextAttachment.path)) {
+          contentStr = fs.readFileSync(contextAttachment.path, 'utf-8');
+        }
+        if (contentStr) {
+          const parsed = JSON.parse(contentStr);
+          realAriaSnapshot = parsed.ariaSnapshot;
+          realComputedStyles = parsed.computedStyles;
+          realSelector = parsed.selector;
+          realHeuristics = parsed.heuristicViolations;
+        }
+      } catch {
+        // Fall back gracefully to synthesized representation
+      }
+    }
+
     // Determine project / viewport details
     const project = test.parent?.project()?.name ?? 'Default Viewport';
     const projectViewport = (test.parent?.project()?.use as any)?.viewport;
@@ -120,8 +149,8 @@ export class ZeroVisualReporter implements Reporter {
       viewport,
       diffPixelRatio: diffDetection.diffPixelRatio,
       boundingBox: diffDetection.boundingBox,
-      ariaSnapshot: `- region "${fullTitle}"`,
-      computedStyles: {
+      ariaSnapshot: realAriaSnapshot || `- region "${fullTitle}"`,
+      computedStyles: realComputedStyles || {
         display: 'block'
       },
       images: {
@@ -135,13 +164,22 @@ export class ZeroVisualReporter implements Reporter {
     const existing = this.failureMap.get(testId);
     if (existing) {
       existing.viewports.push(viewportArtifact);
+      if (realHeuristics && realHeuristics.length > 0) {
+        if (!existing.designContext) {
+          existing.designContext = { heuristicViolations: [], penpotDeltas: [] };
+        }
+        existing.designContext.heuristicViolations.push(...realHeuristics);
+      }
     } else {
       this.failureMap.set(testId, {
         testId,
         testTitle: fullTitle,
         filePath: test.location?.file ?? 'unknown.spec.ts',
-        selector: 'body',
-        viewports: [viewportArtifact]
+        selector: realSelector || 'body',
+        viewports: [viewportArtifact],
+        designContext: realHeuristics && realHeuristics.length > 0
+          ? { heuristicViolations: realHeuristics, penpotDeltas: [] }
+          : undefined
       });
     }
   }

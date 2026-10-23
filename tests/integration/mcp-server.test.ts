@@ -88,7 +88,7 @@ describe('ZeroVisual MCP Server Integration', () => {
     return { client, server };
   }
 
-  it('should register all 4 required tools: list_visual_failures, get_visual_failure_bundle, audit_live_ui_design, optimize_image', async () => {
+  it('should register all required tools including estimate_token_cost', async () => {
     const { client, server } = await setupClientAndServer();
 
     const toolsResponse = await client.listTools();
@@ -98,12 +98,13 @@ describe('ZeroVisual MCP Server Integration', () => {
     expect(toolNames).toContain('get_visual_failure_bundle');
     expect(toolNames).toContain('audit_live_ui_design');
     expect(toolNames).toContain('optimize_image');
+    expect(toolNames).toContain('estimate_token_cost');
 
     await client.close();
     await server.close();
   });
 
-  it('tool: optimize_image should optimize base64 image and return stats', async () => {
+  it('tool: optimize_image should optimize base64 image and return stats plus native ImageContent', async () => {
     const { client, server } = await setupClientAndServer();
 
     // 1x1 transparent png
@@ -117,12 +118,44 @@ describe('ZeroVisual MCP Server Integration', () => {
     });
 
     expect(res.content).toBeDefined();
-    const content = (res.content as any[])[0];
-    const parsed = JSON.parse(content.text);
+    const contentList = res.content as any[];
+    expect(contentList.length).toBeGreaterThanOrEqual(2);
+
+    const textBlock = contentList.find((c) => c.type === 'text');
+    const imageBlock = contentList.find((c) => c.type === 'image');
+
+    expect(textBlock).toBeDefined();
+    const parsed = JSON.parse(textBlock.text);
     expect(parsed.format).toBe('webp');
     expect(parsed.dataUri).toContain('data:image/webp;base64,');
     expect(parsed.stats).toBeDefined();
-    expect(parsed.stats.optimizedResolution).toBeDefined();
+
+    expect(imageBlock).toBeDefined();
+    expect(imageBlock.mimeType).toBe('image/webp');
+    expect(imageBlock.data).toBeDefined();
+
+    await client.close();
+    await server.close();
+  });
+
+  it('tool: estimate_token_cost should estimate tokens across providers', async () => {
+    const { client, server } = await setupClientAndServer();
+
+    const res = await client.callTool({
+      name: 'estimate_token_cost',
+      arguments: {
+        width: 1920,
+        height: 1080,
+        provider: 'llama'
+      }
+    });
+
+    expect(res.content).toBeDefined();
+    const parsed = JSON.parse((res.content as any[])[0].text);
+    expect(parsed.provider).toBe('llama');
+    expect(parsed.originalTokens).toBeGreaterThan(0);
+    expect(parsed.optimizedTokens).toBeLessThan(parsed.originalTokens);
+    expect(parsed.tokenSavingsPercent).toBeDefined();
 
     await client.close();
     await server.close();

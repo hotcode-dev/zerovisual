@@ -8,7 +8,69 @@ export interface RgbColor {
 }
 
 /**
- * Parses CSS color strings (#hex, rgb, rgba, named) to RGBA.
+ * Converts HSL to sRGB.
+ */
+export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (h < 60) { r1 = c; g1 = x; b1 = 0; }
+  else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
+  else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
+  else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
+  else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
+  else { r1 = c; g1 = 0; b1 = x; }
+  return [
+    Math.round((r1 + m) * 255),
+    Math.round((g1 + m) * 255),
+    Math.round((b1 + m) * 255)
+  ];
+}
+
+/**
+ * Converts OKLab to sRGB.
+ */
+export function oklabToRgb(L: number, a: number, b: number): [number, number, number] {
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+
+  const rLin = +4.0767434036 * l - 3.3077115913 * m + 0.2309699291 * s;
+  const gLin = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const bLin = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+  const toSrgb = (c: number): number => {
+    const clamped = Math.max(0, Math.min(1, c));
+    return clamped <= 0.0031308
+      ? 12.92 * clamped
+      : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
+  };
+
+  return [
+    Math.round(toSrgb(rLin) * 255),
+    Math.round(toSrgb(gLin) * 255),
+    Math.round(toSrgb(bLin) * 255)
+  ];
+}
+
+/**
+ * Converts OKLCH to sRGB.
+ */
+export function oklchToRgb(L: number, C: number, H: number): [number, number, number] {
+  const hRad = (H * Math.PI) / 180;
+  const a = C * Math.cos(hRad);
+  const b = C * Math.sin(hRad);
+  return oklabToRgb(L, a, b);
+}
+
+/**
+ * Parses CSS color strings (#hex, rgb/rgba, hsl/hsla, oklch, oklab, named) to RGBA.
  */
 export function parseColor(colorStr: string): RgbColor {
   const str = colorStr.trim().toLowerCase();
@@ -42,13 +104,60 @@ export function parseColor(colorStr: string): RgbColor {
     }
   }
 
-  // rgb(...) or rgba(...) format
-  const rgbMatch = str.match(/^rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  // rgb(...) or rgba(...) format (handles comma or space-separated syntax)
+  const rgbMatch = str.match(/^rgba?\s*\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)(?:[\s,/]+([\d.]+%?))?\s*\)$/);
   if (rgbMatch) {
     const r = parseInt(rgbMatch[1]!, 10);
     const g = parseInt(rgbMatch[2]!, 10);
     const b = parseInt(rgbMatch[3]!, 10);
-    const a = rgbMatch[4] !== undefined ? parseFloat(rgbMatch[4]) : 1;
+    let a = 1;
+    if (rgbMatch[4] !== undefined) {
+      a = rgbMatch[4].endsWith('%') ? parseFloat(rgbMatch[4]) / 100 : parseFloat(rgbMatch[4]);
+    }
+    return { r, g, b, a };
+  }
+
+  // hsl(...) or hsla(...) format
+  const hslMatch = str.match(/^hsla?\s*\(\s*([\d.]+)(?:deg)?[\s,]+([\d.]+)%[\s,]+([\d.]+)%(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+  if (hslMatch) {
+    const h = parseFloat(hslMatch[1]!);
+    const s = parseFloat(hslMatch[2]!) / 100;
+    const l = parseFloat(hslMatch[3]!) / 100;
+    let a = 1;
+    if (hslMatch[4] !== undefined) {
+      a = hslMatch[4].endsWith('%') ? parseFloat(hslMatch[4]) / 100 : parseFloat(hslMatch[4]);
+    }
+    const [r, g, b] = hslToRgb(h, s, l);
+    return { r, g, b, a };
+  }
+
+  // oklch(...) format: oklch(L C H [/ a])
+  const oklchMatch = str.match(/^oklch\s*\(\s*([\d.]+%?)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:deg)?(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+  if (oklchMatch) {
+    let L = parseFloat(oklchMatch[1]!);
+    if (oklchMatch[1]!.endsWith('%')) L /= 100;
+    const C = parseFloat(oklchMatch[2]!);
+    const H = parseFloat(oklchMatch[3]!);
+    let a = 1;
+    if (oklchMatch[4] !== undefined) {
+      a = oklchMatch[4].endsWith('%') ? parseFloat(oklchMatch[4]) / 100 : parseFloat(oklchMatch[4]);
+    }
+    const [r, g, b] = oklchToRgb(L, C, H);
+    return { r, g, b, a };
+  }
+
+  // oklab(...) format: oklab(L a b [/ alpha])
+  const oklabMatch = str.match(/^oklab\s*\(\s*([\d.]+%?)[\s,]+([-\d.]+)[\s,]+([-\d.]+)(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+  if (oklabMatch) {
+    let L = parseFloat(oklabMatch[1]!);
+    if (oklabMatch[1]!.endsWith('%')) L /= 100;
+    const aVal = parseFloat(oklabMatch[2]!);
+    const bVal = parseFloat(oklabMatch[3]!);
+    let a = 1;
+    if (oklabMatch[4] !== undefined) {
+      a = oklabMatch[4].endsWith('%') ? parseFloat(oklabMatch[4]) / 100 : parseFloat(oklabMatch[4]);
+    }
+    const [r, g, b] = oklabToRgb(L, aVal, bVal);
     return { r, g, b, a };
   }
 
@@ -116,19 +225,22 @@ export interface ContrastCheckResult {
  * Evaluates WCAG 2.1 AA text contrast compliance.
  * Normal text requires >= 4.5:1.
  * Large text (>= 24px, or >= 18.66px with bold weight >= 700) requires >= 3.0:1.
+ * Transparent/alpha backgrounds are composited over canvasBgColorStr (default white or dark theme).
  */
 export function checkContrast(
   fgColorStr: string,
   bgColorStr: string,
   fontSizePx = 16,
-  fontWeight: number | string = 400
+  fontWeight: number | string = 400,
+  canvasBgColorStr = '#ffffff'
 ): ContrastCheckResult {
   let fg = parseColor(fgColorStr);
   let bg = parseColor(bgColorStr);
+  const canvasBg = parseColor(canvasBgColorStr);
 
-  // If background is completely transparent, assume white background
-  if ((bg.a ?? 1) === 0) {
-    bg = { r: 255, g: 255, b: 255, a: 1 };
+  // If background has alpha < 1 or is transparent, composite over canvas background
+  if ((bg.a ?? 1) < 1) {
+    bg = compositeColors(bg, canvasBg);
   }
 
   const isBold =
@@ -243,29 +355,36 @@ export function checkTypographyScale(
   const bodyTags = ['p', 'li', 'input', 'textarea', 'label'];
   const isBody = bodyTags.includes(tagName.toLowerCase());
 
-  if (!isBody) {
-    return { valid: true, violations: [] };
-  }
-
   const violations: Array<{ rule: string; expected: string; actual: string }> = [];
 
-  if (fontSizePx < 16) {
+  // Minimum legible text rule across all elements
+  if (fontSizePx > 0 && fontSizePx < 12) {
     violations.push({
       rule: 'TYPOGRAPHY_SCALE',
-      expected: '>= 16px',
+      expected: '>= 12px (minimum legible text)',
       actual: `${fontSizePx}px`
     });
   }
 
-  if (fontSizePx > 0 && lineHeightPx > 0) {
-    const ratio = lineHeightPx / fontSizePx;
-    // Allow slight float tolerance e.g. 1.399
-    if (ratio < 1.395) {
+  if (isBody) {
+    if (fontSizePx < 16 && fontSizePx >= 12) {
       violations.push({
         rule: 'TYPOGRAPHY_SCALE',
-        expected: 'line-height >= 1.4 (unitless ratio)',
-        actual: `line-height ratio ${ratio.toFixed(2)} (${lineHeightPx}px / ${fontSizePx}px)`
+        expected: '>= 16px',
+        actual: `${fontSizePx}px`
       });
+    }
+
+    if (fontSizePx > 0 && lineHeightPx > 0) {
+      const ratio = lineHeightPx / fontSizePx;
+      // Allow slight float tolerance e.g. 1.399
+      if (ratio < 1.395) {
+        violations.push({
+          rule: 'TYPOGRAPHY_SCALE',
+          expected: 'line-height >= 1.4 (unitless ratio)',
+          actual: `line-height ratio ${ratio.toFixed(2)} (${lineHeightPx}px / ${fontSizePx}px)`
+        });
+      }
     }
   }
 
@@ -275,13 +394,26 @@ export function checkTypographyScale(
   };
 }
 
+export interface AccessibilityInfo {
+  role?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  alt?: string;
+  innerText?: string;
+  inputType?: string;
+  hasAssociatedLabel?: boolean;
+}
+
 export interface LintElementInput {
   selector: string;
   tagName: string;
   isInteractive?: boolean;
   isMobileViewport?: boolean;
+  viewportWidth?: number;
   computedStyles: Record<string, string>;
-  boundingBox?: { width: number; height: number };
+  boundingBox?: { x?: number; y?: number; width: number; height: number };
+  canvasBackground?: string;
+  accessibility?: AccessibilityInfo;
 }
 
 /**
@@ -289,7 +421,7 @@ export interface LintElementInput {
  */
 export function lintElementHeuristics(input: LintElementInput): HeuristicViolation[] {
   const violations: HeuristicViolation[] = [];
-  const { selector, tagName, isInteractive, isMobileViewport, boundingBox } = input;
+  const { selector, tagName, isInteractive, isMobileViewport, viewportWidth, boundingBox, canvasBackground, accessibility } = input;
   const computedStyles = input.computedStyles ?? {};
 
   // 1. Contrast check (if color and backgroundColor are present)
@@ -299,7 +431,7 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
   const fontWeight = computedStyles.fontWeight ?? '400';
 
   if (color && bgColor) {
-    const contrast = checkContrast(color, bgColor, fontSizePx, fontWeight);
+    const contrast = checkContrast(color, bgColor, fontSizePx, fontWeight, canvasBackground ?? '#ffffff');
     if (!contrast.valid) {
       violations.push({
         rule: 'CONTRAST',
@@ -335,7 +467,7 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
     computedStyles.cursor === 'pointer';
 
   if (isTargetInteractive && isMobileViewport && boundingBox) {
-    const tapRes = checkTapTarget(boundingBox, true);
+    const tapRes = checkTapTarget({ width: boundingBox.width, height: boundingBox.height }, true);
     if (!tapRes.valid) {
       violations.push({
         rule: 'TAP_TARGET',
@@ -346,7 +478,7 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
     }
   }
 
-  // 4. Typography scale check for body text
+  // 4. Typography scale check for body text and legible microcopy
   const lineHeightVal = computedStyles.lineHeight;
   let lineHeightPx = 0;
   if (lineHeightVal && lineHeightVal !== 'normal') {
@@ -360,6 +492,102 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
       expected: v.expected,
       actual: v.actual
     });
+  }
+
+  // 5. Focus visibility check on interactive elements
+  if (isTargetInteractive) {
+    const outlineStyle = computedStyles.outlineStyle;
+    const outlineWidth = computedStyles.outlineWidth;
+    const outline = computedStyles.outline;
+    const boxShadow = computedStyles.boxShadow;
+
+    const removesOutline =
+      outlineStyle === 'none' ||
+      outlineWidth === '0px' ||
+      outline === 'none' ||
+      outline === '0';
+
+    const hasBoxShadowAlternative =
+      boxShadow &&
+      boxShadow !== 'none' &&
+      boxShadow !== 'rgba(0, 0, 0, 0)' &&
+      boxShadow.trim() !== '';
+
+    if (removesOutline && !hasBoxShadowAlternative) {
+      violations.push({
+        rule: 'FOCUS_VISIBLE',
+        element: selector,
+        expected: 'visible focus ring indicator (outline or box-shadow)',
+        actual: 'outline removed without box-shadow ring alternative'
+      });
+    }
+  }
+
+  // 6. Mobile layout overflow check
+  if (isMobileViewport && viewportWidth && boundingBox) {
+    const elemRight = (boundingBox.x ?? 0) + boundingBox.width;
+    if (elemRight > viewportWidth + 2) {
+      violations.push({
+        rule: 'LAYOUT_OVERFLOW',
+        element: selector,
+        expected: `<= ${viewportWidth}px (fits mobile viewport without horizontal scroll)`,
+        actual: `${Math.round(elemRight)}px (overflows by ${Math.round(elemRight - viewportWidth)}px)`
+      });
+    }
+  }
+
+  // 7. Lighthouse Web Accessibility Checks
+  if (accessibility) {
+    const { alt, ariaLabel, ariaLabelledBy, innerText, inputType, hasAssociatedLabel } = accessibility;
+    const lowerTag = tagName.toLowerCase();
+
+    // Image alt attribute
+    if (lowerTag === 'img' && !alt && !ariaLabel && !ariaLabelledBy) {
+      violations.push({
+        rule: 'ACCESSIBILITY',
+        element: selector,
+        expected: 'img element must have an alt attribute or aria-label',
+        actual: 'missing alt text description'
+      });
+    }
+
+    // Button accessible name
+    if ((lowerTag === 'button' || accessibility.role === 'button') && !innerText && !ariaLabel && !ariaLabelledBy) {
+      violations.push({
+        rule: 'ACCESSIBILITY',
+        element: selector,
+        expected: 'button must have discernible text content or aria-label',
+        actual: 'button has no accessible name'
+      });
+    }
+
+    // Form inputs accessible label
+    const formInputTags = ['input', 'select', 'textarea'];
+    const nonLabeledTypes = ['hidden', 'submit', 'reset', 'button', 'image'];
+    if (
+      formInputTags.includes(lowerTag) &&
+      !nonLabeledTypes.includes(inputType ?? '') &&
+      !hasAssociatedLabel &&
+      !ariaLabel &&
+      !ariaLabelledBy
+    ) {
+      violations.push({
+        rule: 'ACCESSIBILITY',
+        element: selector,
+        expected: 'form control must have an associated <label> or aria-label',
+        actual: 'unlabeled form element'
+      });
+    }
+
+    // Link accessible text
+    if (lowerTag === 'a' && !innerText && !ariaLabel && !ariaLabelledBy) {
+      violations.push({
+        rule: 'ACCESSIBILITY',
+        element: selector,
+        expected: 'anchor link must have discernible text or aria-label',
+        actual: 'empty link with no accessible text'
+      });
+    }
   }
 
   return violations;

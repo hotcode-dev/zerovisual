@@ -67,14 +67,15 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 ```
 
 ### Available MCP Tools:
-- `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns token savings and byte reductions.
-- `audit_live_ui_design`: Launches headless Playwright against a local URL, runs deterministic heuristic linter + Penpot diff, and returns token-optimized design critiques.
+- `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns native MCP `ImageContent` blocks and token savings.
+- `estimate_token_cost`: Calculates estimated Vision LLM tokens for raw vs optimized image resolutions across model tile grids.
+- `audit_live_ui_design`: Launches headless Playwright against a local URL, runs deterministic heuristic linter + Penpot/DTCG diff, and returns token-optimized design critiques.
 - `list_visual_failures`: Lists all failed Playwright visual tests and affected viewports.
-- `get_visual_failure_bundle`: Fetches resized WebP images, `ariaSnapshot` YAML, and computed styles for a specific `testId`.
+- `get_visual_failure_bundle`: Fetches resized WebP images (as native MCP image blocks), `ariaSnapshot` YAML, and computed styles for a specific `testId`.
 
 ---
 
-## 3. Playwright Custom Reporter Setup
+## 3. Playwright Custom Reporter & Real Context Fixture
 
 For automated test suites and CI/CD pipelines, install the project devDependencies:
 
@@ -90,7 +91,9 @@ pnpm add -D zerovisual @playwright/test sharp
 yarn add -D zerovisual @playwright/test sharp
 ```
 
-Add ZeroVisual as a custom reporter in your `playwright.config.ts`. Passing tests execute at standard speed with **zero AI token cost**; only failing visual assertions trigger the pre-processor:
+### A. Register the Reporter in `playwright.config.ts`
+
+Passing tests execute at standard speed with **zero AI token cost**; only failing visual assertions trigger the pre-processor:
 
 ```typescript
 // playwright.config.ts
@@ -105,7 +108,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['zerovisual/reporter', {
-      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local'
+      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local' | 'llama' | 'mistral' | 'deepseek'
       padding: 32,                 // Context pixels around diff bounding box
       outputDir: './test-results'  // Output folder for triage-ready.json
     }]
@@ -113,7 +116,23 @@ export default defineConfig({
 });
 ```
 
-When a visual test like `expect(page).toHaveScreenshot()` fails, ZeroVisual generates:
+### B. Use the ZeroVisual Real Context Fixture
+
+To capture authentic Accessibility Object Model (`ariaSnapshot`) and real computed styles during visual test execution, import `test` from `zerovisual`:
+
+```typescript
+// tests/visual/homepage.spec.ts
+import { test, expect } from 'zerovisual';
+
+test('homepage visual regression with authentic AOM context', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+  await expect(page).toHaveScreenshot('homepage.png');
+});
+```
+
+The auto-fixture automatically detects test failure while the browser page is still open, extracts the live DOM subtree and computed CSS, and attaches `zerovisual-context.json` so your AI agent receives authentic semantic context rather than placeholders!
+
+When a visual test fails, ZeroVisual generates:
 `./test-results/triage-ready.json`.
 
 ---

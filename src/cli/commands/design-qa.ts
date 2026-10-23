@@ -190,7 +190,7 @@ export const designQaCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'openai',
-      description: 'Target Vision LLM provider: openai | anthropic | gemini | local'
+      description: 'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',

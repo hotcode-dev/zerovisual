@@ -50,6 +50,12 @@ export function getProviderDimensions(
       return lowTokenMode
         ? { maxWidth: 384, maxHeight: 384 }
         : { maxWidth: 768, maxHeight: 768 };
+    case 'llama':
+      return { maxWidth: 560, maxHeight: 560 };
+    case 'mistral':
+      return { maxWidth: 512, maxHeight: 512 };
+    case 'deepseek':
+      return { maxWidth: 384, maxHeight: 384 };
     case 'local':
       return custom ?? { maxWidth: 448, maxHeight: 448 };
     default:
@@ -240,6 +246,24 @@ export function estimateVisionTokens(
     const tilesW = Math.ceil(width / tileDim);
     const tilesH = Math.ceil(height / tileDim);
     return tilesW * tilesH * 258;
+  }
+
+  if (provider === 'llama') {
+    const tilesW = Math.ceil(width / 560);
+    const tilesH = Math.ceil(height / 560);
+    return tilesW * tilesH * 324;
+  }
+
+  if (provider === 'mistral') {
+    const patchesW = Math.ceil(width / 16);
+    const patchesH = Math.ceil(height / 16);
+    return patchesW * patchesH;
+  }
+
+  if (provider === 'deepseek') {
+    const tilesW = Math.ceil(width / 384);
+    const tilesH = Math.ceil(height / 384);
+    return tilesW * tilesH * 576;
   }
 
   // Local / default

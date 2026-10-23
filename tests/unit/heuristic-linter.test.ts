@@ -51,6 +51,36 @@ describe('Deterministic UI Heuristic Linter', () => {
       expect(res.valid).toBe(true);
       expect(res.ratio).toBe(21);
     });
+    it('should parse modern CSS colors: HSL, OKLCH, OKLab', () => {
+      // Pure blue in HSL: hsl(240, 100%, 50%)
+      const hsl = parseColor('hsl(240, 100%, 50%)');
+      expect(hsl.r).toBe(0);
+      expect(hsl.g).toBe(0);
+      expect(hsl.b).toBe(255);
+      expect(hsl.a).toBe(1);
+
+      // OKLCH parsing
+      const oklch = parseColor('oklch(0.6 0.2 140 / 0.8)');
+      expect(oklch.r).toBeGreaterThan(0);
+      expect(oklch.g).toBeGreaterThan(0);
+      expect(oklch.a).toBe(0.8);
+
+      // OKLab parsing
+      const oklab = parseColor('oklab(0.7 0.1 -0.1)');
+      expect(oklab.r).toBeGreaterThan(0);
+      expect(oklab.b).toBeGreaterThan(0);
+    });
+
+    it('should support dark-mode canvas compositing for transparent backgrounds', () => {
+      // White text on transparent background in a dark container (#0f172a)
+      const darkCanvasRes = checkContrast('#ffffff', 'transparent', 16, 400, '#0f172a');
+      expect(darkCanvasRes.valid).toBe(true);
+      expect(darkCanvasRes.ratio).toBeGreaterThan(10);
+
+      // Dark text on transparent background in a dark container (#0f172a) fails contrast
+      const darkTextFail = checkContrast('#1e293b', 'transparent', 16, 400, '#0f172a');
+      expect(darkTextFail.valid).toBe(false);
+    });
   });
 
   describe('Spacing Grid (4px/8px rhythm)', () => {
@@ -107,10 +137,70 @@ describe('Deterministic UI Heuristic Linter', () => {
       expect(res.violations.some((v) => v.actual.includes('14px'))).toBe(true);
     });
 
+    it('should flag microcopy text < 12px as illegible across all elements', () => {
+      const res = checkTypographyScale(10, 14, 'span');
+      expect(res.valid).toBe(false);
+      expect(res.violations.some((v) => v.expected.includes('12px'))).toBe(true);
+    });
+
     it('should flag body text with line-height < 1.4', () => {
       const res = checkTypographyScale(16, 18, 'p'); // 18 / 16 = 1.125
       expect(res.valid).toBe(false);
       expect(res.violations.some((v) => v.rule === 'TYPOGRAPHY_SCALE')).toBe(true);
+    });
+  });
+
+  describe('Accessibility, Focus Visible & Mobile Layout Overflow', () => {
+    it('should flag missing image alt attribute', () => {
+      const violations = lintElementHeuristics({
+        selector: 'img.hero',
+        tagName: 'img',
+        computedStyles: {},
+        accessibility: {}
+      });
+
+      expect(violations.some((v) => v.rule === 'ACCESSIBILITY')).toBe(true);
+    });
+
+    it('should flag buttons without accessible name or text', () => {
+      const violations = lintElementHeuristics({
+        selector: 'button.icon-only',
+        tagName: 'button',
+        isInteractive: true,
+        computedStyles: {},
+        accessibility: { innerText: '' }
+      });
+
+      expect(violations.some((v) => v.rule === 'ACCESSIBILITY')).toBe(true);
+    });
+
+    it('should flag interactive elements with outline: none and no box-shadow alternative', () => {
+      const violations = lintElementHeuristics({
+        selector: 'button.submit',
+        tagName: 'button',
+        isInteractive: true,
+        computedStyles: {
+          outline: 'none',
+          boxShadow: 'none'
+        }
+      });
+
+      expect(violations.some((v) => v.rule === 'FOCUS_VISIBLE')).toBe(true);
+    });
+
+    it('should flag mobile layout horizontal overflow when element exceeds viewport width', () => {
+      const violations = lintElementHeuristics({
+        selector: 'div.wide-table',
+        tagName: 'div',
+        isMobileViewport: true,
+        viewportWidth: 390,
+        boundingBox: { x: 20, y: 100, width: 420, height: 200 },
+        computedStyles: {}
+      });
+
+      const overflow = violations.find((v) => v.rule === 'LAYOUT_OVERFLOW');
+      expect(overflow).toBeDefined();
+      expect(overflow?.actual).toContain('overflows by 50px');
     });
   });
 

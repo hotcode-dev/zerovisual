@@ -81,13 +81,31 @@ Local open-source VLMs typically use a vision encoder (like SigLIP or CLIP) trai
 
 ---
 
-## 5. Token & Economics Comparison Matrix
+## 5. Meta Llama 3.2 Vision (`llama`), Mistral Pixtral (`mistral`), and DeepSeek-VL (`deepseek`)
 
-| Scenario | Full HD Canvas (1920×1080) | ZeroVisual Anthropic (504px) | ZeroVisual OpenAI (512px) | ZeroVisual Gemma / Gemini (768px) | ZeroVisual Small Diff (184×112) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Anthropic Tokens** | 2,691 | **324** | 361 | 756 | **28** |
-| **OpenAI Tokens** | 2,125 | 255 | **255** | 425 | **255** |
-| **Gemma / Gemini Tokens** | 1,548 (6 tiles) | 258 (1 tile) | 258 (1 tile) | **258 (1 tile)** | **258 (1 tile)** |
-| **Base64 Payload Size** | ~5,300 KB | **~47 KB** | **~47 KB** | **~65 KB** | **~12 KB** |
-| **Vision Token Savings** | Baseline | **88%** | **88%** | **83.3%** | **Up to 99%** |
-| **Network Byte Savings**| Baseline | **99.1%** | **99.1%** | **98.8%** | **99.8%** |
+### Meta Llama 3.2 Vision (`llama`)
+- **Grid Architecture:** Divides images into discrete **$560 \times 560\text{ px}$ tiles** (each containing a $14 \times 14$ grid of 40px patches).
+- **Tile Token Cost:** Each tile costs **324 tokens**.
+- **ZeroVisual Target:** Aligns cropped diffs within **`560 × 560 px`** to guarantee evaluation in exactly 1 tile (324 tokens) instead of multiple tiles.
+
+### Mistral Pixtral (`mistral`)
+- **Grid Architecture:** Uses a native 2D vision transformer with continuous **$16 \times 16\text{ px}$ patches** without rigid multi-tile splitting.
+- **ZeroVisual Target:** ZeroVisual scales images within **`512 × 512 px`** ($32 \times 32$ patches = 1,024 tokens maximum), with localized button diffs consuming as few as 88 tokens.
+
+### DeepSeek-VL (`deepseek`)
+- **Grid Architecture:** Fixed tile resolution of **$384 \times 384\text{ px}$** (576 vision tokens per tile).
+- **ZeroVisual Target:** ZeroVisual constrains images to **`384 × 384 px`** to fit exactly 1 tile.
+
+---
+
+## 6. Token & Economics Comparison Matrix
+
+| Scenario | Full HD Canvas (1920×1080) | ZeroVisual Anthropic (504px) | ZeroVisual OpenAI (512px) | ZeroVisual Gemma / Gemini (768px) | ZeroVisual Llama (560px) | ZeroVisual Small Diff (184×112) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Anthropic Tokens** | 2,691 | **324** | 361 | 756 | 400 | **28** |
+| **OpenAI Tokens** | 2,125 | 255 | **255** | 425 | 255 | **255** |
+| **Gemma / Gemini Tokens** | 1,548 (6 tiles) | 258 (1 tile) | 258 (1 tile) | **258 (1 tile)** | 258 (1 tile) | **258 (1 tile)** |
+| **Llama Tokens** | 2,592 (8 tiles) | 324 (1 tile) | 324 (1 tile) | 648 (2 tiles) | **324 (1 tile)** | **324 (1 tile)** |
+| **Base64 Payload Size** | ~5,300 KB | **~47 KB** | **~47 KB** | **~65 KB** | **~52 KB** | **~12 KB** |
+| **Vision Token Savings** | Baseline | **88%** | **88%** | **83.3%** | **87.5%** | **Up to 99%** |
+| **Network Byte Savings**| Baseline | **99.1%** | **99.1%** | **98.8%** | **99.0%** | **99.8%** |

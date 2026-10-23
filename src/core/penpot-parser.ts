@@ -196,12 +196,80 @@ export function parsePenpotJson(jsonContent: string): PenpotNodeToken[] {
 }
 
 /**
- * Main parser entry point supporting both Penpot SVG exports and JSON token exports.
+ * Recursively parses W3C Design Tokens Community Group (DTCG) ($value, $type)
+ * and Token Studio tokens, converting token paths into CSS selectors and properties.
  */
-export function parsePenpotTokens(fileContent: string, format: 'svg' | 'json'): PenpotNodeToken[] {
-  if (format === 'svg') {
+export function parseDtcgTokens(jsonContent: string | object): PenpotNodeToken[] {
+  const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+  const nodes: PenpotNodeToken[] = [];
+  const componentMap = new Map<string, Record<string, string>>();
+
+  function walk(obj: any, path: string[]) {
+    if (!obj || typeof obj !== 'object') return;
+
+    // Check if this object is a DTCG token leaf ({ $value: ..., $type?: ... } or { value: ..., type?: ... })
+    const isLeaf =
+      ('$value' in obj && obj.$value !== undefined) ||
+      ('value' in obj && obj.value !== undefined && typeof obj.value !== 'object');
+
+    if (isLeaf) {
+      const val = obj.$value ?? obj.value;
+      const type = obj.$type ?? obj.type;
+      const propCandidate = path[path.length - 1] ?? '';
+      const selectorParts = path.slice(0, -1);
+
+      let propName = normalizePropName(propCandidate);
+      if (type === 'color' && !['color', 'backgroundColor', 'borderColor'].includes(propName)) {
+        propName = propCandidate.includes('bg') || propCandidate.includes('background')
+          ? 'backgroundColor'
+          : 'color';
+      }
+
+      const selector = selectorParts.length > 0
+        ? `.${selectorParts.join('-').toLowerCase()}`
+        : '*';
+
+      const existing = componentMap.get(selector) ?? {};
+      existing[propName] = String(val);
+      componentMap.set(selector, existing);
+      return;
+    }
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('$') && key !== '$value' && key !== '$type') continue;
+      walk(value, [...path, key]);
+    }
+  }
+
+  walk(data, []);
+
+  for (const [selector, properties] of componentMap.entries()) {
+    nodes.push({
+      selector,
+      properties
+    });
+  }
+
+  return nodes;
+}
+
+/**
+ * Main parser entry point supporting Penpot SVG exports, Penpot JSON token exports,
+ * and standard W3C DTCG / Token Studio design tokens.
+ */
+export function parsePenpotTokens(
+  fileContent: string,
+  format: 'svg' | 'json' | 'dtcg' = 'json'
+): PenpotNodeToken[] {
+  if (format === 'svg' || fileContent.trim().startsWith('<svg')) {
     return parsePenpotSvg(fileContent);
   }
+
+  // Detect DTCG tokens format if $value or $type are present
+  if (format === 'dtcg' || fileContent.includes('"$value"') || fileContent.includes('"$type"')) {
+    return parseDtcgTokens(fileContent);
+  }
+
   return parsePenpotJson(fileContent);
 }
 

@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export const TargetProviderSchema = z.enum(['openai', 'anthropic', 'gemini', 'local', 'qwen', 'gemma']);
+export const TargetProviderSchema = z.enum([
+  'openai',
+  'anthropic',
+  'gemini',
+  'local',
+  'qwen',
+  'gemma',
+  'llama',
+  'mistral',
+  'deepseek'
+]);
 export type TargetProvider = z.infer<typeof TargetProviderSchema>;
 
 export const TileDimensionsSchema = z.object({
@@ -62,7 +72,15 @@ export const ViewportArtifactSchema = z.object({
 export type ViewportArtifact = z.infer<typeof ViewportArtifactSchema>;
 
 export const HeuristicViolationSchema = z.object({
-  rule: z.enum(['CONTRAST', 'SPACING_GRID', 'TAP_TARGET', 'TYPOGRAPHY_SCALE']),
+  rule: z.enum([
+    'CONTRAST',
+    'SPACING_GRID',
+    'TAP_TARGET',
+    'TYPOGRAPHY_SCALE',
+    'ACCESSIBILITY',
+    'LAYOUT_OVERFLOW',
+    'FOCUS_VISIBLE'
+  ]),
   element: z.string(),
   expected: z.string(),
   actual: z.string()
@@ -118,7 +136,16 @@ export const RegressionVerdictSchema = z.object({
 export type RegressionVerdict = z.infer<typeof RegressionVerdictSchema>;
 
 export const DesignQaViolationVerdictSchema = z.object({
-  rule: z.enum(['CONTRAST', 'SPACING_GRID', 'TAP_TARGET', 'TYPOGRAPHY_SCALE', 'PENPOT_TOKEN']),
+  rule: z.enum([
+    'CONTRAST',
+    'SPACING_GRID',
+    'TAP_TARGET',
+    'TYPOGRAPHY_SCALE',
+    'PENPOT_TOKEN',
+    'ACCESSIBILITY',
+    'LAYOUT_OVERFLOW',
+    'FOCUS_VISIBLE'
+  ]),
   element: z.string(),
   severity: z.enum(['critical', 'warning', 'info']),
   recommendation: z.string(),

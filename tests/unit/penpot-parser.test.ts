@@ -65,6 +65,24 @@ describe('Penpot Token Parser & Delta Comparator', () => {
       expect(btn?.properties.backgroundColor).toBe('#0066cc');
       expect(btn?.properties.borderRadius).toBe('8px');
     });
+
+    it('should parse W3C DTCG ($value, $type) design tokens and auto-detect format', () => {
+      const dtcgJson = JSON.stringify({
+        btn: {
+          primary: {
+            backgroundColor: { $value: '#2563eb', $type: 'color' },
+            borderRadius: { $value: '6px', $type: 'dimension' }
+          }
+        }
+      });
+
+      const nodes = parsePenpotTokens(dtcgJson);
+      expect(nodes.length).toBeGreaterThan(0);
+      const btn = nodes.find((n) => n.selector === '.btn-primary');
+      expect(btn).toBeDefined();
+      expect(btn?.properties.backgroundColor).toBe('#2563eb');
+      expect(btn?.properties.borderRadius).toBe('6px');
+    });
   });
 
   describe('diffPenpotAgainstDom', () => {

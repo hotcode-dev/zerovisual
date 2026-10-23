@@ -4,8 +4,11 @@
 
 <div class="token-calc-container">
   <div class="calc-header">
-    <h3>Interactive Token & Byte Savings Calculator</h3>
-    <p>See exactly how much AI token spend and network bandwidth ZeroVisual saves on your visual test failures.</p>
+    <div class="calc-title-row">
+      <h3>Interactive Token & Byte Savings Calculator</h3>
+      <span class="badge-new">Updated: Multi-Model + Drop & Drop</span>
+    </div>
+    <p>See exactly how much AI token spend and network bandwidth ZeroVisual saves on your visual test failures or custom screenshots.</p>
   </div>
 
   <div class="calc-grid">
@@ -18,6 +21,9 @@
           <option value="gemma">Google Gemma 4 / Gemini 2.0 (768×768 tile)</option>
           <option value="gemma-low">Google Gemma / Gemini Low-Token Mode (384×384 tile)</option>
           <option value="qwen">Qwen 2.5 / 3.8-VL (504×504 patch grid)</option>
+          <option value="llama">Meta Llama 3.2 Vision (560×560 tile grid)</option>
+          <option value="mistral">Mistral Pixtral (16×16 patch grid)</option>
+          <option value="deepseek">DeepSeek-VL (384×384 tile grid)</option>
           <option value="local">Local VLM (448×448 grid)</option>
         </select>
       </div>
@@ -29,6 +35,19 @@
           <button type="button" class="scenario-btn" data-w="380" data-h="140" data-raw-w="390" data-raw-h="844">Mobile Card (380×140)</button>
           <button type="button" class="scenario-btn" data-w="640" data-h="420" data-raw-w="1920" data-raw-h="1080">Modal Dialog (640×420)</button>
           <button type="button" class="scenario-btn" data-w="1600" data-h="800" data-raw-w="1920" data-raw-h="1080">Full Page Layout (1600×800)</button>
+        </div>
+      </div>
+
+      <div class="control-group upload-group">
+        <label for="image-upload-input">Or Upload / Drop Your Own Screenshot</label>
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="image-upload-input" accept="image/*" class="sr-only" />
+          <div class="drop-zone-content">
+            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span id="upload-status-text">Drop a PNG/JPG screenshot or click to browse</span>
+          </div>
         </div>
       </div>
 
@@ -76,8 +95,26 @@
     box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.2);
   }
 
+  .calc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .badge-new {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    border-radius: 9999px;
+  }
+
   .calc-header h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     font-size: 1.5rem;
     font-weight: 700;
     color: #e0e7ff;
@@ -118,9 +155,15 @@
     background: #0f172a;
     border: 1px solid #475569;
     color: #f8fafc;
-    padding: 0.6rem 0.8rem;
+    padding: 0.6rem 0.85rem;
     border-radius: 8px;
     font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .calc-select:focus {
+    border-color: #6366f1;
   }
 
   .scenario-buttons {
@@ -130,33 +173,78 @@
   }
 
   .scenario-btn {
-    background: rgba(51, 65, 85, 0.5);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    color: #cbd5e1;
-    padding: 0.35rem 0.65rem;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 0.4rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
   }
 
   .scenario-btn:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: #6366f1;
-    color: #fff;
+    background: #334155;
+    color: #f8fafc;
   }
 
   .scenario-btn.active {
-    background: #6366f1;
-    border-color: #818cf8;
-    color: #fff;
+    background: #4f46e5;
+    border-color: #6366f1;
+    color: #ffffff;
     font-weight: 600;
+  }
+
+  .upload-group {
+    margin-top: 0.5rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .drop-zone {
+    border: 2px dashed rgba(99, 102, 241, 0.4);
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: #818cf8;
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  .drop-zone-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: #94a3b8;
+  }
+
+  .drop-icon {
+    width: 18px;
+    height: 18px;
+    color: #818cf8;
   }
 
   .custom-dims-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+    margin-top: 0.5rem;
   }
 
   .calc-slider {
@@ -168,15 +256,15 @@
   .calc-results {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
     justify-content: center;
+    gap: 1rem;
   }
 
   .metric-card {
-    background: rgba(15, 23, 42, 0.75);
-    border: 1px solid rgba(71, 85, 105, 0.4);
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 12px;
-    padding: 1.1rem;
+    padding: 1.15rem 1.25rem;
     transition: transform 0.2s ease;
   }
 
@@ -223,18 +311,21 @@
     const diffWVal = document.getElementById('diff-w-val');
     const diffHVal = document.getElementById('diff-h-val');
     const scenarioBtns = document.querySelectorAll('.scenario-btn');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('image-upload-input') as HTMLInputElement | null;
+    const uploadStatus = document.getElementById('upload-status-text');
 
     const tokenSavingsPct = document.getElementById('token-savings-pct');
     const tokenComparison = document.getElementById('token-comparison');
     const byteSavingsPct = document.getElementById('byte-savings-pct');
     const byteComparison = document.getElementById('byte-comparison');
-    const clarityStatus = document.getElementById('clarity-status');
     const dimComparison = document.getElementById('dim-comparison');
 
     if (!providerSelect || !diffWidthInput || !diffHeightInput) return;
 
     let rawW = 1920;
     let rawH = 1080;
+    let customFileBytes = 0;
 
     function calculateTokens(width: number, height: number, provider: string): number {
       if (provider === 'openai') {
@@ -250,8 +341,20 @@
         const tilesW = Math.ceil(width / tileDim);
         const tilesH = Math.ceil(height / tileDim);
         return tilesW * tilesH * 258;
+      } else if (provider === 'llama') {
+        const tilesW = Math.ceil(width / 560);
+        const tilesH = Math.ceil(height / 560);
+        return tilesW * tilesH * 324;
+      } else if (provider === 'mistral') {
+        const patchesW = Math.ceil(width / 16);
+        const patchesH = Math.ceil(height / 16);
+        return patchesW * patchesH;
+      } else if (provider === 'deepseek') {
+        const tilesW = Math.ceil(width / 384);
+        const tilesH = Math.ceil(height / 384);
+        return tilesW * tilesH * 576;
       } else {
-        // Local
+        // Local default
         const patchesW = Math.ceil(width / 28);
         const patchesH = Math.ceil(height / 28);
         return patchesW * patchesH;
@@ -272,9 +375,10 @@
 
       // Provider dimensions limit
       let maxTile = 504;
-      if (provider === 'openai') maxTile = 512;
+      if (provider === 'openai' || provider === 'mistral') maxTile = 512;
       else if (provider === 'gemini' || provider === 'gemma') maxTile = 768;
-      else if (provider === 'gemini-low' || provider === 'gemma-low') maxTile = 384;
+      else if (provider === 'gemini-low' || provider === 'gemma-low' || provider === 'deepseek') maxTile = 384;
+      else if (provider === 'llama') maxTile = 560;
       else if (provider === 'local') maxTile = 448;
 
       // Model-aware downscale with withoutEnlargement: true
@@ -292,19 +396,68 @@
       const tokenSaved = Math.max(0, Math.round(((rawTokens - optTokens) / rawTokens) * 1000) / 10);
 
       // Byte calculations
-      const rawBytes = Math.round((rawW * rawH * 4) / 2000); // approx compressed PNG KB
-      const optBytes = Math.max(5, Math.round((optW * optH * 0.15) / 1024) + 4); // approx WebP q80 KB
-      const byteSaved = Math.max(0, Math.round(((rawBytes - optBytes) / rawBytes) * 1000) / 10);
+      const rawKb = customFileBytes > 0
+        ? Math.round(customFileBytes / 1024)
+        : Math.round((rawW * rawH * 4) / 2000);
+      const optKb = Math.max(4, Math.round((optW * optH * 0.15) / 1024) + 3);
+      const byteSaved = Math.max(0, Math.round(((rawKb - optKb) / rawKb) * 1000) / 10);
 
       if (tokenSavingsPct) tokenSavingsPct.textContent = `${tokenSaved}%`;
       if (tokenComparison) tokenComparison.textContent = `${rawTokens.toLocaleString()} tokens ➔ ${optTokens.toLocaleString()} tokens`;
 
       if (byteSavingsPct) byteSavingsPct.textContent = `${byteSaved}%`;
-      if (byteComparison) byteComparison.textContent = `${rawBytes.toLocaleString()} KB PNG ➔ ~${optBytes} KB WebP`;
+      if (byteComparison) byteComparison.textContent = `${rawKb.toLocaleString()} KB PNG ➔ ~${optKb} KB WebP`;
 
       if (dimComparison) {
         dimComparison.textContent = `Raw ${rawW}×${rawH} ➔ Optimized ${optW}×${optH} (no enlargement)`;
       }
+    }
+
+    // Drag-and-drop / File upload handler
+    function handleFile(file: File) {
+      if (!file || !file.type.startsWith('image/')) return;
+      customFileBytes = file.size;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          rawW = img.naturalWidth || 1920;
+          rawH = img.naturalHeight || 1080;
+          diffWidthInput.max = rawW.toString();
+          diffHeightInput.max = rawH.toString();
+          diffWidthInput.value = Math.min(rawW, Math.round(rawW * 0.4)).toString();
+          diffHeightInput.value = Math.min(rawH, Math.round(rawH * 0.4)).toString();
+
+          scenarioBtns.forEach((b) => b.classList.remove('active'));
+          if (uploadStatus) {
+            uploadStatus.textContent = `Loaded: ${file.name} (${rawW}×${rawH}px, ${Math.round(file.size / 1024)} KB)`;
+          }
+          update();
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (dropZone && fileInput) {
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer?.files?.[0]) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files?.[0]) {
+          handleFile(fileInput.files[0]);
+        }
+      });
     }
 
     providerSelect.addEventListener('change', update);
@@ -320,6 +473,10 @@
         const h = parseInt(btn.getAttribute('data-h') || '48', 10);
         rawW = parseInt(btn.getAttribute('data-raw-w') || '1920', 10);
         rawH = parseInt(btn.getAttribute('data-raw-h') || '1080', 10);
+        customFileBytes = 0;
+        if (uploadStatus) {
+          uploadStatus.textContent = 'Drop a PNG/JPG screenshot or click to browse';
+        }
 
         diffWidthInput.value = w.toString();
         diffHeightInput.value = h.toString();

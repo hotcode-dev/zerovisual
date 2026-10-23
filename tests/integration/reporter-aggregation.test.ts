@@ -133,4 +133,65 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
     expect(failure.viewports[1]?.viewport).toEqual({ width: 375, height: 667 });
     expect(failure.viewports[1]?.images.diffBase64).toMatch(/^data:image\/webp;base64,/);
   });
+
+  it('should ingest authentic AOM and computed styles from zerovisual-context.json attachment', async () => {
+    const reporter = new ZeroVisualReporter({
+      outputDir: testOutputDir,
+      targetProvider: 'openai'
+    });
+
+    const diffBuffer = await createSyntheticDiffPng();
+    const testTitlePath = ['app.spec.ts', 'Pricing Page', 'Card Alignment'];
+    const mockTest = createMockTestCase(testTitlePath, 'Desktop Chrome');
+
+    const contextPayload = {
+      selector: 'div.pricing-card',
+      ariaSnapshot: '- heading "Enterprise Tier" [level=2]\n- button "Contact Sales"',
+      computedStyles: {
+        display: 'flex',
+        padding: '24px',
+        backgroundColor: 'rgb(15, 23, 42)'
+      },
+      heuristicViolations: [
+        {
+          rule: 'SPACING_GRID',
+          element: 'div.pricing-card',
+          expected: 'multiples of 4px/8px',
+          actual: 'margin: 13px'
+        }
+      ]
+    };
+
+    const mockResult = {
+      status: 'failed',
+      attachments: [
+        {
+          name: 'card-diff.png',
+          contentType: 'image/png',
+          body: diffBuffer
+        },
+        {
+          name: 'zerovisual-context.json',
+          contentType: 'application/json',
+          body: Buffer.from(JSON.stringify(contextPayload))
+        }
+      ]
+    } as unknown as TestResult;
+
+    await reporter.onTestEnd(mockTest, mockResult);
+    await reporter.onEnd({ status: 'failed' } as FullResult);
+
+    const outputFile = path.join(testOutputDir, 'triage-ready.json');
+    expect(fs.existsSync(outputFile)).toBe(true);
+
+    const content = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+    const failure = content.failures[0]!;
+
+    expect(failure.selector).toBe('div.pricing-card');
+    expect(failure.viewports[0]?.ariaSnapshot).toContain('Enterprise Tier');
+    expect(failure.viewports[0]?.computedStyles.display).toBe('flex');
+    expect(failure.viewports[0]?.computedStyles.backgroundColor).toBe('rgb(15, 23, 42)');
+    expect(failure.designContext?.heuristicViolations).toHaveLength(1);
+    expect(failure.designContext?.heuristicViolations[0]?.rule).toBe('SPACING_GRID');
+  });
 });

@@ -26,6 +26,12 @@ describe('Model-Aware Image Optimizer', () => {
       expect(getProviderDimensions('gemma', true)).toEqual({ maxWidth: 384, maxHeight: 384 });
     });
 
+    it('should return exact 560x560 for llama, 512x512 for mistral, and 384x384 for deepseek', () => {
+      expect(getProviderDimensions('llama')).toEqual({ maxWidth: 560, maxHeight: 560 });
+      expect(getProviderDimensions('mistral')).toEqual({ maxWidth: 512, maxHeight: 512 });
+      expect(getProviderDimensions('deepseek')).toEqual({ maxWidth: 384, maxHeight: 384 });
+    });
+
     it('should return 448x448 default for local and respect custom dimensions', () => {
       expect(getProviderDimensions('local')).toEqual({ maxWidth: 448, maxHeight: 448 });
       expect(getProviderDimensions('local', false, { maxWidth: 640, maxHeight: 480 })).toEqual({

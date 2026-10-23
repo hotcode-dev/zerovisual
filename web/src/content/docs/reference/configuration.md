@@ -35,7 +35,7 @@ export default defineConfig({
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `targetProvider` | `'openai' \| 'anthropic' \| 'gemini' \| 'gemma' \| 'qwen' \| 'local'` | `'anthropic'` | Target Vision LLM provider. Selects the exact tile grid downscaling dimensions (e.g., 504px for Anthropic/Qwen, 512px for OpenAI, 768px for Gemma/Gemini). |
+| `targetProvider` | `'openai' \| 'anthropic' \| 'gemini' \| 'gemma' \| 'qwen' \| 'llama' \| 'mistral' \| 'deepseek' \| 'local'` | `'anthropic'` | Target Vision LLM provider. Selects the exact tile grid downscaling dimensions (e.g., 504px for Anthropic/Qwen, 512px for OpenAI/Mistral, 768px for Gemma/Gemini, 560px for Llama 3.2 Vision, 384px for DeepSeek-VL). |
 | `lowTokenMode` | `boolean` | `false` | When `true`, enables aggressive downscaling (e.g., reduces Gemma/Gemini from 768×768 to 384×384) to cut token consumption and latency in half. |
 | `padding` | `number` | `32` | Number of context pixels added around all four edges of the diff bounding box. Clamped to image boundaries. |
 | `outputDir` | `string` | `'./test-results'` | Directory where the generated `triage-ready.json` artifact bundle will be written upon test completion. |
@@ -115,9 +115,10 @@ When running `zerovisual-mcp` over stdio:
 | Tool Name | Parameters | Returns | Description |
 | :--- | :--- | :--- | :--- |
 | `list_visual_failures` | `{ testResultsDir?: string }` | Array of test failures with `testId`, failing viewports, and paths. | Lists all visual failures discovered in the test results directory. |
-| `get_visual_failure_bundle` | `{ testId: string; testResultsDir?: string; provider?: string }` | Complete payload: WebP Base64 images, AOM YAML snapshot, computed styles. | Returns the model-aligned triage bundle for a specific failing visual test. |
-| `audit_live_ui_design` | `{ url: string; penpotPath?: string; provider?: string }` | Design QA bundle with heuristic issues and token diffs. | Audits a live URL using headless Playwright and heuristic math. |
-| `optimize_image` | `{ imagePath?: string; imageBase64?: string; provider?: string; lowTokenMode?: boolean; quality?: number }` | WebP data URI, dimensions, and token/byte savings metrics. | Optimizes an arbitrary screenshot or image for Vision LLM tile grids on demand. |
+| `get_visual_failure_bundle` | `{ testId: string; triagePath?: string }` | Complete payload: Base64 WebP images (as native MCP image blocks), AOM YAML snapshot, computed styles. | Returns the model-aligned triage bundle for a specific failing visual test. |
+| `audit_live_ui_design` | `{ url: string; penpotPath?: string; provider?: string; lowTokenMode?: boolean }` | Design QA bundle with heuristic issues, Penpot deltas, and model-tile WebP screenshots. | Audits a live URL using headless Playwright and heuristic math. |
+| `optimize_image` | `{ imagePath?: string; imageBase64?: string; provider?: string; lowTokenMode?: boolean; quality?: number }` | WebP data URI, dimensions, token/byte savings metrics, and native MCP ImageContent. | Optimizes an arbitrary screenshot or image for Vision LLM tile grids on demand. |
+| `estimate_token_cost` | `{ width: number; height: number; provider?: string; lowTokenMode?: boolean }` | Comparison of original vs. optimized tokens and savings percentage. | Computes predicted token savings for candidate image resolutions. |
 
 ### Prompts
 

@@ -142,7 +142,7 @@ export const optimizeCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'anthropic',
-      description: 'Target Vision LLM provider: anthropic | openai | gemini | local'
+      description: 'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',

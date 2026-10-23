@@ -31,13 +31,17 @@ If you are a developer building a web or mobile app without a dedicated designer
 
 * 🔑 **Bring Your Own Agent (Zero API Keys):** ZeroVisual never calls OpenAI, Anthropic, or Google APIs directly. It runs 100% locally and outputs structured JSON payloads (`triage-ready.json` / `design-qa-ready.json`) or serves them over **MCP** to Cursor, Claude Code, Windsurf, Antigravity, or your custom CI/CD agent.
 * 📐 **Model-Aware Vision Grid Resizing:** Dynamically crops and downscales images using `sharp` (`fit: 'inside'`, `withoutEnlargement: true`, WebP `quality: 80`) to fit the exact vision patch/tile mechanics of your target model:
-  * **OpenAI (`openai`):** `512x512` (fits inside a single 512px tile).
+  * **OpenAI (`openai`):** `512x512` (single 512px tile).
   * **Anthropic (`anthropic`):** `504x504` (aligns to an exact 18×18 grid of 28×28px patches).
-  * **Google Gemini (`gemini`):** `768x768` (single standard tile) or `384x384` (`lowTokenMode`).
-  * **Local VLMs (`local`):** `448x448` default or custom dimensions for local models (Qwen-VL, Gemma, etc.).
+  * **Google Gemini & Gemma (`gemini` / `gemma`):** `768x768` (single standard tile) or `384x384` (`lowTokenMode`).
+  * **Meta Llama 3.2 Vision (`llama`):** `560x560` (exact 1-tile grid of 40px patches).
+  * **Mistral Pixtral (`mistral`):** `512x512` (16×16 continuous patch grid).
+  * **DeepSeek-VL (`deepseek`):** `384x384` (single 384px tile).
+  * **Local VLMs (`local`):** `448x448` default or custom dimensions for local models (Qwen-VL, etc.).
 * 📱 **Multi-Viewport Aggregation:** When a responsive layout breaks across Desktop, Tablet, and Mobile simultaneously, ZeroVisual groups all failing viewports under a single `testId`. Your AI agent diagnoses the responsive breakpoint bug in **one prompt** instead of three separate API calls.
-* 🌳 **Scoped Semantic Context (AOM + CSS):** Extracts only the failing element's Playwright `ariaSnapshot()` YAML and 14 core layout CSS properties (`padding`, `gap`, `fontSize`, `color`, etc.) instead of dumping the entire raw HTML DOM.
-* 🎨 **100% Open-Source Design QA (Penpot + Heuristic Linter):** Built-in mathematical linter for contrast, spacing grids, and tap targets, plus native SVG/JSON token diffing for **Penpot**—zero proprietary Figma lock-in.
+* 🌳 **Scoped Semantic Context (AOM + CSS):** Extracts the component's Playwright `ariaSnapshot()` YAML and computed layout CSS properties, enhanced with an auto-fixture (`import { test } from 'zerovisual'`) that captures live DOM state on failure.
+* 🎨 **100% Open-Source Design QA (Penpot + DTCG + Heuristic Linter):** Mathematical linter for WCAG 2.1 AA contrast (with OKLCH/HSL and dark-mode canvas traversal), 8pt spacing rhythm, 44px tap targets, focus visibility, mobile overflow, plus native token diffing for **Penpot** and standard **W3C DTCG / Token Studio** design tokens.
+* ⚡️ **Native Multimodal MCP Server:** Returns native MCP `ImageContent` blocks alongside JSON data and provides an `estimate_token_cost` tool for calculating token savings.
 * 🧠 **Dual Isolated Agent Skills:** Ships with two separate, strictly-typed Agent Skills (`zerovisual-regression` and `zerovisual-design-qa`) so your LLM never suffers from instruction dilution.
 
 ---
@@ -137,10 +141,11 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 ```
 
 #### Available MCP Tools
-* `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns token savings and byte reductions.
-* `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot diff, and returns a token-optimized design critique bundle.
+* `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns native MCP `ImageContent` blocks and token savings.
+* `estimate_token_cost`: Calculates estimated Vision LLM tokens for raw vs optimized image resolutions across model tile grids.
+* `audit_live_ui_design`: Launches headless Playwright against a local URL, runs the deterministic heuristic linter + Penpot/DTCG diff, and returns a token-optimized design critique bundle.
 * `list_visual_failures`: Lists all failed Playwright visual tests and affected viewports.
-* `get_visual_failure_bundle`: Fetches the resized WebP images, `ariaSnapshot` YAML, and computed styles for a specific `testId`.
+* `get_visual_failure_bundle`: Fetches the resized WebP images (as native MCP image blocks), `ariaSnapshot` YAML, and computed styles for a specific `testId`.
 
 #### Available MCP Prompts (Skills)
 * `critique-ui-design`: Loads `skills/zerovisual-design-qa/SKILL.md` and outputs actionable CSS/Tailwind improvements.
@@ -148,7 +153,7 @@ Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
 
 ---
 
-### 3. Playwright Custom Reporter (Automated Visual Regression)
+### 3. Playwright Custom Reporter & Real Context Fixture
 
 For automated test suites and CI/CD pipelines, install the project devDependencies:
 
@@ -171,11 +176,24 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['zerovisual/reporter', {
-      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local'
+      targetProvider: 'anthropic', // 'openai' | 'anthropic' | 'gemini' | 'local' | 'llama' | 'mistral' | 'deepseek'
       padding: 32,                 // Context pixels around the diff bounding box
       outputDir: './test-results'  // Output folder for triage-ready.json
     }]
   ],
+});
+```
+
+#### Authentic AOM and DOM Context via Auto-Fixture
+Import `test` directly from `zerovisual` in your spec files to automatically capture live AOM `ariaSnapshot` and computed CSS when visual assertions fail:
+
+```typescript
+// tests/visual/homepage.spec.ts
+import { test, expect } from 'zerovisual';
+
+test('homepage visual regression with real AOM context', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+  await expect(page).toHaveScreenshot('homepage.png');
 });
 ```
 

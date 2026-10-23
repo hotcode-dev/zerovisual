@@ -31,7 +31,10 @@
                   "SPACING_GRID",
                   "TAP_TARGET",
                   "TYPOGRAPHY_SCALE",
-                  "PENPOT_TOKEN"
+                  "PENPOT_TOKEN",
+                  "ACCESSIBILITY",
+                  "LAYOUT_OVERFLOW",
+                  "FOCUS_VISIBLE"
                 ]
               },
               "element": {
