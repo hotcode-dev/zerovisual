@@ -82,9 +82,9 @@ To validate performance beyond synthetic components, ZeroVisual was tested again
 ## Benchmark Methodology
 
 ### Evaluated Model & Architecture
-- **Model:** `google/gemma-4-26B-A4B-it` running locally via vLLM
+- **Model:** `RadixArk/Qwen3.8-27B-NVFP4` served via SGLang
 - **API Protocol:** Standard OpenAI-compatible `/v1/chat/completions` endpoint
-- **Vision Grid:** Gemma 4 multimodal native patch grid / model-aligned tiles (768px native tile)
+- **Vision Grid:** Qwen 2.5/3 multimodal native patch grid / model-aligned tiles (504px native tile)
 
 ### Evaluation Rubric
 Each response is scored against ground-truth metadata across three dimensions:
@@ -97,13 +97,13 @@ Each response is scored against ground-truth metadata across three dimensions:
 ## Key Architectural Insights
 
 ### 1. Vision Token Allocation (ViT Patch Math)
-Without ZeroVisual, full-viewport screenshots (1280×800) consume **1,032 image tokens** (a 2×2 grid of 768px tiles) per query. With ZeroVisual's bounding-box isolation and patch-aligned downscaling, image tokens drop to a single native tile (**258 tokens**)—a **75.0% reduction** on every desktop screenshot.
+Without ZeroVisual, full-viewport screenshots (1280×800) consume **1,000 image tokens** per query. With ZeroVisual's bounding-box isolation and patch-aligned downscaling, image tokens drop to model-aligned crops (**70–192 tokens**)—an average **85.1% reduction** on screenshots.
 
 ### 2. Eliminating Canvas Hallucinations
-In complex mobile pages like MDN Web Docs, feeding the full viewport caused the model to struggle with low-contrast elements amidst page clutter (scoring only 30%). Isolating the search input with 32px padding boosted diagnostic accuracy to **65%**. On mobile Wikipedia, accuracy jumped from **0% to 35%**.
+In complex mobile pages like MDN Web Docs, feeding the full viewport caused the model to struggle with low-contrast elements amidst page clutter (scoring only 30%). Isolating the search input with padding boosted diagnostic accuracy to **65%**. On mobile Wikipedia, accuracy jumped from **0% to 65%**.
 
 ### 3. Reasoning Latency
-Full-size images impose substantial overhead during multi-head cross-attention. On Real-World Wikipedia Desktop, response latency dropped from **11.3s to 7.2s** (a **37% speedup**), preventing client request timeouts and token exhaustion.
+Full-size images impose substantial overhead during multi-head cross-attention. On Real-World Hacker News, response latency dropped from **99.1s to 16.0s** (an **84% speedup**), preventing client request timeouts and token exhaustion.
 
 ---
 
@@ -122,6 +122,6 @@ npm run benchmark
 Configuration is handled via `benchmark/.env`:
 
 ```bash
-OPENAI_BASE_URL=https://spark.ntsd.dev:8001/v1
-AGENT_MODEL=google/gemma-4-26B-A4B-it
+OPENAI_BASE_URL=https://192.168.1.114:8001/v1
+AGENT_MODEL=RadixArk/Qwen3.8-27B-NVFP4
 ```
