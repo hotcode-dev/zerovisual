@@ -43,11 +43,12 @@ interface BenchmarkRunResult {
 }
 
 // Load .env
-function loadEnv(): { baseUrl: string; model: string } {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+function loadEnv(): { baseUrl: string; model: string; apiKey?: string } {
   const envPath = path.resolve(process.cwd(), 'benchmark/.env');
   let baseUrl = 'https://spark.ntsd.dev:8001/v1';
   let model = 'RadixArk/Qwen3.8-27B-NVFP4';
+  let apiKey: string | undefined;
+  let aiStudioKey: string | undefined;
 
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf8').split('\n');
@@ -59,10 +60,25 @@ function loadEnv(): { baseUrl: string; model: string } {
       const val = v.join('=').trim();
       if (k?.trim() === 'OPENAI_BASE_URL') baseUrl = val;
       if (k?.trim() === 'AGENT_MODEL') model = val;
+      if (k?.trim() === 'OPENAI_API_KEY') apiKey = val;
+      if (k?.trim() === 'AI_STUDIO_API_KEY') aiStudioKey = val;
     }
   }
 
-  return { baseUrl, model };
+  // Gemma/Gemini models route through Google AI Studio's OpenAI-compatible endpoint.
+  if (/gemma|gemini/i.test(model) && aiStudioKey) {
+    baseUrl = 'https://generativelanguage.googleapis.com/v1beta/openai';
+    apiKey = aiStudioKey;
+  }
+
+  // Only relax TLS verification for the self-signed local SGLang endpoint.
+  if (baseUrl.includes('spark.ntsd.dev')) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  } else {
+    delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  }
+
+  return { baseUrl, model, apiKey };
 }
 
 // Evaluate accuracy against ground truth
@@ -98,11 +114,35 @@ function evaluateAccuracy(answer: string, reasoning: string, gt: GroundTruth): {
   return { score, found };
 }
 
+// Providers split output differently: Qwen/SGLang streams thoughts into
+// reasoning_content with empty content; AI Studio may return either field,
+// null content, or content as an array of parts.
+function extractText(v: unknown): string {
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return v.map((p: any) => p?.text ?? '').join('');
+  return '';
+}
+
+// Gemma 4 on AI Studio emits thinking inline in content as <thought>...</thought>
+// tags with no separate reasoning_content field. Split it out so the benchmark
+// records both a clean answer and the reasoning.
+function splitThoughtTags(text: string): { content: string; reasoning: string } {
+  const thoughts = [...text.matchAll(/<thought>([\s\S]*?)<\/thought>/g)]
+    .map(m => m[1]!.trim())
+    .filter(Boolean);
+  if (thoughts.length === 0) return { content: text, reasoning: '' };
+  return {
+    content: text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim(),
+    reasoning: thoughts.join('\n\n')
+  };
+}
+
 async function callVlm(
   baseUrl: string,
   model: string,
   imageDataUri: string,
-  promptText: string
+  promptText: string,
+  apiKey?: string
 ): Promise<{
   content: string;
   reasoning: string;
@@ -119,7 +159,10 @@ async function callVlm(
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {})
+    },
     body: JSON.stringify({
       model,
       messages: [
@@ -144,30 +187,57 @@ async function callVlm(
   }
 
   const data = await res.json();
-  const choice = data.choices?.[0];
-  const content = choice?.message?.content ?? '';
-  const reasoning = choice?.message?.reasoning_content ?? '';
+  const message = data.choices?.[0]?.message ?? {};
+  let content = extractText(message.content);
+  let reasoning = extractText(message.reasoning_content) || extractText(message.reasoning);
+  const thoughtSplit = splitThoughtTags(content);
+  if (!reasoning && thoughtSplit.reasoning) {
+    reasoning = thoughtSplit.reasoning;
+    content = thoughtSplit.content;
+  }
   const usage = data.usage ?? {};
+  const promptTokens = usage.prompt_tokens ?? 0;
+  const completionTokens = usage.completion_tokens ?? 0;
 
   return {
     content,
     reasoning,
     usage: {
-      prompt_tokens: usage.prompt_tokens ?? 0,
-      completion_tokens: usage.completion_tokens ?? 0,
-      total_tokens: usage.total_tokens ?? 0,
-      image_tokens: usage.prompt_tokens_details?.image_tokens ?? 0,
-      reasoning_tokens: usage.reasoning_tokens ?? 0
+      prompt_tokens: promptTokens,
+      completion_tokens: completionTokens,
+      total_tokens: usage.total_tokens ?? promptTokens + completionTokens,
+      image_tokens: usage.prompt_tokens_details?.image_tokens ?? usage.image_tokens ?? 0,
+      reasoning_tokens: usage.reasoning_tokens ?? usage.completion_tokens_details?.reasoning_tokens ?? 0
     },
     latencyMs
   };
 }
 
+// AI Studio intermittently fails vision ingestion under load: 429/5xx, or a
+// transient 400 "Unable to process input image" (Google's own message says
+// "Please retry"). Back off and retry all three.
+async function callVlmWithRetry(...args: Parameters<typeof callVlm>): ReturnType<typeof callVlm> {
+  const attempts = 4;
+  for (let i = 0; ; i++) {
+    try {
+      return await callVlm(...args);
+    } catch (err: any) {
+      const retryable = /API error \((429|5\d\d)\)/.test(err.message)
+        || err.message.includes('Unable to process input image');
+      if (!retryable || i === attempts - 1) throw err;
+      const delayMs = 3000 * 2 ** i + Math.round(Math.random() * 1000);
+      console.warn(`      ↻ API error, retry ${i + 1}/${attempts - 1} in ${delayMs}ms`);
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
+
 async function runBenchmark() {
-  const { baseUrl, model } = loadEnv();
+  const { baseUrl, model, apiKey } = loadEnv();
   console.log(`🚀 ZeroVisual Vision Benchmark Runner`);
   console.log(`🌐 Base URL: ${baseUrl}`);
-  console.log(`🧠 Model:    ${model}\n`);
+  console.log(`🧠 Model:    ${model}`);
+  console.log(`🔑 Auth:     ${apiKey ? 'API key' : 'none'}\n`);
 
   const testdataDir = path.resolve(process.cwd(), 'benchmark/testdata');
   const resultsDir = path.resolve(process.cwd(), 'benchmark/results');
@@ -220,7 +290,7 @@ Identify:
 
     let resA;
     try {
-      resA = await callVlm(baseUrl, model, rawBase64, promptText);
+      resA = await callVlmWithRetry(baseUrl, model, rawBase64, promptText, apiKey);
     } catch (err: any) {
       console.error(`   ❌ Failed Mode A:`, err.message);
       continue;
@@ -314,7 +384,7 @@ Identify:
     const optPayloadBytes = optResult.buffer.length;
     let resB;
     try {
-      resB = await callVlm(baseUrl, model, optResult.dataUri, promptText);
+      resB = await callVlmWithRetry(baseUrl, model, optResult.dataUri, promptText, apiKey);
     } catch (err: any) {
       console.error(`   ❌ Failed Mode B:`, err.message);
       continue;
@@ -426,7 +496,7 @@ function generateReports(results: BenchmarkRunResult[], resultsDir: string, mode
 
   // Build Markdown Report
   let md = `# 📊 ZeroVisual Empirical Benchmark Report\n\n`;
-  md += `> **Model Evaluated:** \`${model}\` via SGLang (\`${baseUrl}\`)\n`;
+  md += `> **Model Evaluated:** \`${model}\` via \`${baseUrl}\`\n`;
   md += `> **Date:** ${new Date().toISOString()}\n`;
   md += `> **Total Test Cases:** ${rawRuns.length}\n\n`;
 
