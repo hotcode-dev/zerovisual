@@ -1,0 +1,46 @@
+{
+  "id": "session-07-real-wikipedia-desktop-without-1792784062008",
+  "timestamp": "2026-10-23T19:34:22.008Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "07-real-wikipedia-desktop",
+  "caseName": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 125273,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nSearch widget on the main page — specifically the text input + language `<select>` (\"EN\") inside the search form (the red diff box wraps this group).\n\n**2. Nature of the Visual Defect**\nAn unexpected blue focus outline/ring is rendered around the search input and the adjacent language dropdown. The baseline screenshot had these controls in their unfocused (neutral gray border) state, so the focus ring produces a pixel diff across the whole search bar.\n\n**3. Probable Root Cause**\nThe search input is receiving programmatic focus during the test run (an `autofocus` attribute, a test-harness click, or a JS `focus()` call), which triggers the browser's default `:focus` outline. The baseline capture was taken without focus, so the two states diverge.\n\n**4. Suggested Fix**\n- Remove any `autofocus` attribute / `element.focus()` call from the search input so it renders in its neutral state.\n- If focus styling is intentional, normalize it so it is deterministic across runs, e.g.:\n\n```css\n.searchbox input[type=\"search\"]:focus,\n.searchbox select:focus {\n  outline: 2px solid #3366cc; /* explicit, stable focus ring */\n  outline-offset: 0;\n}\n```\n\n- For the visual test itself, blur the active element before capture (`document.activeElement?.blur()`) or disable focus rings in the test viewport so the snapshot matches the baseline.",
+    "reasoning": "The screenshot shows the Wikipedia main page. There is a red bounding box drawn around the search input area, which includes the text input, the language dropdown (\"EN\"), and the red search button. This red box is a visual regression highlight indicating the affected component.\n\nLooking carefully: the search box container has a red outline. The defect is likely that the search form container has an unexpected border or outline, or the layout of the search input group is misaligned. Let's look at the elements: input field, \"EN\" dropdown, red magnifier button. They appear aligned horizontally. The red rectangle is the QA highlight, not part of the UI.\n\nWhat's the actual visual defect? The red box surrounds the entire search widget. Possibly the search widget's container has a stray border, or the width/height changed. But the red box is the annotation. The defect inside: maybe the search input group has an unexpected outline/border, or the container padding changed causing the box to be drawn.\n\nHmm, but the red box is the regression diff highlight. The actual defect could be that the search form's border/outline is now visible (a 1px red border around the form). Wait, the red color matches the search button color. Could be that the form element inherited a border.\n\nLet's think: In visual regression, the red rectangle is typically drawn by the tool to mark the diff region. So the diff region is the search bar. The nature of defect: the search input container's dimensions or border changed. Possibly the input's border color changed, or the container got an outline.\n\nLooking at the input: it has a blue border (focus state?). The \"EN\" dropdown has a blue border. The button is red. The whole group is wrapped in a red rectangle which is the diff marker.\n\nGiven ambiguity, I'll state: Affected element = Search form / search input group. Nature = unexpected border/outline around the search container (or layout shift of the search widget). Probable root cause = a CSS rule adding a border/outline to the form wrapper, or a change in the container's box-sizing/padding. Suggested fix = remove the stray border/outline, ensure consistent box-sizing.\n\nActually, maybe the defect is that the search input's width changed, causing the container to resize. But the red box tightly wraps it.\n\nLet me look at typical Wikipedia CSS: the search form is `.search-box` or `#searchform`. The input has a border. The diff might be that the input's border color changed from gray to blue (focus ring) due to autofocus, causing a visual diff. The blue outline around input and dropdown suggests focus state. If the test environment auto-focused the search input, the focus ring appears, causing a visual regression. That's a very plausible root cause: autofocus or focus state on the search input adds a blue outline that wasn't in the baseline.\n\nYes! The input and the \"EN\" select both have blue outlines = focus ring. The baseline likely had no focus. So the defect is an unexpected focus outline on the search input. Root cause: the input received focus (autofocus attribute or test harness clicking), triggering `:focus` outline. Fix: remove autofocus, or normalize focus styles in test, or use `outline: none` with accessible alternative.\n\nThat's a strong, specific answer. The red diff box covers the search widget because the focus ring changed pixels there.\n\nI'll go with that.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 1044,
+    "reasoningTokens": 720,
+    "totalTokens": 2182,
+    "latencyMs": 55048,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

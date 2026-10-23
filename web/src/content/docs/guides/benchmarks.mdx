@@ -1,6 +1,6 @@
 ---
 title: Empirical LLM Benchmarks
-description: Real-world empirical benchmark comparing Vision LLM visual regression triage with and without ZeroVisual on local Gemma 4 26B (google/gemma-4-26B-A4B-it).
+description: Real-world empirical benchmark comparing Vision LLM visual regression triage with and without ZeroVisual on RadixArk/Qwen3.8-27B-NVFP4 served via SGLang.
 pagefind: false
 ---
 
@@ -8,7 +8,7 @@ import BenchmarkExplorer from '../../../components/BenchmarkExplorer.astro';
 
 ## Interactive Benchmark & AI Session Explorer
 
-Explore all 11 empirical benchmark scenarios below—including 5 real-world production websites (Wikipedia Desktop & Mobile, Hacker News, GitHub Pricing, MDN Web Docs) and 6 synthetic component regressions. Toggle between pristine baselines, injected defect screenshots, pixel diffs, and ZeroVisual model-aligned crops, and inspect the real VLM reasoning trace (`<think>`) and token consumption metrics.
+Explore all 11 empirical benchmark scenarios below—including 5 real-world production websites (Wikipedia Desktop & Mobile, Hacker News, GitHub Pricing, MDN Web Docs) and 6 synthetic component regressions. Toggle between pristine baselines, injected defect screenshots, pixel diffs, and ZeroVisual model-aligned crops, and inspect the real VLM reasoning trace (`<think>`) and token consumption metrics on `RadixArk/Qwen3.8-27B-NVFP4`.
 
 <BenchmarkExplorer />
 
@@ -16,17 +16,17 @@ Explore all 11 empirical benchmark scenarios below—including 5 real-world prod
 
 ## Executive Summary
 
-To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using a real local Vision-Language Model (`google/gemma-4-26B-A4B-it` served via vLLM) across 11 diverse web UI visual regression scenarios (both real-world websites and component-level regressions).
+To evaluate ZeroVisual in realistic production settings, we conducted an empirical benchmark using a state-of-the-art open-source Vision-Language Model (**`RadixArk/Qwen3.8-27B-NVFP4`** served via SGLang) across 11 diverse web UI visual regression scenarios (both real-world websites and component-level regressions).
 
-ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer (ViT) patch grids, and converts them to optimized WebP format—achieving dramatic reductions in token overhead and latency while improving triage accuracy.
+ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer (ViT) patch grids (504×504 for Qwen), and converts them to optimized WebP format—achieving dramatic reductions in token overhead and latency while improving triage accuracy.
 
 | Core Metric | Without ZeroVisual (Raw Viewport) | With ZeroVisual (Optimized) | Empirical Improvement |
 | :--- | :--- | :--- | :--- |
-| **Vision Image Tokens (ViT)** | **9,030 tokens** | **2,838 tokens** | **-68.6% ViT Token Reduction** |
-| **Network Payload Transfer** | **638.9 KB** | **116.2 KB** | **-81.8% Bandwidth Reduced** |
-| **Total Tokens Consumed** | **7,612 tokens** | **7,148 tokens** | **-6.1% Total Tokens Saved** |
-| **Average Roundtrip Latency** | **8.4 seconds** | **7.3 seconds** | **13% Faster Latency** |
-| **Average Triage Accuracy** | **59.1%** | **65.5%** | **+6.4% Accuracy Improvement** |
+| **Vision Image Tokens (ViT)** | **8,756 tokens** | **1,304 tokens** | **-85.1% Vision Token Savings** |
+| **Network Payload Transfer** | **638.9 KB** | **71.8 KB** | **-88.8% Bandwidth Reduced** |
+| **Total Tokens Consumed** | **25,748 tokens** | **18,105 tokens** | **-29.7% Total Tokens Saved** |
+| **Average Roundtrip Latency** | **67.4 seconds** | **66.4 seconds** | **Faster Reasoning Turnaround** |
+| **Average Triage Accuracy** | **59.1%** | **68.2%** | **+9.1% Accuracy Improvement** |
 
 ---
 
@@ -34,28 +34,28 @@ ZeroVisual crops visual failure diffs, aligns them to native Vision Transformer 
 
 | Test Case | Mode | Resolution | Payload | Total Tokens | ViT Image Tokens | Latency | Accuracy |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1. Wikipedia Search Bar Shift** | Raw Viewport | 1280×800 | 24.6 KB | 797 | 1,032 | 11,299 ms | 65% |
-| | **ZeroVisual** | **634×489** | **8.2 KB** | **700** | **258** | **8,522 ms** (25% faster) | **65%** |
-| **2. GitHub PR Merge Box Regression** | Raw Viewport | 1280×800 | 27.1 KB | 606 | 1,032 | 6,088 ms | 65% |
-| | **ZeroVisual** | **768×140** | **6.0 KB** | **662** | **258** | **7,393 ms** | **65%** |
-| **3. SaaS Pricing Card Contrast Violation** | Raw Viewport | 1280×800 | 34.3 KB | 716 | 1,032 | 8,723 ms | 65% |
-| | **ZeroVisual** | **274×103** | **0.6 KB** | **592** | **258** | **5,824 ms** (33% faster) | **65%** |
-| **4. E-Commerce Checkout Collision** | Raw Viewport | 1280×800 | 22.4 KB | 650 | 1,032 | 7,122 ms | 100% |
-| | **ZeroVisual** | **504×328** | **7.0 KB** | **646** | **258** | **7,396 ms** | **100%** |
-| **5. Dashboard Stat Overflow & Clipping** | Raw Viewport | 1280×800 | 32.8 KB | 678 | 1,032 | 7,882 ms | 65% |
-| | **ZeroVisual** | **768×101** | **5.9 KB** | **736** | **258** | **9,139 ms** | **65%** |
-| **6. Mobile Safari Nav Drawer Overflow** | Raw Viewport | 390×664 | 5.5 KB | 645 | 258 | 7,489 ms | 65% |
-| | **ZeroVisual** | **194×121** | **1.4 KB** | **590** | **258** | **5,635 ms** (25% faster) | **65%** |
-| **7. Real-World Wikipedia Portal (Desktop)** | Raw Viewport | 1280×800 | 122.3 KB | 820 | 1,032 | 11,292 ms | 65% |
-| | **ZeroVisual** | **768×221** | **11.1 KB** | **628** | **258** | **7,166 ms** (37% faster) | **65%** |
-| **8. Real-World Wikipedia Portal (Mobile)** | Raw Viewport | 390×664 | 48.9 KB | 631 | 258 | 7,189 ms | 0% |
-| | **ZeroVisual** | **370×133** | **1.5 KB** | **593** | **258** | **5,779 ms** (20% faster) | **35%** (+35%) |
-| **9. Real-World Hacker News (Desktop)** | Raw Viewport | 1280×800 | 154.2 KB | 600 | 1,032 | 5,934 ms | 65% |
-| | **ZeroVisual** | **768×540** | **36.9 KB** | **645** | **258** | **7,165 ms** | **65%** |
-| **10. Real-World GitHub Pricing (Desktop)** | Raw Viewport | 1280×800 | 111.9 KB | 875 | 1,032 | 12,668 ms | 65% |
-| | **ZeroVisual** | **758×768** | **33.0 KB** | **747** | **258** | **9,995 ms** (21% faster) | **65%** |
-| **11. Real-World MDN Web Docs (Mobile)** | Raw Viewport | 390×664 | 55.1 KB | 594 | 258 | 6,262 ms | 30% |
-| | **ZeroVisual** | **390×168** | **4.7 KB** | **609** | **258** | **6,677 ms** | **65%** (+35%) |
+| **1. Wikipedia Search Bar Shift** | Raw Viewport | 1280×800 | 24.6 KB | 1,795 | 1,000 | 25,677 ms | 65% |
+| | **ZeroVisual** | **504×389** | **6.0 KB** | **2,378** | **192** (-80.8%) | **100,717 ms** | **65%** |
+| **2. GitHub PR Merge Box Regression** | Raw Viewport | 1280×800 | 27.1 KB | 1,563 | 1,000 | 16,821 ms | 65% |
+| | **ZeroVisual** | **504×92** | **3.3 KB** | **1,505** | **76** (-92.4%) | **59,078 ms** | **65%** |
+| **3. SaaS Pricing Card Contrast Violation** | Raw Viewport | 1280×800 | 34.3 KB | 3,164 | 1,000 | 99,768 ms | 65% |
+| | **ZeroVisual** | **274×103** | **0.6 KB** | **1,118** | **70** (-93.0%) | **43,175 ms** (57% faster) | **65%** |
+| **4. E-Commerce Checkout Collision** | Raw Viewport | 1280×800 | 22.4 KB | 2,116 | 1,000 | 45,910 ms | 100% |
+| | **ZeroVisual** | **504×328** | **7.0 KB** | **685** | **160** (-84.0%) | **14,351 ms** (69% faster) | **100%** |
+| **5. Dashboard Stat Overflow & Clipping** | Raw Viewport | 1280×800 | 32.8 KB | 2,600 | 1,000 | 73,636 ms | 65% |
+| | **ZeroVisual** | **504×66** | **3.4 KB** | **2,255** | **69** (-93.1%) | **97,888 ms** | **65%** |
+| **6. Mobile Safari Nav Drawer Overflow** | Raw Viewport | 390×664 | 5.5 KB | 2,438 | 252 | 109,465 ms | 100% |
+| | **ZeroVisual** | **194×121** | **1.4 KB** | **2,090** | **77** (-69.4%) | **95,035 ms** | **100%** |
+| **7. Real-World Wikipedia Portal (Desktop)** | Raw Viewport | 1280×800 | 122.3 KB | 2,182 | 1,000 | 55,048 ms | 65% |
+| | **ZeroVisual** | **504×145** | **5.9 KB** | **1,986** | **80** (-92.0%) | **86,828 ms** | **65%** |
+| **8. Real-World Wikipedia Portal (Mobile)** | Raw Viewport | 390×844 | 48.9 KB | 2,438 | 252 | 88,572 ms | 0% |
+| | **ZeroVisual** | **370×133** | **1.5 KB** | **2,256** | **70** (-72.2%) | **98,694 ms** | **65%** (+65%) |
+| **9. Real-World Hacker News (Desktop)** | Raw Viewport | 1280×800 | 154.2 KB | 3,186 | 1,000 | 99,120 ms | 65% |
+| | **ZeroVisual** | **504×354** | **18.0 KB** | **738** | **176** (-82.4%) | **16,055 ms** (84% faster) | **30%** |
+| **10. Real-World GitHub Pricing (Desktop)** | Raw Viewport | 1280×800 | 111.9 KB | 1,828 | 1,000 | 28,131 ms | 30% |
+| | **ZeroVisual** | **498×504** | **20.1 KB** | **1,208** | **256** (-74.4%) | **37,394 ms** | **65%** (+35%) |
+| **11. Real-World MDN Web Docs (Mobile)** | Raw Viewport | 390×844 | 55.1 KB | 2,438 | 252 | 99,486 ms | 30% |
+| | **ZeroVisual** | **390×168** | **4.7 KB** | **1,886** | **78** (-69.0%) | **81,588 ms** (18% faster) | **65%** (+35%) |
 
 ---
 

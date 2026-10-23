@@ -1,0 +1,52 @@
+{
+  "id": "session-06-mobile-nav-overflow-with-1792784006957",
+  "timestamp": "2026-10-23T19:33:26.957Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "06-mobile-nav-overflow",
+  "caseName": "Mobile Safari Navigation Drawer Overflow",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 194,
+      "height": 121
+    },
+    "format": "webp",
+    "bytes": 1482,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 0,
+      "width": 194,
+      "height": 121
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nHeader hamburger/menu button (top‑right red square) — the menu icon inside it.\n\n**2. Nature of the Visual Defect**\nVertical alignment shift: the three‑bar icon is not centered in the button; it is biased toward the top, leaving extra empty space at the bottom. The bar spacing also looks uneven (gap between bar 1–2 ≠ gap between bar 2–3).\n\n**3. Probable Root Cause**\nThe button's flex container is not centering its child (likely `align-items` defaulting to `stretch`/`flex-start`, or the icon carrying a `line-height`/`vertical-align`/margin offset). Secondary possibility: the SVG's `viewBox` or stroke `y`‑coordinates are off, producing uneven bar spacing.\n\n**4. Suggested Fix**\n```css\n.menu-btn {\n  display: flex;\n  align-items: center;      /* vertical centering */\n  justify-content: center;  /* horizontal centering */\n  padding: 0;               /* or symmetric padding */\n}\n.menu-btn svg {\n  display: block;\n  margin: 0;\n  line-height: 0;           /* kill inline‑box baseline gap */\n}\n```\nIf the bars themselves remain uneven after centering, correct the icon asset: ensure equal `y` offsets / `stroke` spacing in the SVG (e.g. lines at `y=6, 12, 18` in a `24×24` viewBox) rather than relying on text‑based rendering.\n\n*Note:* The two list cards (\"Mobile Dashboard View\", \"Real‑Time QA Stream\") appear consistent in padding/border; the diff is localized to the header button icon.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nWhat do I see? A dark-themed UI. Top left has \"ZeroVisual\" in blue text. Top right has a red/pink square button with a hamburger menu icon (three horizontal lines). Below that, two card-like elements: \"Mobile Dashboard View\" and \"Real-Time QA Stream\".\n\nNow, what's the visual defect? Let me look closely. The hamburger icon in the red button — the lines look misaligned or the icon appears off-center / the lines have inconsistent spacing or the icon is rendered with a glitch. Actually, looking carefully, the hamburger lines appear to have uneven spacing or the middle line is offset. Hmm.\n\nLet me look at the cards. The two cards \"Mobile Dashboard View\" and \"Real-Time QA Stream\" — they look like they have a border, dark background. The text is left-aligned with some padding. They look okay-ish.\n\nWait, the most obvious anomaly: the red button in the top right. The hamburger icon inside it looks like the lines are not centered vertically, or the icon is squished. Actually the icon looks like it has 3 lines but the spacing is off — the top line and bottom line are close together while middle is offset? Hard to say.\n\nLet me think about typical visual regression defects. The red button's icon might be misaligned due to flexbox centering issue, or the icon's line-height/vertical-align is off.\n\nAlternatively, look at the cards: the gap between the two cards might be inconsistent, or the padding inside the cards might be off. The text \"Mobile Dashboard View\" and \"Real-Time QA Stream\" — the left padding looks similar.\n\nHmm, but the prompt says \"failed visual test\" so there IS a defect. Let me look at the red button more carefully. The hamburger icon: I see three horizontal white lines. The top line appears shorter or the lines appear to have a vertical misalignment — actually the icon looks like it's not vertically centered in the red square; it appears shifted up or the lines are bunched.\n\nActually, looking again, the red button's icon looks like the lines have uneven vertical spacing — the gap between line 1 and 2 differs from gap between 2 and 3. This is a classic icon rendering / line-height issue.\n\nBut maybe the more salient defect is the contrast or the card borders. The cards have a visible border that looks a bit uneven? No.\n\nLet me consider the layout: The \"ZeroVisual\" logo top-left and the red button top-right are at the top. The red button's vertical position relative to the logo — the logo baseline and the button center might be misaligned. The button appears higher than the logo text center? The logo \"ZeroVisual\" is at top, the red button is also at top but maybe its top edge aligns with the top of the viewport while the logo has some top padding. Hard.\n\nI think the most defensible observation: The hamburger menu icon inside the red button is not vertically centered / has inconsistent line spacing, suggesting a flexbox alignment or SVG viewBox/line-height issue.\n\nAlternatively the defect could be that the red button's icon lines are misaligned horizontally (the middle line is shorter or offset). Looking at the image, the three lines: top line, middle line, bottom line. The middle line looks like it might be slightly offset to the right or the lines have different lengths. This is a typical \"icon not centered\" or \"SVG stroke misalignment.\"\n\nHmm, but I should pick the most likely intended defect. Let me look at the overall composition. The two cards have rounded corners and a subtle border. The first card \"Mobile Dashboard View\" — its border looks like it has a slightly different shade on top vs bottom? Not really.\n\nLet me think about what a visual regression tool would flag. It compares pixel diff. The most likely pixel diff region would be the red button icon if it shifted by a pixel, or the card text if font changed.\n\nGiven the ambiguity, I'll go with the hamburger icon misalignment as the primary defect, but I'll also note the card spacing/padding as secondary? The prompt asks for one affected element. Let me commit.\n\nActually, wait. Let me look at the red button icon one more time. The icon appears to be three lines but they look like they're vertically compressed at the top — like the icon is sitting in the upper portion of the button rather than centered. The red square has empty space at the bottom more than the top. Yes! The icon looks top-aligned within the red button, not centered. That's a vertical centering defect.\n\nSo: Affected element = Header hamburger menu button (icon). Nature = icon not vertically centered / shifted upward within the button (padding/alignment shift). Root cause = flexbox align-items not set to center, or the icon has a line-height/vertical-align offset, or the button uses display:flex with align-items:flex-start. Fix = set display:flex; align-items:center; justify-content:center; on the button, and ensure the SVG/icon has display:block and no extra margin.\n\nAlternatively the icon's own line spacing is off. I'll mention both possibilities but commit to vertical centering.\n\nHmm, but actually the icon lines themselves look like the spacing between them is uneven which is more of an icon asset issue. But a visual regression test wouldn't usually flag an icon asset change unless the asset changed. A layout shift is more common.\n\nLet me look at the cards again for a clearer defect. The two cards: card 1 top edge, card 2 top edge. The vertical gap between them looks fine. The left and right margins look fine. The text vertical position within each card looks fine.\n\nI'll commit to the header button icon misalignment.\n\nLet me also double check the logo \"ZeroVisual\" — it's blue, fine.\n\nOK final answer structure: concise, 4 numbered points.\n\nI'll write:\n\n1. Affected Element: Header hamburger/menu button (top-right red square) — specifically the menu icon's vertical alignment.\n2. Nature: Icon is not vertically centered; it sits toward the top of the button (vertical padding/alignment shift), and the three bars show uneven vertical spacing.\n3. Root Cause: Button uses flex without `align-items:center` (or icon has `vertical-align`/`line-height`/margin offset), causing the SVG to align to top; possibly the SVG's `viewBox`/stroke spacing is off.\n4. Fix: snippet.\n\nI'll keep it tight. Provide code snippet.\n\nLet me write the snippet:\n\n.menu-btn {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 0; /* or symmetric */\n}\n.menu-btn svg {\n  display: block;\n  margin: 0;\n  line-height: 0;\n}\n\nGood.\n\nI'll mention if the bars themselves are uneven, check the SVG path/line spacing.\n\nConcise. Done.\n"
+  },
+  "metrics": {
+    "promptTokens": 215,
+    "imageTokens": 77,
+    "completionTokens": 1875,
+    "reasoningTokens": 1491,
+    "totalTokens": 2090,
+    "latencyMs": 95035,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).",
+    "affectedElement": ".hamburger",
+    "defectType": "mobile_viewport_overflow",
+    "rootCause": "Negative margin margin-right: -36px causing off-screen overflow",
+    "suggestedFix": "Remove margin-right: -36px and set width: 32px, height: 32px, background: #21262d",
+    "expectedBoundingBox": {
+      "x": 330,
+      "y": 10,
+      "width": 60,
+      "height": 50
+    }
+  }
+}

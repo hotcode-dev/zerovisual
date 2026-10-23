@@ -1,0 +1,52 @@
+{
+  "id": "session-05-dashboard-stat-overflow-with-1792783802460",
+  "timestamp": "2026-10-23T19:30:02.460Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 66
+    },
+    "format": "webp",
+    "bytes": 3452,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 8,
+      "y": 109,
+      "width": 1264,
+      "height": 166
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nThe metric value node inside the **\"ACTIVE AGENTS\"** KPI card — the `12,450` figure (`.kpi-card__value` / `.metric-value`).\n\n**2. Nature of the Visual Defect**\nColor / semantic‑contrast inconsistency. The value is rendered in **danger‑red/pink** (`≈ #ff4d6d`) while the three sibling cards (`94.2%`, `34 KB`, `$0.0002`) render in neutral white. This directly contradicts the card's own trend line, which is a **positive green** `↑ 34% this week`. A red value + green \"up\" indicator is a broken visual state (reads as \"alerting\" when the metric is healthy). No padding, margin, overlap, or baseline shift is present — the card geometry matches the others.\n\n**3. Probable Root Cause**\nA conditional/semantic class or CSS variable is mis‑applied to this one card's value, overriding the neutral token. Most likely one of:\n- A JS‑driven status class (e.g. `data-status=\"alert\"` → `.metric-value--danger`) that fired on the wrong metric or on a stale threshold.\n- A leftover `:hover` / `.is-active` / `.selected` state leaking into the snapshot.\n- A theme token `--metric-value-color` resolving to the error color for this instance instead of `--text-primary`.\n\n**4. Suggested Fix**\nDecouple the value color from the trend color: the value should always use the neutral token; only the delta line carries semantic color.\n\n```css\n/* Value is always neutral — never semantic */\n.kpi-card__value {\n  color: var(--text-primary);   /* white */\n  font-weight: 700;\n}\n\n/* Semantic color lives ONLY on the trend indicator */\n.kpi-card__delta--up   { color: var(--success); }  /* green */\n.kpi-card__delta--down { color: var(--danger);  }  /* red   */\n\n/* Remove the stray danger binding on the value */\n.kpi-card__value--danger { color: var(--text-primary); } /* or delete the",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look at the screenshot carefully.\n\nLooking at the image: There are four cards in a row on a dark background. Each card has a label at top, a big number, and a small green sub-label.\n\nCard 1: \"TOKENS SAVED\" / \"94.2%\" / \"↑ 4.1% vs avg\"\nCard 2: \"ACTIVE AGENTS\" / \"12,450\" / \"↑ 34% this week\"\nCard 3: \"PAYLOAD P95\" / \"34 KB\" / \"↓ 18% reduced\"\nCard 4: \"COST PER OFF\" / \"$0.0002\" / \"Zero API Keys\"\n\nNow what's the visual defect? Let me look carefully. The numbers have different colors. Card 1 \"94.2%\" is white. Card 2 \"12,450\" is RED/pink. Card 3 \"34 KB\" is white. Card 4 \"$0.0002\" is white.\n\nSo the \"ACTIVE AGENTS\" value is rendered in red/pink while all others are white. That's a color inconsistency. But is that a defect? Possibly the red indicates a negative trend? But the sub-label says \"↑ 34% this week\" which is green (positive). So having the number red while the trend is green/positive is inconsistent. Actually wait, maybe the red is intentional for \"active agents\" as a highlight? Hard to say.\n\nLet me look at alignment. The cards appear to be the same height. The text baselines: top labels aligned. Big numbers: \"94.2%\" baseline, \"12,450\" baseline, \"34 KB\", \"$0.0002\". They look roughly aligned. The sub-labels aligned.\n\nHmm, but look at the vertical position of the big numbers. In card 1, \"94.2%\" appears slightly higher? Let's look. Card 1 number top is around same as card 2. Card 3 \"34 KB\" looks like it's positioned a bit higher than the others? Actually \"34 KB\" baseline looks higher than \"12,450\" baseline. Let's look: card 2 \"12,450\" is large and its baseline is lower. Card 3 \"34 KB\" baseline appears higher (the text sits higher in the card). Card 4 \"$0.0002\" baseline also maybe higher.\n\nHmm, this is subtle. Let's look at the sub-labels: card 1 \"↑ 4.1% vs avg\" green, card 2 \"↑ 34% this week\" green, card 3 \"↓ 18% reduced\" green, card 4 \"Zero API Keys\" green. They look aligned.\n\nThe most striking anomaly is the red color on \"12,450\". In a dashboard, metric values are typically uniform color (white). The red on one card is likely a CSS class misapplication or a conditional color rule that fired incorrectly (e.g., a \"danger\"/\"alert\" class applied to the wrong element, or a hover state, or a data-driven color that mapped to red).\n\nBut wait, maybe the intended design is that the number color reflects the trend direction: green up = good, but here they used red for up? No, the sub-labels are green for up. So the big number being red contradicts.\n\nAlternatively, maybe the defect is that the \"12,450\" is overflowing or the font weight differs. It looks bolder? Hard to tell.\n\nLet me think about typical visual regression test failures. The most common \"obvious\" defect a QA would flag: color mismatch on one metric value. The red \"12,450\" stands out against white others. That's a contrast/color inconsistency.\n\nBut also consider: maybe the red is actually correct for \"active agents\" because it's a \"hot\" metric? Unlikely in a regression test; the baseline would have it white.\n\nLet me look at vertical alignment more carefully by comparing the top edges of the big numbers. Card 1 \"94.2%\" top ~ y=30. Card 2 \"12,450\" top ~ y=20 (it's bigger so extends higher). Card 3 \"34 KB\" top ~ y=30. Card 4 \"$0.0002\" top ~ y=30. The \"12,450\" is larger font? It looks bigger than \"94.2%\"? \"94.2%\" width vs \"12,450\" width. \"12,450\" appears larger in font size than the others! Look: \"94.2%\" digits height vs \"12,450\" digits height. \"12,450\" looks taller. Hmm. And \"34 KB\" looks smaller. \"$0.0002\" looks medium.\n\nActually the font sizes might be auto-fit based on content length (like a \"fit text\" component). \"12,450\" is 6 chars, \"94.2%\" is 5 chars, \"34 KB\" is 5 chars, \"$0.0002\" is 7 chars. If auto-fit, longer text = smaller font. But \"12,450\" (6 chars) is bigger than \"$0.0002\" (7 chars)? That's consistent with auto-fit (fewer chars = bigger). And \"34 KB\" (5 chars incl space) should be similar to \"94.2%\" (5 chars). They look similar size. OK so font size auto-fit is plausible and not a defect.\n\nSo the real anomaly remains the color.\n\nLet me look at the red color: it's a pinkish red (#ff4d6d-ish). The sub-labels are green (#2dd4bf-ish teal). The red number with green sub-label is a semantic mismatch: a positive trend (↑ 34%) should not have a red (negative/danger) value color.\n\nThus: Affected element: the metric value in the \"ACTIVE AGENTS\" card (the \"12,450\" figure). Nature: color/contrast inconsistency — value rendered in danger-red instead of neutral white, conflicting with the positive green trend indicator. Root cause: a conditional CSS class (e.g., .metric-value--danger or a data-status=\"alert\") incorrectly applied to this card's value, or a CSS variable / theme token for the value color resolved to the error color for this instance (maybe a leftover :hover or .active state, or a JS-driven class binding that mis-mapped the metric). Suggested fix: ensure the value color is bound to a neutral token (var(--metric-value-color)) and only the trend indicator carries semantic color; remove the stray danger class.\n\nProvide code snippet.\n\nI'll keep concise.\n\nLet me double check there's no overlap or padding shift. The cards look evenly spaced. No overlap. Padding looks consistent. So color is the main defect.\n\nI'll write the answer with the four points.\n"
+  },
+  "metrics": {
+    "promptTokens": 207,
+    "imageTokens": 69,
+    "completionTokens": 2048,
+    "reasoningTokens": 1561,
+    "totalTokens": 2255,
+    "latencyMs": 97888,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

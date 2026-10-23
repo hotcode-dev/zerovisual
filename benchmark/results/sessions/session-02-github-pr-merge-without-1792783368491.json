@@ -1,0 +1,46 @@
+{
+  "id": "session-02-github-pr-merge-without-1792783368491",
+  "timestamp": "2026-10-23T19:22:48.492Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "02-github-pr-merge",
+  "caseName": "GitHub Pull Request Merge Card Regression",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 27720,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\n\"Merge pull request\" button\n\n**2. Nature of the Visual Defect:**\nUnintended dashed orange outline/border surrounding the button.\n\n**3. Probable Root Cause in CSS or layout:**\nAn incorrect or persistent `outline` or `border` CSS property is being applied to the button. This is likely an unintended focus state (e.g., `:focus` or `:focus-visible`) or a leftover debug style.\n\n**4. Suggested Fix or code snippet:**\nRemove the outline or border from the button's CSS, or ensure it only applies under specific, intended conditions.\n\n```css\n/* If it's an unwanted focus ring */\n.merge-button:focus {\n  outline: none; /* Or use a more subtle box-shadow instead */\n}\n\n/* If it's a leftover border */\n.merge-button {\n  border: none;\n}\n```",
+    "reasoning": "1.  **Analyze the image:** The screenshot shows a dark-themed UI, likely a GitHub pull request interface.\n2.  **Identify the defect:** There is a prominent, dashed orange border surrounding the \"Merge pull request\" button. This is not a standard UI element for a button in this context; it looks like a debug outline, a focus ring that shouldn't be visible, or a CSS border applied to the wrong element.\n3.  **Determine the affected element:** The \"Merge pull request\" button.\n4.  **Determine the nature of the defect:** Unintended visual outline/border (dashed orange line).\n5.  **Determine the probable root cause:** A CSS `outline` or `border` property is being applied to the button, likely due to a focus state (e.g., `:focus` or `:focus-visible`) that is persisting or being triggered incorrectly, or a debug class was left in the code.\n6.  **Formulate the suggested fix:** Remove the outline/border or adjust the focus styles.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 425,
+    "reasoningTokens": 228,
+    "totalTokens": 1563,
+    "latencyMs": 16821,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.",
+    "affectedElement": ".btn-merge",
+    "defectType": "button_styling_regression",
+    "rootCause": "Incorrect CSS rule overriding padding, font-size, and background color",
+    "suggestedFix": "Restore background: #238636, padding: 9px 18px, font-size: 14px, border-radius: 6px",
+    "expectedBoundingBox": {
+      "x": 550,
+      "y": 110,
+      "width": 280,
+      "height": 90
+    }
+  }
+}

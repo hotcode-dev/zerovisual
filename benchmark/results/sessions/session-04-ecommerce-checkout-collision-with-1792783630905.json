@@ -1,0 +1,52 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-with-1792783630905",
+  "timestamp": "2026-10-23T19:27:10.905Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 328
+    },
+    "format": "webp",
+    "bytes": 7156,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 388,
+      "y": 247,
+      "width": 504,
+      "height": 328
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name**\n\"Pay Now\" Button (Green CTA at the bottom of the Order Summary card)\n\n**2. Nature of the Visual Defect**\nText overlap / Collision. The centered text (\"Pay $53.41 Now\") is overlapping with the right-aligned text (\"$53.41\").\n\n**3. Probable Root Cause in CSS or layout**\nInsufficient horizontal padding on the button container, or a lack of spacing (e.g., `gap` or `margin`) between the text elements inside the button. The button width may also be constrained too tightly.\n\n**4. Suggested Fix or code snippet**\nAdd horizontal padding to the button and ensure proper spacing between the text elements using Flexbox.\n\n```css\n.pay-button {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 12px 24px; /* Increase horizontal padding */\n  gap: 16px; /* Add space between elements */\n}\n```",
+    "reasoning": "The user wants a visual regression analysis of the provided screenshot.\n1.  **Affected Element:** The green button at the bottom of the \"Order Summary\" card.\n2.  **Nature of Defect:** The text inside the button is overlapping. Specifically, \"Pay $53.41 Now\" is colliding with the right-aligned \"$53.41\".\n3.  **Root Cause:** The button likely lacks sufficient horizontal padding, or the text elements inside it are not properly spaced using flexbox (e.g., missing `gap` or `margin`). The container might also be too narrow for the content.\n4.  **Suggested Fix:** Add padding to the button, or use flexbox properties to space out the text elements.\n"
+  },
+  "metrics": {
+    "promptTokens": 298,
+    "imageTokens": 160,
+    "completionTokens": 387,
+    "reasoningTokens": 159,
+    "totalTokens": 685,
+    "latencyMs": 14351,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

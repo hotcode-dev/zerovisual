@@ -1,0 +1,52 @@
+{
+  "id": "session-11-real-mdn-search-mobile-with-1792784697981",
+  "timestamp": "2026-10-23T19:44:57.981Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "11-real-mdn-search-mobile",
+  "caseName": "Real-World MDN Web Docs (Mobile 390×844) Search Contrast Failure",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 168
+    },
+    "format": "webp",
+    "bytes": 4774,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nHero banner CTA graphic — the right \"hand/cursor\" icon and its backing rectangle inside the WorkOS \"Build faster.\" ad module (the light‑lavender square behind the right pointer).\n\n**2. Nature of the Visual Defect**\nAn unintended solid light‑lavender block is rendered behind the right cursor, overlapping it and breaking the left/right symmetry (left cursor sits cleanly on the blue field, right cursor sits on a stray box). Reads as a mis‑colored / mis‑positioned element or a leaked hover/focus state — not part of the intended composition.\n\n**3. Probable Root Cause**\n- A `background-color` (or a failed `background-image` falling back to a default) applied to the cursor's wrapper / drop‑target card that should be `transparent`.\n- OR a `:hover` / `:focus-within` / `:active` state on that element is active at capture time (test‑harness pointer position), painting the lavender fill.\n- OR an absolutely‑positioned decorative element with the wrong `background` and no `z-index` containment, bleeding over the cursor.\n\n**4. Suggested Fix**\nMake the wrapper transparent, kill the stray state, and guard the background image:\n\n```css\n/* The cursor / drop-target wrapper should have no fill */\n.hero-cursor,\n.hero-cursor::before {\n  background: transparent;          /* remove lavender block */\n  background-image: none;           /* or correct the asset URL */\n}\n\n/* Ensure no hover/focus fill leaks into the screenshot */\n.hero-cursor:hover,\n.hero-cursor:focus,\n.hero-cursor:focus-within {\n  background: transparent;\n  outline: none;\n}\n\n/* If the lavender box is a separate decorative node, hide/fix it */\n.hero-cursor__card {\n  background: transparent;          /* was: #d8d0f0 */\n  /* or: display: none; if it's a leftover placeholder */\n}\n```\n\n**Verification:** Re‑run the snapshot with the pointer parked outside the banner (or with `:hover`/`:focus` suppressed via `page.emulateMedia` / forced‑states) and confirm both cursors render on the uniform blue field with no backing rectangle.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot and identify the defect.\n\nLet me look at the image. There's a blue banner with \"WorkOS\" logo top left, \"Build faster.\" text, and two hand cursor icons. The right hand cursor is sitting on top of a light purple/lavender rectangular block. There's an \"AD\" badge in the bottom right.\n\nWhat's the visual defect here? Let me look carefully. The right hand cursor appears to be overlapping or sitting on a light purple rectangle that looks out of place. This light purple block looks like a placeholder or a background element that's mispositioned, or perhaps it's a hover state / focus ring that's rendering incorrectly.\n\nActually, looking more carefully: the left hand cursor is on the blue background. The right hand cursor is on a light lavender/purple square. This square looks like it could be a mis-rendered element — perhaps a background image that failed to load, or a placeholder box, or a hover highlight that's the wrong color/size.\n\nHmm, but in visual regression testing, the \"defect\" is usually a difference from baseline. Let me think about what's visually wrong. The light purple rectangle behind the right cursor looks like an unintended background block. It could be:\n- A missing background image showing a fallback color\n- An element with wrong background color\n- A hover/focus state that shouldn't be there\n- An overlap issue where the cursor icon's container has a background that's bleeding through\n\nActually the most likely interpretation: the right cursor icon has a background box (light purple) that the left one doesn't have, OR the light purple box is a separate element that's mispositioned/overlapping.\n\nLet me look at the layout. The two cursors are connected by horizontal lines (like a \"drag\" or \"swipe\" motion graphic). The right cursor sits on a purple square. This purple square might be a \"drop zone\" or a card that's supposed to be there but is the wrong color, OR it's an element that's overlapping the cursor incorrectly.\n\nGiven the context of \"Build faster\" and WorkOS, this is likely a marketing hero banner. The two hands might represent a \"handoff\" or \"drag and drop\" animation. The purple square could be a card/element that the right hand is \"placing\" or \"grabbing.\"\n\nIn a visual regression failure, the defect is probably that this purple square is mispositioned, wrong size, wrong color, or it's an element that shouldn't be visible (e.g., a placeholder that didn't get replaced, or a background that's showing through).\n\nLet me think about the most plausible QA finding. The light purple rectangle looks like it has a hard edge and is positioned behind the right cursor. It looks like a background element with the wrong color or a missing image fallback. The contrast between the purple and the blue is jarring.\n\nI'll frame it as: the right cursor's container / the \"card\" element behind it is rendering with an incorrect background color (light lavender instead of transparent or matching the design), causing a visible block that overlaps the cursor and breaks the visual composition. Alternatively it's a mispositioned element.\n\nActually, let me look at the position. The purple box is roughly square, positioned to the right, behind the right hand. The left hand has no such box. So the asymmetry is the defect. In the baseline, presumably both hands would be on the blue background, OR both would have a consistent treatment. The purple box is anomalous.\n\nRoot cause candidates:\n- A `background-color` applied to a wrapper that should be transparent\n- A `:hover` or `:focus` state leaking into the screenshot (e.g., the test harness's mouse position triggered a hover state on the right element)\n- A missing background image with a fallback color\n- An element with `position: absolute` that's mispositioned\n\nThe hover-state theory is actually quite strong for visual regression: the screenshot tool's cursor or a simulated hover could trigger a hover background on one element. But the purple box is large and square, more like a card.\n\nHmm, but the right hand IS a cursor icon (a hand pointer graphic), not the actual mouse. So the purple box is part of the design graphic. So it's a design element that's wrong.\n\nLet me settle on a clear, defensible answer. I'll say:\n\n1. Affected element: The right \"hand/cursor\" graphic's backing card / the drop-target rectangle in the hero banner (WorkOS \"Build faster\" ad).\n2. Nature of defect: An unintended light-lavender background block is rendered behind the right cursor, overlapping it and breaking symmetry with the left cursor; looks like a mispositioned/mis-colored element or a hover/focus state artifact.\n3. Root cause: A background-color or background-image fallback on the cursor's wrapper / a `:hover`/`:focus-within` state that's active during capture; or an absolutely-positioned element with wrong `background` and missing `transparent`.\n4. Fix: ensure the wrapper background is transparent, remove the stray hover state, or correct the background image URL; provide snippet.\n\nI'll keep it concise and direct as instructed. Provide a code snippet.\n\nLet me make the snippet concrete. I'll show a fix that sets the element's background to transparent and ensures no hover state, plus a note about background-image fallback.\n\nI'll write the response in the four numbered sections, concise.\n"
+  },
+  "metrics": {
+    "promptTokens": 216,
+    "imageTokens": 78,
+    "completionTokens": 1670,
+    "reasoningTokens": 1172,
+    "totalTokens": 1886,
+    "latencyMs": 81588,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.",
+    "affectedElement": "input[type=\"search\"]",
+    "defectType": "contrast_violation",
+    "rootCause": "White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)",
+    "suggestedFix": "Restore text color to #1b1b1b, restore default input padding, and remove #ef4444 border",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 496,
+      "width": 390,
+      "height": 168
+    }
+  }
+}

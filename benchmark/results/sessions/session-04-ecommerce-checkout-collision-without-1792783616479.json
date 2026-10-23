@@ -1,0 +1,46 @@
+{
+  "id": "session-04-ecommerce-checkout-collision-without-1792783616479",
+  "timestamp": "2026-10-23T19:26:56.479Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "04-ecommerce-checkout-collision",
+  "caseName": "E-Commerce Checkout Total & Button Collision",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 22948,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`Order Summary` card → bottom **Total Due row + CTA button** (\"Pay $53.41 Now\").\n\n**2. Nature of the Visual Defect**\nElement overlap / contrast violation. The green CTA background has expanded to fill the entire total row, so the dark \"Total Due\" label (left) and the dark \"$53.41\" price (right) are now rendered *on top of* the green button background, colliding with the centered white button label. Result: black-on-green text (failed contrast) and three text nodes crammed into one band instead of a clean \"label … price\" row above a separate button.\n\n**3. Probable Root Cause**\nThe total row and the button are sharing one flex/block container where the button's `background-color` (or a `::before`/full-width pseudo-element) bleeds across the row, or the button is `position:absolute` / `width:100%` overlapping the total row. The total row lost its own (transparent/white) background and vertical separation, so the green fill and the row's text stack in the same box.\n\n**4. Suggested Fix**\nKeep the total row and the CTA as two distinct stacked elements; give the row a neutral background and let the button own the green fill.\n\n```css\n.order-summary__total-row {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  background: transparent;   /* was inheriting/overlapped by green */\n  padding: 8px 0;\n  color: #111;\n}\n.order-summary__cta {\n  display: block;\n  width: 100%;\n  margin-top: 8px;           /* separate from the total row */\n  padding: 12px 16px;\n  background: #10b981;\n  color: #fff;\n  text-align: center;\n  border: none;\n}\n```\nEnsure the button is **not** absolutely positioned and that no full-width green background is applied to the total row container. Re-run the snapshot after the change.",
+    "reasoning": "The screenshot shows an \"Order Summary\" card. The bottom row contains a green button/area with \"Total Due\", \"Pay $53.41 Now\", and \"$53.41\". The text elements are overlapping or crammed together. Specifically, \"Total Due\" (black text) and \"Pay $53.41 Now\" (white text) and \"$53.41\" (black text) are all on the same green background row, but they appear to be overlapping or misaligned. The \"Total Due\" label is black on green (poor contrast), the button text \"Pay $53.41 Now\" is white, and the price \"$53.41\" is black on green. It looks like the total row and the button have been merged/overlapped. The green button background extends across the entire row, and the \"Total Due\" label and the price are sitting on top of the green button background, causing contrast issues and overlap.\n\nLooking carefully: The green rectangle spans the full width. Inside it, left-aligned \"Total Due\" in black, center \"Pay $53.41 Now\" in white, right \"$53.41\" in black. This is a layout defect where the button (which should be a separate CTA) has expanded to full width and the total row content is overlapping it, OR the total row's background became green and the button text is overlapping.\n\nThe nature: element overlap / contrast violation. The \"Total Due\" label and total price are rendered in dark text on a green background (the button's background), indicating the button's background has bled into the total row, or the total row and button are stacked/overlapping.\n\nProbable root cause: The CTA button and the total row are in the same flex container without proper separation; the button's background-color or the row's background is applied incorrectly, or the button is absolutely positioned / has width:100% overlapping the total row. Possibly the total row and button share a container where the button's green background covers the row.\n\nSuggested fix: Separate the total row from the button; ensure the button is its own element with proper padding and the total row has transparent/white background. Use flex with space-between for the total row, and place the button below it.\n\nLet me write concisely.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 978,
+    "reasoningTokens": 497,
+    "totalTokens": 2116,
+    "latencyMs": 45910,
+    "accuracyScore": 100
+  },
+  "groundTruth": {
+    "defect": "The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.",
+    "affectedElement": ".total-row and .btn-pay",
+    "defectType": "layout_element_collision",
+    "rootCause": "margin-bottom: -32px on .total-row causing overlapping layout collision",
+    "suggestedFix": "Remove negative margin and set margin-bottom: 24px",
+    "expectedBoundingBox": {
+      "x": 420,
+      "y": 440,
+      "width": 440,
+      "height": 100
+    }
+  }
+}

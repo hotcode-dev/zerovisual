@@ -1,0 +1,46 @@
+{
+  "id": "session-08-real-wikipedia-mobile-without-1792784237426",
+  "timestamp": "2026-10-23T19:37:17.426Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "08-real-wikipedia-mobile",
+  "caseName": "Real-World Wikipedia Portal (Mobile 390×844) Language Switcher Displacement",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 390,
+      "height": 664
+    },
+    "format": "png",
+    "bytes": 50042,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot and identify a visual defect.\n\nLet me examine the screenshot. It's a Wikipedia language selection page. There's a grid of language links with article counts.\n\nLooking at the layout:\n- Row 1: English, 日本語, Deutsch\n- Row 2: Français, Русский, Español\n- Row 3: Italiano, 中文, Português\n- Row 4: Polski (only one item, left column)\n\nNow let me look at the alignment carefully. The columns appear to be a 3-column grid. Let me check the vertical alignment of the text within each cell.\n\nLooking at \"English\" / \"7,254,000+\" / \"articles\" - the text \"articles\" is on a second line.\nLooking at \"日本語\" / \"1,523,000+\" / \"記事\" - the \"記事\" appears to be on a second line but it looks misaligned vertically compared to \"articles\". Actually let me look. \"7,254,000+\" is on one line, \"articles\" below. For Japanese, \"1,523,000+\" then \"記事\" below. The vertical position of \"記事\" looks slightly higher or lower? Hard to say.\n\nLet me look at the column alignment horizontally. The three columns: English column left, Japanese column middle, Deutsch column right. The headers \"English\", \"日本語\", \"Deutsch\" - are they aligned at the same top? They look roughly aligned.\n\nHmm, but look at the second row: \"Français\", \"Русский\", \"Español\". The \"Русский\" header appears to be vertically offset - it looks like it's positioned a bit lower than \"Français\" and \"Español\"? Let me look. \"Français\" top aligns with \"Español\" top. \"Русский\" looks like it's at the same baseline actually. Hmm.\n\nWait, look more carefully. In row 2, \"Français\" and \"Español\" headers are at one vertical position, but \"Русский\" header appears slightly lower. Actually no, they look aligned.\n\nLet me look at the article counts. Row 2: \"2 785 000+\" / \"articles\", \"2 123 000+\" / \"статей\", \"2 144 000+\" / \"artículos\". The \"статей\" word appears vertically centered differently? In the French cell, \"articles\" is on the second line. In Russian cell, \"статей\" is on the second line. They look aligned.\n\nHmm, let me look at the third row: \"Italiano\" / \"1.991.000+\" / \"voci\", \"中文\" / \"1,561,000+\" / \"目 / 條目\", \"Português\" / \"1.185.000+\" / \"artigos\". The Chinese \"目 / 條目\" - the text wraps oddly. \"1,561,000+\" then \"目 / 條目\" on next line. That looks fine.\n\nNow the fourth row: \"Polski\" / \"1 711 000+\" / \"haseł\". This is in the left column only.\n\nLet me look at the horizontal alignment of the columns more carefully. The middle column \"日本語\", \"Русский\", \"中文\" - the text within appears centered. The right column \"Deutsch\", \"Español\", \"Português\" centered.\n\nHmm, what's the defect? Let me look at vertical alignment of the second-line text across columns in each row. In row 1, \"articles\" (English) baseline vs \"記事\" (Japanese) vs \"Artikel\" (Deutsch). \"Artikel\" is a single word on the second line. \"articles\" second line. \"記事\" second line. They look aligned.\n\nWait, maybe the defect is that the \"Русский\" header and its count are vertically misaligned relative to the other columns in row 2. Let me look really carefully at the pixel positions.\n\nRow 2 headers: \"Français\" y-position, \"Русский\" y-position, \"Español\" y-position. In the image, \"Français\" and \"Español\" appear at the same height. \"Русский\" appears... actually it looks like \"Русский\" is at the same height too. Hmm.\n\nLet me look at the counts in row 2: \"2 785 000+\" vs \"2 123 000+\" vs \"2 144 000+\". The \"2 123 000+\" (Russian) appears to be vertically lower than the others? Look: \"2 785 000+\" top aligns with \"2 144 000+\" top. \"2 123 000+\" looks like it's a touch lower. And \"статей\" vs \"articles\" vs \"artículos\" - \"статей\" looks lower too.\n\nHmm, this is subtle. Actually maybe the issue is the Japanese column. Look at row 1: \"日本語\" header, then \"1,523,000+\" then \"記事\". The \"記事\" appears to be vertically centered in a way that's offset. Actually in row 1, the English \"articles\" is at a certain y. The Japanese \"記事\" appears at a slightly different y - maybe higher. And Deutsch \"Artikel\" at yet another?\n\nLet me think about typical visual regression defects in such grids. A common one is that the text in cells is top-aligned vs center-aligned, causing misalignment when content has different line counts. Or a font issue with CJK characters causing line-height differences.\n\nActually, look at the Japanese \"記事\" - it's two CJK characters. The line height for CJK might differ, causing the second line to sit at a different vertical position than the Latin \"articles\" and \"Artikel\". That's a plausible root cause: differing line-height / font metrics between CJK and Latin fonts causing vertical misalignment of the wrapped second line within the grid cells.\n\nBut the question asks to identify ONE affected element and defect. Let me look for the most obvious misalignment.\n\nLet me look at row 3 middle: \"中文\" header, \"1,561,000+\", \"目 / 條目\". The \"目 / 條目\" wraps to a second line. Compare vertical position of \"voci\" (Italiano), \"目 / 條目\" (Chinese), \"artigos\" (Português). \"voci\" and \"artigos\" look aligned. \"目 / 條目\" looks aligned too maybe.\n\nHmm, I'm spending too much effort. Let me look at the overall structure. Actually, maybe the defect is the horizontal alignment of the columns themselves. Look at the left column: \"English\", \"Français\", \"Italiano\", \"Polski\" - these are left-aligned? They appear centered within their column actually. \"English\" centered, \"Français\" centered, \"Italiano\" centered, \"Polski\" centered. The middle column centered. Right column centered.\n\nWait, look at the right column headers: \"Deutsch\", \"Español\", \"Português\". And the counts \"3.159.000+\", \"2.144.000+\", \"1.185.000+\". These look centered.\n\nLet me look at vertical spacing between rows. Row 1 to row 2 gap vs row 2 to row 3 gap vs row 3 to row 4 gap. They look consistent.\n\nHmm, maybe the defect is that the \"Русский\" cell content is vertically offset because the header \"Русский\" is on the same line but the count \"2 123 000+\" is positioned lower. Let me look at the image once more in my mind. In row 2, I see \"Français\" then below \"2 785 000+\" then \"articles\". In the middle I see \"Русский\" then below \"2 123 000+\" then \"статей\". In the right \"Español\" then \"2 144 000+\" then \"artículos\". \n\nComparing the y of \"2 785 000+\" and \"2 123 000+\" and \"2 144 000+\": I think \"2 123 000+\" is slightly lower. And \"статей\" is slightly lower than \"articles\"/\"artículos\". This suggests the Russian cell's content block is shifted down, OR the Russian header \"Русский\" is shorter in height causing the count to start lower if it's vertically centered in a fixed-height cell.\n\nActually that's a strong hypothesis: if each grid cell has a fixed height and content is vertically centered (align-items: center), then a cell with a shorter header (or different font metrics) would have its content block centered differently, causing the count line to appear at a different y than sibling cells. But here all headers are single line, so centering would put them at the same y... unless the header font for Cyrillic has different line-height.\n\nHmm, but actually the headers in row 2: \""
+  },
+  "metrics": {
+    "promptTokens": 390,
+    "imageTokens": 252,
+    "completionTokens": 2048,
+    "reasoningTokens": 2049,
+    "totalTokens": 2438,
+    "latencyMs": 88572,
+    "accuracyScore": 0
+  },
+  "groundTruth": {
+    "defect": "The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.",
+    "affectedElement": "#js-lang-list-button",
+    "defectType": "button_displacement",
+    "rootCause": "Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override",
+    "suggestedFix": "Remove transform and restore opacity: 1 on #js-lang-list-button",
+    "expectedBoundingBox": {
+      "x": 10,
+      "y": 425,
+      "width": 370,
+      "height": 133
+    }
+  }
+}

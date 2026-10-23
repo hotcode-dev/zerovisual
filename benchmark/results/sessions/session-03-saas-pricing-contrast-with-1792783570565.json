@@ -1,0 +1,52 @@
+{
+  "id": "session-03-saas-pricing-contrast-with-1792783570565",
+  "timestamp": "2026-10-23T19:26:10.566Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "03-saas-pricing-contrast",
+  "caseName": "SaaS Pricing Card Contrast Violation",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 274,
+      "height": 103
+    },
+    "format": "webp",
+    "bytes": 572,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 503,
+      "y": 262,
+      "width": 274,
+      "height": 103
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`Get Pro` CTA button (label text + button surface).\n\n**2. Nature of the Visual Defect**\nContrast violation / washed‑out label. The \"Get Pro\" text is a light gray that is nearly the same luminance as the pale blue‑gray button fill, making the label barely legible. The whole control also reads as faded/disabled.\n\n**3. Probable Root Cause**\nThe button's text color (or an inherited theme token / `opacity`) resolves to a low‑contrast value against the light background. Likely one of:\n- `color` set to a light gray (e.g. `#9aa3ad`) on a light fill (`#d8e0ea`).\n- An `opacity` / `alpha` applied to the button or label.\n- A CSS variable (e.g. `--btn-text`) that should be dark/white is undefined and falling back to a light value.\n\n**4. Suggested Fix**\nIncrease label contrast and remove any unintended fade:\n\n```css\n.btn-get-pro {\n  background: #4f46e5;        /* or keep light fill but darken text */\n  color: #ffffff;             /* ≥ 4.5:1 contrast */\n  opacity: 1;                 /* ensure no fade */\n}\n/* If keeping the light fill, use a dark label instead: */\n.btn-get-pro--light {\n  background: #d8e0ea;\n  color: #1f2937;             /* dark text on light bg */\n}\n```\n\nVerify with a contrast checker (target ≥ 4.5:1 for normal text) and confirm the disabled state is not being applied to the enabled variant.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look carefully at the screenshot.\n\nWhat do I see? A button labeled \"Get Pro\" inside a container with a purple/indigo border. The button has a light grayish-blue background. The text \"Get Pro\" appears very low contrast—it's a light gray color on a light grayish-blue background. The text is barely legible. This is a classic contrast violation.\n\nLet me look more carefully. The button background is a pale blue-gray (#d8e0ea-ish). The text \"Get Pro\" is a slightly darker gray but very close in luminance to the background. The contrast ratio is likely below WCAG AA (4.5:1). The text looks washed out, almost like it's disabled or the color is wrong.\n\nPossible root causes:\n- The button text color is set to a light gray that doesn't contrast with the light background.\n- Or the button is in a disabled state but the test expects enabled state.\n- Or a CSS variable for text color is wrong / inherited incorrectly.\n- Or opacity is applied to the button making text fade.\n\nLooking at the image, the whole button looks faded—both the background and text are pale. This could be an opacity issue on the button, or the text color is too light. The text \"Get Pro\" is grayish, the background is light blue-gray. The contrast between them is poor.\n\nMost likely defect: low text contrast / color mismatch. The text color is too close to the background color.\n\nRoot cause: CSS color property for the button label is set to a value with insufficient contrast against the button's background, OR an opacity/alpha value is applied, OR a theme variable (e.g., --text-primary) resolved to a light value on a light background.\n\nSuggested fix: increase contrast—set text color to a darker shade (e.g., #1f2937 or white with darker bg), or remove opacity, or fix the CSS variable.\n\nLet me be concise and direct per instructions. Format with the 4 numbered points.\n\nI'll provide a code snippet.\n\nAffected element: \"Get Pro\" button (CTA button).\n\nNature: Contrast violation / text color too light relative to background (washed-out label).\n\nRoot cause: Button label color set to a low-contrast gray (or opacity applied / wrong theme token) on a light blue-gray background.\n\nFix: snippet.\n\nI'll keep it tight.\n"
+  },
+  "metrics": {
+    "promptTokens": 208,
+    "imageTokens": 70,
+    "completionTokens": 910,
+    "reasoningTokens": 528,
+    "totalTokens": 1118,
+    "latencyMs": 43175,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.",
+    "affectedElement": ".cta-pro",
+    "defectType": "accessibility_contrast_violation",
+    "rootCause": "Improper color values: background: #e2e8f0; color: #cbd5e1",
+    "suggestedFix": "Set background: #6366f1; color: #ffffff to ensure >= 4.5:1 contrast ratio",
+    "expectedBoundingBox": {
+      "x": 508,
+      "y": 310,
+      "width": 212,
+      "height": 48
+    }
+  }
+}

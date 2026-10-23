@@ -1,0 +1,52 @@
+{
+  "id": "session-07-real-wikipedia-desktop-with-1792784148852",
+  "timestamp": "2026-10-23T19:35:48.852Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "07-real-wikipedia-desktop",
+  "caseName": "Real-World Wikipedia Portal (Desktop 1280×800) Search Bar Shift",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 145
+    },
+    "format": "webp",
+    "bytes": 6070,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\nSearch bar — the language‑selector text input (`EN ▾`) and the magenta search/submit button.\n\n**2. Nature of the Visual Defect**\nElement overlap / width overflow. The input's blue right border is visible *behind/past* the magenta button, i.e. the input box extends under the button instead of stopping at its left edge. The button is rendered on top of the input's right side rather than sitting beside it.\n\n**3. Probable Root Cause**\nThe input is set to `width: 100%` of the container while the button is `position: absolute` on top of it, with no space reserved for the button (missing `padding-right` / `gap`). So the input's box overlaps the button's footprint.\n\n**4. Suggested Fix**\nEither reserve space for the button on the input, or (preferred) lay the two out as flex siblings so they can't overlap:\n\n```css\n/* Option A – flex (recommended) */\n.search {\n  display: flex;\n  gap: 0;            /* button flush to input */\n}\n.search input {\n  flex: 1 1 auto;\n  min-width: 0;      /* prevents overflow */\n  width: auto;       /* drop width:100% */\n}\n.search button {\n  flex: 0 0 auto;\n}\n\n/* Option B – keep absolute button, but clear it */\n.search input {\n  width: 100%;\n  padding-right: 48px; /* = button width */\n}\n```\n\nRe‑run the visual test after the change; the diff box around the search component should clear once the input's right edge no longer extends under the button.",
+    "reasoning": "The user wants me to act as a visual regression QA engineer. I need to look at the screenshot carefully.\n\nLooking at the image, I see a search bar area at the top. There's a red rectangle (the visual diff highlight) around a search input field. Inside the search field, there's a language selector dropdown showing \"EN\" with a chevron, and to the right is a red/magenta search button with a magnifying glass icon.\n\nThe red outline indicates the diff region. Let me look closely at what's wrong. The search input box appears to have the language dropdown \"EN\" and the search button. The red highlight box surrounds the entire search component.\n\nLooking carefully: the search button (magenta/red square with magnifying glass) appears to be overlapping or misaligned with the input field. Actually, the input field's right edge seems to be cut off or the button is overlapping the input. The input box border (blue outline) seems to extend but the button is sitting on top of it, possibly overlapping the right border of the input.\n\nLet me look. The blue-bordered input contains \"EN v\" and then the magenta button. The magenta button appears to overlap the right side of the input field — the input's right border is hidden behind the button, or the button is positioned with negative margin causing overlap. Also the input field looks like it might be too narrow, clipping the text or the dropdown.\n\nActually the typical defect here: the search button overlaps the input field's right edge, or the input field width is incorrect causing the button to be pushed/overlapping. The red diff box suggests the whole component changed position or size.\n\nLet me think about what a visual regression diff would highlight. The red rectangle is the bounding box of the changed region. The change could be that the search button moved, or the input width changed, or padding changed.\n\nLooking at the layout: the input has a blue border (focus state?). The \"EN\" dropdown is on the left inside the input. The search button is on the right, magenta. The button's left edge seems to overlap the input's right border — there's no gap, the button is flush or overlapping.\n\nHmm, but is that a defect or intended? In many designs the button is attached to the right of the input. The diff might be that previously the button was inside or the input was wider.\n\nLet me consider the most likely intended answer for this kind of exercise. The red box highlights the search component. The visible issue: the search button (magenta) overlaps the input field, OR the input field's right padding is insufficient causing the \"EN\" dropdown and button to crowd. Actually the \"EN\" is on the left, button on right, lots of empty space in middle. That's fine.\n\nWait, maybe the defect is that the input field's border (blue) is showing on the right side behind the button, meaning the button is not covering the input's right edge properly, or the input is wider than the container so the button overflows.\n\nLet me look at the blue outline. The blue outline goes around the input including the area where the button is? The blue line on the right appears to be just left of the button, and the button is outside the blue box? Hard to say.\n\nI think the cleanest interpretation: The search button overlaps the input field / the input field width is too large, causing the button to be pushed out or overlap. Root cause: input width set to 100% without accounting for button width, or button positioned absolutely with wrong offset.\n\nAlternatively the defect is a margin/padding shift: the search bar component shifted or the button's vertical alignment is off.\n\nGiven the ambiguity, I'll provide a focused answer: Affected element = Search input / language selector + search button (search bar component). Nature = element overlap / misalignment: the magenta search button overlaps the right edge of the text input (or the input's right border is visible behind the button), and the input width is incorrect. Root cause = input width:100% inside a flex container without reserving space for the button, or button absolute positioning with negative right offset / missing gap. Fix = use flex with gap, set input flex:1 and min-width:0, position button as flex item not absolute, or add padding-right.\n\nLet me look one more time at the image to be precise. The blue rectangle (input border) — its right vertical edge appears to be at the left edge of the magenta button, and the magenta button's left edge touches it. Actually I see the blue line continuing to the right of the button? There's a thin blue line on the far right of the magenta button? Possibly the input extends behind the button and its right border shows to the right of the button. That would mean the input is wider than the visible area and the button is positioned on top, with the input's right border peeking out. That's an overlap/width bug.\n\nYes I think I see a faint blue vertical line to the right of the magenta button. That strongly suggests the input field is too wide (100%) and the button is absolutely positioned on top, so the input's right border shows beyond the button. That's a classic overlap/width defect.\n\nSo: Nature = element overlap / input width overflow; the input's right border is visible to the right of the search button because the input spans full width while the button is absolutely positioned over it.\n\nRoot cause: input { width: 100% } inside a relative container with button { position:absolute; right:0 } but the input lacks padding-right to clear the button, OR the container width includes the button so input 100% overflows.\n\nFix: give input padding-right equal to button width, or use flex layout.\n\nI'll write concise answer with code snippet.\n\nLet me draft.\n\n1. Affected Element: Search bar — language dropdown input + search (submit) button.\n2. Nature: Element overlap / width overflow — the text input's right border extends past the magenta search button (button sits on top of the input's right edge), indicating the input is sized to 100% of the container while the button is absolutely positioned over it.\n3. Root cause: input width:100% with absolutely-positioned button and no reserved space (missing padding-right / gap), so the input's box overlaps the button.\n4. Fix: switch to flex with gap, or add padding-right to input.\n\nProvide snippet.\n\nKeep concise.\n"
+  },
+  "metrics": {
+    "promptTokens": 218,
+    "imageTokens": 80,
+    "completionTokens": 1768,
+    "reasoningTokens": 1378,
+    "totalTokens": 1986,
+    "latencyMs": 86828,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.",
+    "affectedElement": "#search-form",
+    "defectType": "layout_shift",
+    "rootCause": "Accidental CSS override applying margin-left: 60px and #e11d48 background color",
+    "suggestedFix": "Remove margin-left on #search-form and restore button background color to progressive blue #36c",
+    "expectedBoundingBox": {
+      "x": 0,
+      "y": 432,
+      "width": 1280,
+      "height": 368
+    }
+  }
+}

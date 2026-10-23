@@ -3,6 +3,7 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Card, CardGrid } from '@astrojs/starlight/components';
 import ImageCompare from '../components/ImageCompare.astro';
 import TokenCalculator from '../components/TokenCalculator.astro';
+import '../styles/custom.css';
 ---
 
 <StarlightPage
@@ -14,7 +15,7 @@ import TokenCalculator from '../components/TokenCalculator.astro';
       tagline: 'Cut Vision LLM token consumption by up to 90% and shrink payload bytes by 99%—without requiring a single AI API key.',
       actions: [
         { text: 'Get Started', link: '/guides/getting-started/', icon: 'right-arrow' },
-        { text: 'Benchmarks (-87.7% ViT)', link: '/guides/benchmarks/', variant: 'secondary' },
+        { text: 'Benchmarks (-85.1% ViT)', link: '/guides/benchmarks/', variant: 'secondary' },
         { text: 'How It Works', link: '/guides/how-it-works/', variant: 'minimal' },
         { text: 'View on GitHub', link: 'https://github.com/hotcode-dev/zerovisual', icon: 'external', variant: 'minimal' },
       ],
@@ -37,7 +38,7 @@ import TokenCalculator from '../components/TokenCalculator.astro';
       </div>
       <h3 class="text-xl font-bold text-white tracking-tight">Interactive Benchmark & AI Session Explorer</h3>
       <p class="text-sm text-slate-300 mt-1 max-w-2xl">
-        Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on Gemma 4 26B (<code>google/gemma-4-26B-A4B-it</code>).
+        Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on <code>RadixArk/Qwen3.8-27B-NVFP4</code>.
       </p>
     </div>
     <a href="/guides/benchmarks/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-md shadow-indigo-500/25 whitespace-nowrap">
@@ -128,13 +129,13 @@ import TokenCalculator from '../components/TokenCalculator.astro';
     </blockquote>
 
     <div class="mt-8 mb-4">
-      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Gemma 4 26B & Live Websites)</h3>
-      <p class="text-slate-400 mb-4">Tested against a local LLM endpoint (<code>google/gemma-4-26B-A4B-it</code> via vLLM) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
+      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Qwen 3.8 27B & Live Websites)</h3>
+      <p class="text-slate-400 mb-4">Tested against a local Vision LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
       <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-sm">
-        <li><strong>Vision Image Tokens:</strong> 9,030 tokens ➔ <strong class="text-emerald-400">2,838 tokens</strong> (-68.6% ViT Token Reduction)</li>
-        <li><strong>Live Production Sites Payload:</strong> 492.3 KB ➔ <strong class="text-emerald-400">87.2 KB</strong> (-82.3% Bandwidth Saved)</li>
-        <li><strong>Average Latency:</strong> 8.4s ➔ <strong class="text-emerald-400">7.3s</strong> (13% Faster Roundtrips, up to 37% on desktop)</li>
-        <li><strong>Diagnostic Triage Accuracy:</strong> 59.1% ➔ <strong class="text-emerald-400">65.5%</strong> (+6.4% Accuracy Boost)</li>
+        <li><strong>Vision Image Tokens:</strong> 8,756 tokens ➔ <strong class="text-emerald-400">1,304 tokens</strong> (-85.1% ViT Token Reduction)</li>
+        <li><strong>Network Payload Transfer:</strong> 638.9 KB ➔ <strong class="text-emerald-400">71.8 KB</strong> (-88.8% Bandwidth Saved)</li>
+        <li><strong>Total Tokens Consumed:</strong> 25,748 tokens ➔ <strong class="text-emerald-400">18,105 tokens</strong> (-29.7% Total Token Reduction)</li>
+        <li><strong>Diagnostic Triage Accuracy:</strong> 59.1% ➔ <strong class="text-emerald-400">68.2%</strong> (+9.1% Accuracy Boost)</li>
       </ul>
       <div class="mt-4">
         <a href="/guides/benchmarks/" class="text-indigo-400 hover:text-indigo-300 underline font-semibold inline-flex items-center gap-1.5">

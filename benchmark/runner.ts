@@ -44,19 +44,21 @@ interface BenchmarkRunResult {
 
 // Load .env
 function loadEnv(): { baseUrl: string; model: string } {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const envPath = path.resolve(process.cwd(), 'benchmark/.env');
   let baseUrl = 'https://spark.ntsd.dev:8001/v1';
-  let model = 'google/gemma-4-26B-A4B-it';
+  let model = 'RadixArk/Qwen3.8-27B-NVFP4';
 
   if (fs.existsSync(envPath)) {
     const lines = fs.readFileSync(envPath, 'utf8').split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed || trimmed.startsWith('#')) continue;
-      const [k, ...v] = trimmed.split('=');
+      const cleanLine = trimmed.split('#')[0]!.trim();
+      const [k, ...v] = cleanLine.split('=');
       const val = v.join('=').trim();
-      if (k.trim() === 'OPENAI_BASE_URL') baseUrl = val;
-      if (k.trim() === 'AGENT_MODEL') model = val;
+      if (k?.trim() === 'OPENAI_BASE_URL') baseUrl = val;
+      if (k?.trim() === 'AGENT_MODEL') model = val;
     }
   }
 
@@ -227,8 +229,8 @@ Identify:
     const evalA = evaluateAccuracy(resA.content, resA.reasoning, metadata.groundTruth);
     const traceSessionIdA = `session-${metadata.id}-without-${Date.now()}`;
 
-    const effectiveAnswerA = resA.content.trim().length > 10 
-      ? resA.content.trim() 
+    const effectiveAnswerA = resA.content.trim().length > 10
+      ? resA.content.trim()
       : (resA.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resA.reasoning.trim());
 
     const resultA: BenchmarkRunResult = {
@@ -293,13 +295,13 @@ Identify:
     // RUN 2: WITH ZeroVisual (Cropped diff box + model-aligned WebP)
     // =========================================================================
     console.log(`   ⏳ Mode B: WITH ZeroVisual (Diff Bounding Box + Tile Downscaled WebP)...`);
-    
+
     // Detect diff bounding box with ZeroVisual
     const diffResult = await detectDiffBoundingBox(diffPng, { padding: 32 });
-    
+
     // Determine target provider based on model architecture
-    const targetProvider = model.toLowerCase().includes('gemma') 
-      ? 'gemini' 
+    const targetProvider = model.toLowerCase().includes('gemma')
+      ? 'gemini'
       : (model.toLowerCase().includes('qwen') ? 'qwen' : 'local');
 
     // Optimize image for target provider
@@ -321,8 +323,8 @@ Identify:
     const evalB = evaluateAccuracy(resB.content, resB.reasoning, metadata.groundTruth);
     const traceSessionIdB = `session-${metadata.id}-with-${Date.now()}`;
 
-    const effectiveAnswerB = resB.content.trim().length > 10 
-      ? resB.content.trim() 
+    const effectiveAnswerB = resB.content.trim().length > 10
+      ? resB.content.trim()
       : (resB.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resB.reasoning.trim());
 
     const resultB: BenchmarkRunResult = {
@@ -348,7 +350,7 @@ Identify:
     allResults.push(resultB);
 
     const tokenSavedPct = (((resultA.totalTokens - resultB.totalTokens) / resultA.totalTokens) * 100).toFixed(1);
-    const imgTokenSavedPct = resultA.imageTokens > 0 
+    const imgTokenSavedPct = resultA.imageTokens > 0
       ? (((resultA.imageTokens - resultB.imageTokens) / resultA.imageTokens) * 100).toFixed(1)
       : '0.0';
     const bytesSavedPct = (((rawPayloadBytes - optPayloadBytes) / rawPayloadBytes) * 100).toFixed(1);

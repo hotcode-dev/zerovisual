@@ -1,0 +1,46 @@
+{
+  "id": "session-10-real-github-pricing-desktop-without-1792784479475",
+  "timestamp": "2026-10-23T19:41:19.475Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "10-real-github-pricing-desktop",
+  "caseName": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 114551,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n1. **Affected Element / Component name:** Top promotional banner (specifically the decorative pixel-art graphic on the right).\n2. **Nature of the Visual Defect:** Element overflow / clipping. The graphic on the right side of the banner is cut off at the edge of the viewport/container.\n3. **Probable Root Cause in CSS or layout:** The banner container likely has a fixed width or `max-width` that is smaller than the viewport, or the decorative graphic is absolutely positioned with a fixed width that exceeds the container's bounds. The container might also be missing `overflow: hidden` if the graphic is causing a horizontal scrollbar, or it *has* `overflow: hidden` which is causing the visible clipping.\n4. **Suggested Fix or code snippet:** \n   - If the clipping is unintended and the graphic should be fully visible: Make the graphic responsive (e.g., `max-width: 100%`) or adjust its `right` positioning.\n   - If the clipping is intended but causing layout issues (like a horizontal scroll): Ensure the banner wrapper has `overflow: hidden`.\n   ```css\n   .promo-banner {\n     position: relative;\n     overflow: hidden; /* Prevents horizontal scroll if graphic overflows */\n     width: 100%;\n   }\n   .promo-banner__graphic {\n     position: absolute;\n     right: 0;\n     top: 0;\n     height: 100%;\n     width: auto; /* Or a specific responsive width */\n     max-width: 100%;\n   }\n   ```",
+    "reasoning": "1.  **Analyze the image:** I see a webpage screenshot. At the very top, there is a promotional banner (\"UNIVERSE'26\"). Below it is the main navigation bar.\n2.  **Identify the defect:** Looking closely at the top right corner of the promotional banner, there is a graphic made of colored squares. This graphic is being cut off on the right side of the viewport. It appears to be overflowing its container or the container is too narrow, causing the right edge of the graphic to be clipped.\n3.  **Determine affected element:** The promotional banner at the top, specifically the decorative graphic on the right.\n4.  **Nature of defect:** Element overflow / clipping.\n5.  **Probable root cause:** The banner container likely has a fixed width or `overflow: hidden` applied, but the decorative graphic inside is positioned absolutely or has a fixed width that exceeds the available space on smaller screens or specific viewport widths. Alternatively, the banner's max-width is smaller than the viewport, but the graphic is positioned relative to the viewport edge.\n6.  **Suggested fix:** Ensure the banner container handles overflow gracefully (e.g., `overflow: hidden` on the banner itself if it's meant to be a background, or adjust the graphic's positioning/width). If the graphic is meant to be fully visible, it needs to be responsive or the banner needs to be wider. Given it's a decorative element, `overflow: hidden` on the banner wrapper is the standard fix to prevent horizontal scrolling, but the clipping itself might be the \"defect\" if it looks broken. Let's assume the clipping is the visual regression.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 690,
+    "reasoningTokens": 349,
+    "totalTokens": 1828,
+    "latencyMs": 28131,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+    "affectedElement": ".btn-mktg",
+    "defectType": "zindex_collision",
+    "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+    "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+    "expectedBoundingBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  }
+}

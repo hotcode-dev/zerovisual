@@ -1,0 +1,52 @@
+{
+  "id": "session-10-real-github-pricing-desktop-with-1792784516895",
+  "timestamp": "2026-10-23T19:41:56.895Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "10-real-github-pricing-desktop",
+  "caseName": "Real-World GitHub Pricing (Desktop 1280×800) CTA Button Z-Index Collision",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 498,
+      "height": 504
+    },
+    "format": "webp",
+    "bytes": 20538,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element:** Hero `<h1>` heading (\"GitHub, the complete developer platform\").\n\n**2. Visual Defect:** Horizontal clipping/overflow — the left edge of the heading is cut off by the viewport (\"**G**itHub\" → \"itHub\", \"**d**eveloper\" → \"eveloper\"). The sub‑text and CTA button below are correctly centered, so only the H1 is mispositioned.\n\n**3. Probable Root Cause:** The H1 (or its wrapper) is left‑aligned inside a container whose left edge sits outside the viewport — typically a negative `margin-left`, a `transform: translateX(-…)`, or a `width: 100vw`/`min-width` that ignores the parent's padding. The centered siblings confirm the page grid is fine; only the heading's box is shifted left.\n\n**4. Suggested Fix:**\n```css\n.hero__heading {\n  /* remove any negative offset / transform */\n  margin-left: 0;\n  transform: none;\n  width: 100%;\n  max-width: 100%;\n  text-align: center;      /* match the sub‑text & CTA */\n  overflow-wrap: break-word;\n}\n.hero {\n  overflow-x: hidden;      /* safety net against 100vw overflow */\n  padding-inline: 1rem;    /* respect container gutters */\n}\n```\nVerify the H1's computed `left`/`margin-left`/`transform` in DevTools; it should align with the centered paragraph. Re‑run the snapshot after the change.",
+    "reasoning": "The screenshot shows a hero section with a large heading \"GitHub, the complete developer platform\" that is cut off on the left side. The text starts with \"itHub\" instead of \"GitHub\" and \"eveloper platform\" instead of \"developer platform\". This indicates the text is overflowing or the container is too narrow, or there's a negative margin/transform pushing the content off-screen to the left.\n\nLooking more carefully: the heading text is left-aligned but the first characters are clipped. The subtext below (\"GitHub. That's why we've packed...\") appears centered and fully visible. The CTA button \"Start free for 30 days\" is also centered. So the heading is left-aligned but its container or the text itself is shifted left, causing the left edge to be clipped by the viewport.\n\nActually, the heading looks like it's left-aligned to a container that extends beyond the left viewport edge, OR the heading has a negative left margin / transform translateX. The subtext and button are centered within the visible area, suggesting the heading's alignment context differs.\n\nMost likely root cause: The heading element has `text-align: left` but its parent container has a width/position that places its left edge off-screen, OR there's a `transform: translateX(-...)` or negative margin. Alternatively, the heading is in a flex/grid column that's misaligned.\n\nGiven the subtext is centered, the heading might be intended to be centered too but is left-aligned and overflowing. Or the heading container has `width: 100%` but with a negative margin-left.\n\nLet me think about typical GitHub homepage: the hero heading is usually centered. Here it appears left-shifted and clipped. The probable defect is horizontal overflow / clipping of the hero heading due to incorrect alignment or container width.\n\nI'll state: Affected element: Hero heading (H1). Defect: text clipped on left (horizontal overflow / misalignment). Root cause: heading container has negative left margin or transform, or text-align left within an over-wide container, causing left portion to render outside viewport. Fix: ensure container has proper padding/width and text-align center, or remove negative margin/transform.\n\nBe concise.\n"
+  },
+  "metrics": {
+    "promptTokens": 394,
+    "imageTokens": 256,
+    "completionTokens": 814,
+    "reasoningTokens": 461,
+    "totalTokens": 1208,
+    "latencyMs": 37394,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.",
+    "affectedElement": ".btn-mktg",
+    "defectType": "zindex_collision",
+    "rootCause": "Negative z-index: -1 and translateY(-30px) causing button collision and occlusion",
+    "suggestedFix": "Remove z-index: -1, remove translateY transform, and restore canonical green button styling",
+    "expectedBoundingBox": {
+      "x": 429,
+      "y": 0,
+      "width": 790,
+      "height": 800
+    }
+  }
+}

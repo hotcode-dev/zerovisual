@@ -1,0 +1,52 @@
+{
+  "id": "session-09-real-hackernews-desktop-with-1792784451342",
+  "timestamp": "2026-10-23T19:40:51.342Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "09-real-hackernews-desktop",
+  "caseName": "Real-World Hacker News (Desktop 1280×800) Header Navigation Collapse",
+  "mode": "with_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 504,
+      "height": 354
+    },
+    "format": "webp",
+    "bytes": 18386,
+    "isZeroVisualOptimized": true,
+    "cropBox": {
+      "x": 71,
+      "y": 0,
+      "width": 1138,
+      "height": 800
+    }
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component name:**\nTop banner / Header / Featured article card (the large red block).\n\n**2. Nature of the Visual Defect:**\nSevere contrast violation / Invisible text. The text and content within the red block are completely obscured by the background color.\n\n**3. Probable Root Cause in CSS or layout:**\nThe text color is set to the same color (or a very similar shade) as the background color (red). This likely happened due to a recent styling update where the background was changed to red without adjusting the typography colors.\n\n**4. Suggested Fix or code snippet:**\nUpdate the text color to a high-contrast color, such as white or black.\n\n```css\n.banner-header {\n  background-color: #d32f2f; /* Assuming this is the red color */\n  color: #ffffff; /* Change text color to white for contrast */\n}\n```",
+    "reasoning": "1.  **Analyze the screenshot:** The image shows a web page with a list of articles. At the top, there is a large, solid red rectangular block. Inside this block, there is a small yellow square with the number \"12\" and some faint, illegible text next to it.\n2.  **Identify the affected element:** The large red block at the top, which appears to be a header, banner, or featured article card.\n3.  **Identify the visual defect:** The background of this element is entirely red, and the text inside it is invisible or has extremely low contrast. The layout of the text within the block is also broken or obscured.\n4.  **Determine the probable root cause:** This is a classic contrast violation. The text color is likely set to red (or a very similar shade) to match the background, or the background color was recently changed to red without updating the text color.\n5.  **Formulate the suggested fix:** Change the text color to a high-contrast color like white or black.\n"
+  },
+  "metrics": {
+    "promptTokens": 314,
+    "imageTokens": 176,
+    "completionTokens": 424,
+    "reasoningTokens": 225,
+    "totalTokens": 738,
+    "latencyMs": 16055,
+    "accuracyScore": 30
+  },
+  "groundTruth": {
+    "defect": "Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.",
+    "affectedElement": ".pagetop",
+    "defectType": "navigation_collapse",
+    "rootCause": "Overridden padding and red background on main header td with font-size: 0px on .pagetop links",
+    "suggestedFix": "Restore default 2px padding, #ff6600 background, and remove font-size: 0px",
+    "expectedBoundingBox": {
+      "x": 71,
+      "y": 0,
+      "width": 1138,
+      "height": 800
+    }
+  }
+}

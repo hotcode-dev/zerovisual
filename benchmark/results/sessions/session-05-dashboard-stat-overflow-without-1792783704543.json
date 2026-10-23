@@ -1,0 +1,46 @@
+{
+  "id": "session-05-dashboard-stat-overflow-without-1792783704543",
+  "timestamp": "2026-10-23T19:28:24.543Z",
+  "benchmarkRunTimestamp": "2026-10-23T19:20:25.232Z",
+  "caseId": "05-dashboard-stat-overflow",
+  "caseName": "Dashboard KPI Metric Overflow and Clipping",
+  "mode": "without_zerovisual",
+  "model": "RadixArk/Qwen3.8-27B-NVFP4",
+  "systemPrompt": "You are an automated visual regression QA engineer.",
+  "userPrompt": "You are an automated visual regression QA engineer analyzing a screenshot from a failed visual test.\nBe concise and direct.\nIdentify:\n1. Affected Element / Component name\n2. Nature of the Visual Defect (e.g. padding shift, font size, contrast violation, margin collapse, element overlap)\n3. Probable Root Cause in CSS or layout\n4. Suggested Fix or code snippet",
+  "inputImage": {
+    "resolution": {
+      "width": 1280,
+      "height": 800
+    },
+    "format": "png",
+    "bytes": 33568,
+    "isZeroVisualOptimized": false
+  },
+  "output": {
+    "content": "\n\n**1. Affected Element / Component**\n`ACTIVE AGENTS` metric card → the value node (`.metric-value` / the `12,450` figure). The other three cards (`TOKENS SAVED`, `PAYLOAD P95`, `COST PER DIFF`) render correctly and serve as the baseline.\n\n**2. Nature of the Visual Defect**\n- **Font-size overflow:** the value `12,450` is rendered at ~2–3× the size of its sibling values, breaking the card's vertical rhythm and nearly touching the top/bottom padding (content overflow / layout breakage).\n- **Unexpected color / state:** the value is red/pink (`#f43f5e`-ish) while all peer values are white — an unintended \"alert/critical\" state was applied.\n- Net effect: card height/visual weight no longer matches the grid; baseline diff fails on both size and color.\n\n**3. Probable Root Cause (CSS / layout)**\nA conditional or status-driven class (e.g. `.value--critical`, `data-status=\"alert\"`, or a threshold hook) was incorrectly matched to this card and is applying both an oversized `font-size` and a red `color`. Likely compounded by:\n- A wrong/leaked font-size value (e.g. a `vw`/`clamp()` unit or a heading style cascading into `.metric-value`), and\n- No `overflow`/`min-height` guard on the card, so the larger glyph expands the box instead of clipping.\n\n**4. Suggested Fix**\nPin the value to the shared scale and isolate the status color so it never affects size:\n\n```css\n.metric-value {\n  font-size: 1.75rem;          /* match sibling cards */\n  line-height: 1.2;\n  color: var(--text-primary);  /* white baseline */\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n/* status should only recolor, never resize */\n.metric-value[data-status=\"critical\"] {\n  color: var(--danger);        /* red, but same size */\n}\n```\n\nAlso add a stable box so a long number can't reflow the grid:\n```css\n.metric-card { min-height: 96px; }\n.metric-value { display: block; max-width: 100%; }\n```\n\nVerify the threshold logic that sets `data-status` — `12,450` should not be flagged critical; the size regression points to a class/specificity bug rather than a real data alert.",
+    "reasoning": "The user wants a concise visual regression QA analysis. Let me look carefully at the screenshot.\n\nThere are four cards in a row: \"TOKENS SAVED\", \"ACTIVE AGENTS\", \"PAYLOAD P95\", \"COST PER DIFF\".\n\nLooking at the layout:\n- Card 1 (TOKENS SAVED): value \"94.2%\" in white, normal size.\n- Card 2 (ACTIVE AGENTS): value \"12,450\" in RED/pink, and it's MUCH larger than the others — it's overflowing the card's vertical bounds. The number is huge compared to the other cards' values. It looks like the font size is way too big, causing the text to overflow the card height (the card is taller than the others, or the text is clipping/overflowing).\n- Card 3 (PAYLOAD P95): \"34 KB\" white normal.\n- Card 4 (COST PER DIFF): \"$0.0002\" white normal.\n\nSo the defect is on the \"ACTIVE AGENTS\" card. The value \"12,450\" is rendered in an oversized font and in a red/pink color, while all other values are white and consistent size. The text appears to overflow the card's vertical padding — the card height is larger than the others (the card extends from ~75 to ~145, while others are ~75 to ~145 too actually... let me look. Card 1 top ~75 bottom ~145. Card 2 top ~75 bottom ~145. They look same height actually. But the \"12,450\" text is so big it nearly touches top and bottom edges, overflowing the intended padding. The label \"ACTIVE AGENTS\" is at top, then the huge number, then \"↑ 14% this week\" at bottom. The number is so large it crowds the layout.\n\nAlso color: red vs white. That's a color/contrast or state issue — maybe a \"critical/alert\" state was triggered incorrectly, or a CSS class for an alert value was applied.\n\nSo nature of defect: font-size overflow + unexpected color (red) on the metric value, causing vertical overflow / layout breakage within the card.\n\nProbable root cause: A CSS rule targeting the value element (e.g., `.metric-value` or a data attribute like `data-status=\"critical\"`) applied an oversized `font-size` and a red `color`. Possibly a responsive breakpoint or a conditional class (e.g., `.alert` / `.critical`) was mistakenly applied to this card, or a unit error (e.g., `font-size: 12450` vs `1.245rem`? no). More likely a class like `.value--large` or a status-driven color. The font size might be set in a way that scales with content or a wrong value.\n\nActually the number 12,450 has more digits; maybe a CSS rule uses `font-size` based on something, or maybe the value element has no `overflow` constraint and a `font-size` that's too big. But the other values are short. The red color suggests a threshold-based styling (value above threshold = red). The huge size suggests maybe a CSS variable for font size got set wrong, or a `clamp()`/`vw` unit that's too large, or the element picked up a heading style.\n\nLet me think: maybe the component applies a \"highlight\" or \"emphasis\" class when value exceeds a threshold, and that class sets both color:red and a much larger font-size (intended for a hero number but wrong here). Or a CSS specificity bug where a global `.number` or `.stat` rule with large font-size leaked.\n\nSuggested fix: constrain the value font-size to match siblings (e.g., `font-size: 1.5rem` or `2rem`), add `overflow: hidden` / `text-overflow` or `min-height` to card, and ensure color only changes via a deliberate status class with appropriate contrast. Provide snippet.\n\nLet me write concisely.\n\nI'll structure with the 4 numbered points.\n"
+  },
+  "metrics": {
+    "promptTokens": 1138,
+    "imageTokens": 1000,
+    "completionTokens": 1462,
+    "reasoningTokens": 891,
+    "totalTokens": 2600,
+    "latencyMs": 73636,
+    "accuracyScore": 65
+  },
+  "groundTruth": {
+    "defect": "The \"Active Agents\" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.",
+    "affectedElement": ".kpi-card:nth-child(2) .kpi-val",
+    "defectType": "typography_overflow_clipping",
+    "rootCause": "font-size: 64px on metric value exceeds card dimensions",
+    "suggestedFix": "Restore font-size: 28px and color: #fff",
+    "expectedBoundingBox": {
+      "x": 345,
+      "y": 90,
+      "width": 285,
+      "height": 130
+    }
+  }
+}

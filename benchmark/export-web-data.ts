@@ -3,8 +3,24 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
 
+function getBenchmarkProvider(): 'qwen' | 'gemini' | 'openai' | 'anthropic' | 'llama' | 'mistral' | 'deepseek' | 'local' {
+  const envPath = path.resolve(process.cwd(), 'benchmark/.env');
+  let model = 'RadixArk/Qwen3.8-27B-NVFP4';
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const cleanLine = line.trim().split('#')[0]!.trim();
+      const [k, ...v] = cleanLine.split('=');
+      if (k?.trim() === 'AGENT_MODEL') model = v.join('=').trim();
+    }
+  }
+  if (model.toLowerCase().includes('qwen')) return 'qwen';
+  if (model.toLowerCase().includes('gemma') || model.toLowerCase().includes('gemini')) return 'gemini';
+  return 'local';
+}
+
 function calculateVisionTokens(width: number, height: number): number {
-  return estimateVisionTokens(width, height, 'gemini');
+  return estimateVisionTokens(width, height, getBenchmarkProvider());
 }
 
 interface CaseSessionExport {
@@ -101,7 +117,7 @@ export async function exportWebData() {
 
     // Optimize
     const optResult = await optimizeImageForProvider(actualBuffer, {
-      provider: 'gemini',
+      provider: getBenchmarkProvider(),
       cropBox,
       quality: 85
     });
