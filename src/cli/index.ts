@@ -7,7 +7,7 @@ import { estimateCommand } from './commands/estimate.js';
 export const mainCommand = defineCommand({
   meta: {
     name: 'zerovisual',
-    version: '0.1.0',
+    version: '0.2.0',
     description: 'Zero-API-key visual regression, UI design QA, and model-aware image optimizer'
   },
   subCommands: {
