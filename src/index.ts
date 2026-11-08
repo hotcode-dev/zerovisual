@@ -9,5 +9,5 @@ export * from './reporter/fixture.js';
 export * from './cli/commands/regression.js';
 export * from './cli/commands/design-qa.js';
 export * from './cli/commands/optimize.js';
-export * from './mcp/server.js';
+export * from './cli/commands/estimate.js';
 

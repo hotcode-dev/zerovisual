@@ -9,19 +9,19 @@ sidebar:
 
 ZeroVisual supports two seamless integration paths depending on your workflow:
 
-| Workflow | Use Case | Installation Command | Dependencies Required |
+| Workflow | Use Case | 1-Command Installation | Dependencies Required |
 | :--- | :--- | :--- | :--- |
-| **🤖 AI Agent Mode** *(Zero Install)* | Cursor, Claude Code, Windsurf, Antigravity | `npx skills add hotcode-dev/zerovisual`<br>`claude mcp add zerovisual -- npx -y zerovisual-mcp` | **None** (runs on-demand via `npx` with zero project dependencies) |
+| **🤖 AI Agent Mode** *(Zero Install)* | Cursor, Claude Code, Windsurf, Antigravity | `npx skills add hotcode-dev/zerovisual` | **None** (runs on-demand via bundled skill scripts + `npx`) |
 | **🧪 Playwright & CI Mode** *(Project DevDep)* | Visual regression suites, CI/CD runners, local scripts | `npm install -D zerovisual @playwright/test sharp` | Node.js `>=20.0.0`, `@playwright/test` |
 
 ---
 
-## 1. Install Agent Skills (`npx skills add`)
+## 1. 1-Command Agent Install (`npx skills add`)
 
-Equip your AI coding agent (Cursor, Claude Code, Windsurf, Antigravity) with ZeroVisual's isolated domain skills without modifying `package.json`:
+Equip your AI coding agent (Cursor, Claude Code, Windsurf, Antigravity) with ZeroVisual's isolated domain skills and bundled execution scripts—no MCP server setup or `package.json` edits required:
 
 ```bash
-# Install all ZeroVisual Agent Skills from the repository:
+# 1-command install for all ZeroVisual Agent Skills + Scripts:
 npx skills add hotcode-dev/zerovisual
 
 # Or install individual skills as needed:
@@ -30,52 +30,13 @@ npx skills add hotcode-dev/zerovisual/skills/zerovisual-design-qa
 npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 ```
 
-- **`skills/zerovisual-optimize`**: Teaches agents how and when to optimize user screenshots and UI images to eliminate Vision LLM token waste and network payload latency.
-- **`skills/zerovisual-design-qa`**: Teaches agents objective UI/UX mentoring guidelines (8pt spatial grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind classes).
-- **`skills/zerovisual-regression`**: Teaches agents strict code-to-code visual regression forensics (filtering font anti-aliasing noise, cross-viewport correlation, semantic AOM validation).
+- **`skills/zerovisual-optimize`** (`scripts/optimize.mjs`): Teaches agents how and when to optimize user screenshots and UI images to eliminate Vision LLM token waste and network payload latency.
+- **`skills/zerovisual-design-qa`** (`scripts/design-qa.mjs`): Teaches agents objective UI/UX mentoring guidelines (8pt spatial grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind classes).
+- **`skills/zerovisual-regression`** (`scripts/regression.mjs`): Teaches agents strict code-to-code visual regression forensics (filtering font anti-aliasing noise, cross-viewport correlation, semantic AOM validation).
 
 ---
 
-## 2. MCP Server Integration (Cursor, Claude Code, Antigravity)
-
-Connect ZeroVisual directly to your AI IDE over `stdio` so your coding agent can inspect visual failures, optimize screenshots, and critique live UI on demand:
-
-### Fast Setup via CLI:
-```bash
-# Claude Code:
-claude mcp add zerovisual -- npx -y zerovisual-mcp
-
-# Or via add-mcp across coding agents:
-npx -y add-mcp "npx -y zerovisual-mcp"
-```
-
-### Manual Configuration:
-Add the following to your `.cursor/mcp.json` or `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "zerovisual": {
-      "command": "npx",
-      "args": ["-y", "zerovisual-mcp"],
-      "env": {
-        "ZEROVISUAL_PROVIDER": "anthropic"
-      }
-    }
-  }
-}
-```
-
-### Available MCP Tools:
-- `optimize_image`: Optimizes arbitrary screenshots or images for Vision LLM tile grids and returns native MCP `ImageContent` blocks and token savings.
-- `estimate_token_cost`: Calculates estimated Vision LLM tokens for raw vs optimized image resolutions across model tile grids.
-- `audit_live_ui_design`: Launches headless Playwright against a local URL, runs deterministic heuristic linter + Penpot/DTCG diff, and returns token-optimized design critiques.
-- `list_visual_failures`: Lists all failed Playwright visual tests and affected viewports.
-- `get_visual_failure_bundle`: Fetches resized WebP images (as native MCP image blocks), `ariaSnapshot` YAML, and computed styles for a specific `testId`.
-
----
-
-## 3. Playwright Custom Reporter & Real Context Fixture
+## 2. Playwright Custom Reporter & Real Context Fixture
 
 For automated test suites and CI/CD pipelines, install the project devDependencies:
 
@@ -137,7 +98,7 @@ When a visual test fails, ZeroVisual generates:
 
 ---
 
-## 4. Standalone CLI Usage
+## 3. Standalone CLI Usage
 
 ZeroVisual ships with an executable binary `zerovisual` powered by `citty`.
 

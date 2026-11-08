@@ -2,6 +2,7 @@ import { defineCommand, runMain } from 'citty';
 import { regressionCommand } from './commands/regression.js';
 import { designQaCommand } from './commands/design-qa.js';
 import { optimizeCommand } from './commands/optimize.js';
+import { estimateCommand } from './commands/estimate.js';
 
 export const mainCommand = defineCommand({
   meta: {
@@ -12,7 +13,8 @@ export const mainCommand = defineCommand({
   subCommands: {
     regression: regressionCommand,
     'design-qa': designQaCommand,
-    optimize: optimizeCommand
+    optimize: optimizeCommand,
+    estimate: estimateCommand
   }
 });
 

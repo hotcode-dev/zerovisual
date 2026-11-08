@@ -155,14 +155,12 @@ To prevent instruction dilution and prompt pollution, ZeroVisual maintains two s
 
 ---
 
-## 10. Model Context Protocol (MCP) Server
+## 10. Bundled Skill Scripts (`skills/*/scripts/*.mjs`)
 
-ZeroVisual runs an official stdio MCP server (`zerovisual-mcp`), allowing Cursor, Claude Code, Windsurf, and Antigravity to interact natively:
+Instead of requiring users to configure IDE-specific MCP servers or maintain background `stdio` processes, ZeroVisual packages executable runner scripts directly inside each skill directory:
 
-- **Tools:**
-  - `list_visual_failures`: Discovers all failing visual tests in the current project workspace.
-  - `get_visual_failure_bundle`: Retrieves the model-aligned WebP images, AOM YAML snapshot, and computed styles for a given `testId`.
-  - `audit_live_ui_design`: Spawns headless Playwright against a local URL, runs the deterministic heuristic linter and Penpot diff, and returns an optimized critique payload.
-- **Prompts:**
-  - `triage-regression`: Formats the regression bundle into a forensic triage prompt with strict schema enforcement.
-  - `critique-ui-design`: Formats the design QA bundle into a structured UI/UX audit prompt.
+- **`skills/zerovisual-optimize/scripts/optimize.mjs`**: Optimizes screenshots to `.optimized.webp` and computes token/byte savings.
+- **`skills/zerovisual-design-qa/scripts/design-qa.mjs`**: Launches headless Playwright against a live URL, evaluates deterministic heuristics + Penpot tokens, and saves `.webp` viewport screenshots to `./test-results/artifacts/`.
+- **`skills/zerovisual-regression/scripts/regression.mjs`**: Crops and downscales Playwright diff images to `./test-results/artifacts/*.webp` and emits `./test-results/triage-ready.json`.
+
+Each script automatically resolves a local installation of `zerovisual` if present, or falls back to `npx --yes zerovisual` on demand—giving users a **1-command installation** (`npx skills add hotcode-dev/zerovisual`) with zero idle context overhead.

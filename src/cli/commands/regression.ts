@@ -21,6 +21,7 @@ export interface RegressionOptions {
   provider?: TargetProvider;
   lowTokenMode?: boolean;
   padding?: number;
+  json?: boolean;
 }
 
 /**
@@ -93,7 +94,6 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
   const diffFiles = findDiffFiles(inputDir);
 
   if (diffFiles.length === 0) {
-    console.log(`[ZeroVisual] No visual diff files (*-diff.png) found in ${inputDir}. Zero tokens consumed.`);
     const emptyPayload: TriagePayload = {
       version: '1.0.0',
       mode: 'regression',
@@ -102,9 +102,28 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
       timestamp: new Date().toISOString(),
       failures: []
     };
+    if (options.json) {
+      console.log(
+        JSON.stringify(
+          {
+            mode: 'regression',
+            totalFailures: 0,
+            targetProvider: provider,
+            tileDimensions: emptyPayload.tileDimensions,
+            failures: []
+          },
+          null,
+          2
+        )
+      );
+    } else {
+      console.log(`[ZeroVisual] No visual diff files (*-diff.png) found in ${inputDir}. Zero tokens consumed.`);
+    }
     return emptyPayload;
   }
 
+  const artifactsDir = path.join(outputDir, 'artifacts');
+  fs.mkdirSync(artifactsDir, { recursive: true });
   const failureMap = new Map<string, FailureEntry>();
 
   for (const diffPath of diffFiles) {
@@ -117,11 +136,19 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
       cropBox: diffDetection.boundingBox
     });
 
+    const { testId, testTitle } = inferTestId(diffPath);
+    const projectName = inferProjectName(diffPath);
+    const safeProject = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const diffImagePath = path.join(artifactsDir, `${testId}-${safeProject}-diff.webp`);
+    fs.writeFileSync(diffImagePath, optimizedDiff.buffer);
+
     // Check for companion -actual.png and -expected.png
     const dir = path.dirname(diffPath);
     const baseName = path.basename(diffPath).replace(/-diff\.png$/, '').replace(/diff\.png$/, '');
 
     let actualBase64: string | undefined;
+    let actualImagePath: string | undefined;
     const actualPath = path.join(dir, `${baseName}-actual.png`);
     if (fs.existsSync(actualPath)) {
       const opt = await optimizeImageForProvider(fs.readFileSync(actualPath), {
@@ -130,9 +157,12 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
         cropBox: diffDetection.boundingBox
       });
       actualBase64 = opt.dataUri;
+      actualImagePath = path.join(artifactsDir, `${testId}-${safeProject}-actual.webp`);
+      fs.writeFileSync(actualImagePath, opt.buffer);
     }
 
     let expectedBase64: string | undefined;
+    let expectedImagePath: string | undefined;
     const expectedPath = path.join(dir, `${baseName}-expected.png`);
     if (fs.existsSync(expectedPath)) {
       const opt = await optimizeImageForProvider(fs.readFileSync(expectedPath), {
@@ -141,10 +171,9 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
         cropBox: diffDetection.boundingBox
       });
       expectedBase64 = opt.dataUri;
+      expectedImagePath = path.join(artifactsDir, `${testId}-${safeProject}-expected.webp`);
+      fs.writeFileSync(expectedImagePath, opt.buffer);
     }
-
-    const { testId, testTitle } = inferTestId(diffPath);
-    const projectName = inferProjectName(diffPath);
 
     const viewportArtifact: ViewportArtifact = {
       project: projectName,
@@ -161,7 +190,10 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
       images: {
         diffBase64: optimizedDiff.dataUri,
         actualBase64,
-        expectedBase64
+        expectedBase64,
+        diffImagePath,
+        actualImagePath,
+        expectedImagePath
       }
     };
 
@@ -193,9 +225,42 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
   const outputFile = path.join(outputDir, 'triage-ready.json');
   fs.writeFileSync(outputFile, JSON.stringify(validated, null, 2), 'utf-8');
 
-  console.log(
-    `[ZeroVisual] Successfully processed ${diffFiles.length} diff(s) across ${failureMap.size} test(s). Wrote: ${outputFile}`
-  );
+  if (options.json) {
+    console.log(
+      JSON.stringify(
+        {
+          mode: validated.mode,
+          totalFailures: validated.failures.length,
+          outputFile,
+          targetProvider: validated.targetProvider,
+          tileDimensions: validated.tileDimensions,
+          failures: validated.failures.map((f) => ({
+            testId: f.testId,
+            testTitle: f.testTitle,
+            filePath: f.filePath,
+            selector: f.selector,
+            viewports: f.viewports.map((v) => ({
+              project: v.project,
+              viewport: v.viewport,
+              diffPixelRatio: v.diffPixelRatio,
+              boundingBox: v.boundingBox,
+              ariaSnapshot: v.ariaSnapshot,
+              computedStyles: v.computedStyles,
+              diffImagePath: v.images.diffImagePath,
+              actualImagePath: v.images.actualImagePath,
+              expectedImagePath: v.images.expectedImagePath
+            }))
+          }))
+        },
+        null,
+        2
+      )
+    );
+  } else {
+    console.log(
+      `[ZeroVisual] Successfully processed ${diffFiles.length} diff(s) across ${failureMap.size} test(s). Wrote: ${outputFile}`
+    );
+  }
 
   return validated;
 }
@@ -233,6 +298,11 @@ export const regressionCommand = defineCommand({
       type: 'string',
       default: '32',
       description: 'Bounding box padding in pixels around detected diff region'
+    },
+    json: {
+      type: 'boolean',
+      default: false,
+      description: 'Output concise JSON triage summary (with WebP file paths) to stdout'
     }
   },
   async run({ args }) {
@@ -242,7 +312,8 @@ export const regressionCommand = defineCommand({
       outputDir: args.output,
       provider,
       lowTokenMode: args.lowTokenMode,
-      padding: parseInt(args.padding, 10) || 32
+      padding: parseInt(args.padding, 10) || 32,
+      json: args.json
     });
   }
 });

@@ -24,6 +24,7 @@ export interface DesignQaOptions {
   outputDir?: string;
   provider?: TargetProvider;
   lowTokenMode?: boolean;
+  json?: boolean;
   browserInstance?: Browser; // Allows passing mock or existing browser in tests
 }
 
@@ -39,6 +40,9 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   }
 
   const outputDir = path.resolve(process.cwd(), options.outputDir ?? './test-results');
+  const artifactsDir = path.join(outputDir, 'artifacts');
+  fs.mkdirSync(artifactsDir, { recursive: true });
+  const testId = `design-qa-${url.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
   const provider = options.provider ?? 'openai';
   const lowTokenMode = options.lowTokenMode ?? false;
 
@@ -96,6 +100,10 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         lowTokenMode
       });
 
+      const safeVpName = vp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const diffImagePath = path.join(artifactsDir, `${testId}-${safeVpName}.webp`);
+      fs.writeFileSync(diffImagePath, optimized.buffer);
+
       viewportsArtifacts.push({
         project: vp.name,
         viewport: { width: vp.width, height: vp.height },
@@ -109,7 +117,8 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         ariaSnapshot: domContext.ariaSnapshot,
         computedStyles: domContext.computedStyles,
         images: {
-          diffBase64: optimized.dataUri
+          diffBase64: optimized.dataUri,
+          diffImagePath
         }
       });
 
@@ -139,7 +148,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
     timestamp: new Date().toISOString(),
     failures: [
       {
-        testId: `design-qa-${url.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`,
+        testId,
         testTitle: `UI Design QA Audit for ${url}`,
         filePath: url,
         selector: 'body',
@@ -157,9 +166,36 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   const outputFile = path.join(outputDir, 'design-qa-ready.json');
   fs.writeFileSync(outputFile, JSON.stringify(validated, null, 2), 'utf-8');
 
-  console.log(
-    `[ZeroVisual] Design QA audit complete for ${url}. Violations: ${aggregatedViolations.length}, Penpot deltas: ${penpotDeltas.length}. Wrote: ${outputFile}`
-  );
+  if (options.json) {
+    console.log(
+      JSON.stringify(
+        {
+          status: 'success',
+          url,
+          outputFile,
+          targetProvider: provider,
+          tileDimensions: validated.tileDimensions,
+          heuristicViolationsCount: aggregatedViolations.length,
+          penpotDeltasCount: penpotDeltas.length,
+          heuristicViolations: aggregatedViolations,
+          penpotDeltas,
+          viewports: viewportsArtifacts.map((v) => ({
+            project: v.project,
+            viewport: v.viewport,
+            ariaSnapshot: v.ariaSnapshot,
+            computedStyles: v.computedStyles,
+            diffImagePath: v.images.diffImagePath
+          }))
+        },
+        null,
+        2
+      )
+    );
+  } else {
+    console.log(
+      `[ZeroVisual] Design QA audit complete for ${url}. Violations: ${aggregatedViolations.length}, Penpot deltas: ${penpotDeltas.length}. Wrote: ${outputFile}`
+    );
+  }
 
   return validated;
 }
@@ -196,6 +232,11 @@ export const designQaCommand = defineCommand({
       type: 'boolean',
       default: false,
       description: 'Enable aggressive token reduction (e.g. 384x384 for Gemini)'
+    },
+    json: {
+      type: 'boolean',
+      default: false,
+      description: 'Output concise JSON audit summary (with WebP file paths) to stdout'
     }
   },
   async run({ args }) {
@@ -205,7 +246,8 @@ export const designQaCommand = defineCommand({
       penpotPath: args.penpot,
       outputDir: args.output,
       provider,
-      lowTokenMode: args.lowTokenMode
+      lowTokenMode: args.lowTokenMode,
+      json: args.json
     });
   }
 });

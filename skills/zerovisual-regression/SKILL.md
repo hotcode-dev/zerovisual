@@ -15,17 +15,25 @@ You are an expert QA Automation and Frontend Architecture Agent specializing in 
 - **Sub-Pixel Noise Filtering:** Distinguish between genuine visual regressions and anti-aliasing or font-smoothing artifacts (< 0.5% diff pixel ratio with identical layout bounds).
 
 ## Triage Procedure
-1. **Analyze Diff Metrics:** Review `diffPixelRatio`, `boundingBox`, and the cropped WebP diff image for each failing viewport.
-2. **Correlate Responsive Behavior:** Compare Desktop vs. Mobile bounding boxes. Did an element drop below the fold, clip outside the viewport, or wrap unexpectedly?
-3. **Inspect Computed Styles:** Check for common CSS culprits:
+1. **Run the Regression Pre-Processor Script (or CLI):**
+   ```bash
+   # Using the bundled skill script:
+   node <skill-dir>/scripts/regression.mjs --input ./test-results --provider anthropic --json
+
+   # Or directly via npx:
+   npx -y zerovisual regression --input ./test-results --provider anthropic --json
+   ```
+2. **Analyze Diff Metrics & View Cropped WebP Artifacts:** Review `diffPixelRatio` and `boundingBox` from the JSON summary, and use your native file/image viewer tool to inspect the cropped `.webp` diff images at `viewports[].diffImagePath` (plus `actualImagePath` / `expectedImagePath` in `./test-results/artifacts/`).
+3. **Correlate Responsive Behavior:** Compare Desktop vs. Mobile bounding boxes. Did an element drop below the fold, clip outside the viewport, or wrap unexpectedly?
+4. **Inspect Computed Styles:** Check for common CSS culprits:
    - Fixed `width: ...px` instead of `max-width: 100%` or responsive flex/grid units.
    - Missing `flex-wrap: wrap` causing horizontal overflow on narrow screens.
    - Unintended margin/padding inflation.
-4. **Determine Verdict:**
+5. **Determine Verdict:**
    - `bug`: Unintended visual degradation, layout break, text truncation, or element overlap.
    - `intentional_change`: Legitimate UI update (e.g. updated brand color, copy change, or intentional component redesign).
    - `flaky_subpixel_noise`: Sub-pixel anti-aliasing differences, font-rendering variations across platforms without structural change.
-5. **Output Requirement:** Output strictly valid JSON matching `output.schema.json`.
+6. **Output Requirement:** Output strictly valid JSON matching `output.schema.json`.
 
 ```json
 {

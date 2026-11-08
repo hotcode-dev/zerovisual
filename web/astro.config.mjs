@@ -47,7 +47,6 @@ export default defineConfig({
 					items: [
 						{ label: 'Configuration & CLI Flags', slug: 'reference/configuration' },
 						{ label: 'Agent Skills Reference', slug: 'reference/skills' },
-						{ label: 'MCP Server Integration', slug: 'reference/mcp-server' },
 					],
 				},
 			],

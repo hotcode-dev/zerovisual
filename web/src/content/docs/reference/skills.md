@@ -14,6 +14,7 @@ ZeroVisual provides two isolated, strictly-typed Agent Skills installed via `npx
 ## 1. `zerovisual-regression`
 
 - **Location:** `skills/zerovisual-regression/SKILL.md`
+- **Bundled Script:** `skills/zerovisual-regression/scripts/regression.mjs`
 - **Output Schema:** `skills/zerovisual-regression/output.schema.json`
 - **Role:** Forensic QA Triage Engineer
 
@@ -39,6 +40,7 @@ ZeroVisual provides two isolated, strictly-typed Agent Skills installed via `npx
 ## 2. `zerovisual-design-qa`
 
 - **Location:** `skills/zerovisual-design-qa/SKILL.md`
+- **Bundled Script:** `skills/zerovisual-design-qa/scripts/design-qa.mjs`
 - **Output Schema:** `skills/zerovisual-design-qa/output.schema.json`
 - **Role:** UI/UX Engineering Mentor
 
@@ -77,11 +79,12 @@ ZeroVisual provides two isolated, strictly-typed Agent Skills installed via `npx
 ## 3. `zerovisual-optimize`
 
 - **Location:** `skills/zerovisual-optimize/SKILL.md`
+- **Bundled Script:** `skills/zerovisual-optimize/scripts/optimize.mjs`
 - **Role:** Vision Image Pre-Processing & Token Optimizer
 
 ### Responsibilities
 - Identifies uncompressed screenshots (such as macOS high-DPI `2880×1800` captures or 4 MB PNG images) provided by the user.
 - Pre-processes them with model-aware tile math before dispatching to Vision LLMs.
 - Enforces downscaling to 504px (Anthropic), 512px (OpenAI), 768px/384px (Gemini), or 448px (Local), and compression to WebP (quality 80) to eliminate up to 90% vision tokens and 99% network payload.
-- Can invoke either the CLI `zerovisual optimize` or the MCP tool `optimize_image`.
+- Invokes the bundled `scripts/optimize.mjs` script or `npx -y zerovisual optimize` CLI command.
 

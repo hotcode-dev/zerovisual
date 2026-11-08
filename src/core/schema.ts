@@ -56,7 +56,10 @@ export type ZeroVisualConfig = z.infer<typeof ZeroVisualConfigSchema>;
 export const ViewportImagesSchema = z.object({
   diffBase64: z.string().startsWith('data:image/webp;base64,'),
   actualBase64: z.string().startsWith('data:image/webp;base64,').optional(),
-  expectedBase64: z.string().startsWith('data:image/webp;base64,').optional()
+  expectedBase64: z.string().startsWith('data:image/webp;base64,').optional(),
+  diffImagePath: z.string().optional(),
+  actualImagePath: z.string().optional(),
+  expectedImagePath: z.string().optional()
 });
 export type ViewportImages = z.infer<typeof ViewportImagesSchema>;
 

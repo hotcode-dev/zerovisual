@@ -1,7 +1,7 @@
 {
   "name": "zerovisual",
   "version": "0.1.0",
-  "description": "Zero-API-key visual regression and automated UI design QA pre-processor, Playwright reporter, CLI, and MCP server",
+  "description": "Zero-API-key visual regression and automated UI design QA pre-processor, Playwright reporter, CLI, and Agent Skills",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -15,8 +15,7 @@
   },
   "bin": {
     "zerovisual": "dist/cli/index.js",
-    "zerovisual-optimize": "dist/cli/index.js",
-    "zerovisual-mcp": "dist/mcp/server.js"
+    "zerovisual-optimize": "dist/cli/index.js"
   },
   "files": [
     "dist",
@@ -40,8 +39,6 @@
     "playwright",
     "visual-regression",
     "design-qa",
-    "mcp",
-    "model-context-protocol",
     "testing",
     "vlm",
     "vision-llm",
@@ -63,7 +60,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
     "citty": "^0.1.6",
     "fast-xml-parser": "^4.5.3",
     "sharp": "^0.33.5",

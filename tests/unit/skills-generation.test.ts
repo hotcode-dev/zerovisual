@@ -33,4 +33,16 @@ describe('Skill Output Schema Generation', () => {
     expect(regParsed.$schema).toBeDefined();
     expect(dqaParsed.$schema).toBeDefined();
   });
+
+  it('should include executable bundled scripts for all three skills', () => {
+    const scripts = [
+      'skills/zerovisual-optimize/scripts/optimize.mjs',
+      'skills/zerovisual-design-qa/scripts/design-qa.mjs',
+      'skills/zerovisual-regression/scripts/regression.mjs'
+    ];
+    for (const relPath of scripts) {
+      const fullPath = path.resolve(process.cwd(), relPath);
+      expect(fs.existsSync(fullPath)).toBe(true);
+    }
+  });
 });

@@ -1,11 +1,11 @@
 ---
 title: Configuration & CLI Flags
-description: Exhaustive reference for Playwright reporter options, CLI commands, and MCP parameters.
+description: Exhaustive reference for Playwright reporter options and CLI commands.
 sidebar:
   order: 1
 ---
 
-This page provides the complete parameter reference for ZeroVisual's Playwright Custom Reporter, CLI commands, and MCP tools.
+This page provides the complete parameter reference for ZeroVisual's Playwright Custom Reporter and CLI commands.
 
 ---
 
@@ -106,24 +106,21 @@ npx zerovisual-optimize <input-path> [options]
 
 ---
 
-## 5. MCP Server Tools & Prompts
+## 5. CLI: `zerovisual estimate`
 
-When running `zerovisual-mcp` over stdio:
+Calculates estimated Vision LLM tokens for raw vs. model-tile-aligned image resolutions across providers without encoding an image.
 
-### Tools
+```bash
+npx zerovisual estimate --width 1920 --height 1080 --provider anthropic --json
+```
 
-| Tool Name | Parameters | Returns | Description |
-| :--- | :--- | :--- | :--- |
-| `list_visual_failures` | `{ testResultsDir?: string }` | Array of test failures with `testId`, failing viewports, and paths. | Lists all visual failures discovered in the test results directory. |
-| `get_visual_failure_bundle` | `{ testId: string; triagePath?: string }` | Complete payload: Base64 WebP images (as native MCP image blocks), AOM YAML snapshot, computed styles. | Returns the model-aligned triage bundle for a specific failing visual test. |
-| `audit_live_ui_design` | `{ url: string; penpotPath?: string; provider?: string; lowTokenMode?: boolean }` | Design QA bundle with heuristic issues, Penpot deltas, and model-tile WebP screenshots. | Audits a live URL using headless Playwright and heuristic math. |
-| `optimize_image` | `{ imagePath?: string; imageBase64?: string; provider?: string; lowTokenMode?: boolean; quality?: number }` | WebP data URI, dimensions, token/byte savings metrics, and native MCP ImageContent. | Optimizes an arbitrary screenshot or image for Vision LLM tile grids on demand. |
-| `estimate_token_cost` | `{ width: number; height: number; provider?: string; lowTokenMode?: boolean }` | Comparison of original vs. optimized tokens and savings percentage. | Computes predicted token savings for candidate image resolutions. |
+### Command Flags
 
-### Prompts
-
-| Prompt Name | Arguments | Description |
-| :--- | :--- | :--- |
-| `triage-regression` | `{ testId: string }` | Formats the regression bundle and binds `skills/zerovisual-regression` for forensic triage. |
-| `critique-ui-design` | `{ url: string; penpotPath?: string }` | Formats the design audit bundle and binds `skills/zerovisual-design-qa` for UI/UX mentoring. |
+| Flag | Shorthand | Type | Default | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `--width` | `-w` | `number` | *Required* | Image pixel width (e.g., `1920`). |
+| `--height` | `-h` | `number` | *Required* | Image pixel height (e.g., `1080`). |
+| `--provider` | `-p` | `string` | `'anthropic'` | Target vision provider (`openai`, `anthropic`, `gemini`, `gemma`, `qwen`, `llama`, `mistral`, `deepseek`, `local`). |
+| `--lowTokenMode` | | `boolean` | `false` | Enable aggressive low-token mode (e.g. 384×384 for Gemma/Gemini). |
+| `--json` | | `boolean` | `false` | Outputs JSON formatted token estimate summary to stdout. |
 

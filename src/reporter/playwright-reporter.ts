@@ -69,8 +69,28 @@ export class ZeroVisualReporter implements Reporter {
       cropBox: diffDetection.boundingBox
     });
 
+    // Determine project / viewport details
+    const project = test.parent?.project()?.name ?? 'Default Viewport';
+    const projectViewport = (test.parent?.project()?.use as any)?.viewport;
+    const viewport = projectViewport
+      ? { width: projectViewport.width, height: projectViewport.height }
+      : { width: optimizedDiff.width, height: optimizedDiff.height };
+
+    const titlePath = test.titlePath();
+    const fullTitle = titlePath.slice(1).join(' > ');
+    const testId = normalizeTestId(titlePath);
+    const safeProject = project.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const outDir = path.resolve(process.cwd(), this.config.outputDir);
+    const artifactsDir = path.join(outDir, 'artifacts');
+    fs.mkdirSync(artifactsDir, { recursive: true });
+
+    const diffImagePath = path.join(artifactsDir, `${testId}-${safeProject}-diff.webp`);
+    fs.writeFileSync(diffImagePath, optimizedDiff.buffer);
+
     // Check for optional actual and expected images
     let actualBase64: string | undefined;
+    let actualImagePath: string | undefined;
     const actualAttachment = result.attachments.find(
       (att) => att.name.endsWith('-actual.png') || att.name.endsWith('actual.png')
     );
@@ -84,10 +104,13 @@ export class ZeroVisualReporter implements Reporter {
           cropBox: diffDetection.boundingBox
         });
         actualBase64 = opt.dataUri;
+        actualImagePath = path.join(artifactsDir, `${testId}-${safeProject}-actual.webp`);
+        fs.writeFileSync(actualImagePath, opt.buffer);
       }
     }
 
     let expectedBase64: string | undefined;
+    let expectedImagePath: string | undefined;
     const expectedAttachment = result.attachments.find(
       (att) => att.name.endsWith('-expected.png') || att.name.endsWith('expected.png')
     );
@@ -101,6 +124,8 @@ export class ZeroVisualReporter implements Reporter {
           cropBox: diffDetection.boundingBox
         });
         expectedBase64 = opt.dataUri;
+        expectedImagePath = path.join(artifactsDir, `${testId}-${safeProject}-expected.webp`);
+        fs.writeFileSync(expectedImagePath, opt.buffer);
       }
     }
 
@@ -133,17 +158,6 @@ export class ZeroVisualReporter implements Reporter {
       }
     }
 
-    // Determine project / viewport details
-    const project = test.parent?.project()?.name ?? 'Default Viewport';
-    const projectViewport = (test.parent?.project()?.use as any)?.viewport;
-    const viewport = projectViewport
-      ? { width: projectViewport.width, height: projectViewport.height }
-      : { width: optimizedDiff.width, height: optimizedDiff.height };
-
-    const titlePath = test.titlePath();
-    const fullTitle = titlePath.slice(1).join(' > ');
-    const testId = normalizeTestId(titlePath);
-
     const viewportArtifact: ViewportArtifact = {
       project,
       viewport,
@@ -156,7 +170,10 @@ export class ZeroVisualReporter implements Reporter {
       images: {
         diffBase64: optimizedDiff.dataUri,
         actualBase64,
-        expectedBase64
+        expectedBase64,
+        diffImagePath,
+        actualImagePath,
+        expectedImagePath
       }
     };
 

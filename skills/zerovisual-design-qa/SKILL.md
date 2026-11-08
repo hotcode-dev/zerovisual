@@ -20,10 +20,17 @@ You are an expert Design Systems Engineer and UI/UX Mentor for software engineer
 - **Actionable Code Deliverables:** Every violation must include an exact CSS fix and a modern Tailwind CSS utility replacement.
 
 ## Audit Procedure
-1. Review the deterministic `heuristicViolations` and `penpotDeltas` reported in the payload.
-2. Inspect the model-grid-aligned WebP screenshot to evaluate visual balance and spacing consistency.
-3. Calculate an overall design QA score (0-100) based on severity and density of violations.
-4. Output strictly valid JSON matching `output.schema.json`.
+1. **Run the Design QA Script (or CLI) against the target URL:**
+   ```bash
+   # Using the bundled skill script:
+   node <skill-dir>/scripts/design-qa.mjs --url <url> --provider anthropic --json
+
+   # Or directly via npx (add --penpot <path> if comparing against a Penpot file):
+   npx -y zerovisual design-qa --url <url> --provider anthropic --json
+   ```
+2. **Review Deterministic Heuristics & Deltas:** Inspect the `heuristicViolations`, `penpotDeltas`, `ariaSnapshot`, and `computedStyles` printed in the JSON summary (or in `./test-results/design-qa-ready.json`).
+3. **Inspect Optimized Viewport Screenshots:** Use your native file/image viewer tool to view each viewport's model-grid-aligned `.webp` screenshot at `viewports[].diffImagePath` (saved under `./test-results/artifacts/`).
+4. **Calculate Overall Score & Verdict:** Calculate an overall design QA score (0-100) based on severity and density of violations, and output strictly valid JSON matching `output.schema.json`.
 
 ```json
 {

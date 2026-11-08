@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
 import { runRegressionCommand } from '../../src/cli/commands/regression.js';
 import { runDesignQaCommand } from '../../src/cli/commands/design-qa.js';
+import { runEstimateCommand } from '../../src/cli/commands/estimate.js';
 import { TriagePayloadSchema } from '../../src/core/schema.js';
 
 describe('ZeroVisual CLI Commands Integration', () => {
@@ -81,6 +82,24 @@ describe('ZeroVisual CLI Commands Integration', () => {
       const parsed = TriagePayloadSchema.parse(content);
       expect(parsed.mode).toBe('regression');
       expect(parsed.failures[0]?.viewports[0]?.images.diffBase64).toMatch(/^data:image\/webp;base64,/);
+      const diffImgPath = parsed.failures[0]?.viewports[0]?.images.diffImagePath;
+      expect(diffImgPath).toBeDefined();
+      expect(fs.existsSync(diffImgPath!)).toBe(true);
+    });
+  });
+
+  describe('runEstimateCommand', () => {
+    it('should calculate raw vs optimized token costs accurately', () => {
+      const summary = runEstimateCommand({
+        width: 1920,
+        height: 1080,
+        provider: 'anthropic',
+        json: true
+      });
+      expect(summary.provider).toBe('anthropic');
+      expect(summary.originalResolution).toBe('1920x1080');
+      expect(summary.optimizedTokens).toBeLessThan(summary.originalTokens);
+      expect(summary.tileDimensions).toEqual({ maxWidth: 504, maxHeight: 504 });
     });
   });
 
@@ -171,6 +190,9 @@ describe('ZeroVisual CLI Commands Integration', () => {
       const fileContent = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
       const validated = TriagePayloadSchema.parse(fileContent);
       expect(validated.mode).toBe('design-qa');
+      const vpDiffPath = validated.failures[0]?.viewports[0]?.images.diffImagePath;
+      expect(vpDiffPath).toBeDefined();
+      expect(fs.existsSync(vpDiffPath!)).toBe(true);
     });
   });
 });

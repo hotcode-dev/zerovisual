@@ -55,7 +55,7 @@ import '../styles/custom.css';
     <h2 class="text-2xl font-bold text-slate-100 tracking-tight mb-6">Why ZeroVisual?</h2>
     <CardGrid stagger>
       <Card title="Zero API Keys Required (BYOA)" icon="key">
-        ZeroVisual never calls LLM APIs directly. It runs 100% locally on your machine or CI/CD runner and outputs structured JSON or serves tools via standard MCP over stdio.
+        ZeroVisual never calls LLM APIs directly. It runs 100% locally on your machine or CI/CD runner and outputs structured JSON and model-aligned WebP artifacts for your coding agent via 1-command Skills + Scripts.
       </Card>
       <Card title="Model-Aware Grid Math" icon="setting">
         Aligns failure diffs to exact Vision Transformer grids: 512px for OpenAI, 504px for Anthropic (28px patches), 768px/384px for Gemini, and 448px for Local models.
@@ -124,7 +124,7 @@ import '../styles/custom.css';
       <strong class="text-indigo-100 font-semibold block mb-2">Why Both Token Count and Network Bytes Matter:</strong>
       <ol class="list-decimal pl-5 space-y-2 text-sm leading-relaxed">
         <li><strong>Vision Tokens (Pixel Dimensions):</strong> Vision Transformers (ViTs) calculate tokens based on geometric patch grids (e.g. Anthropic's 28×28px patches, OpenAI's 512×512px tiles)—not file bytes. Cropping and downscaling ensures failure diffs fit inside a <strong>single vision tile</strong>.</li>
-        <li><strong>Network Bytes (Payload Size):</strong> MCP over <code>stdio</code> and HTTP API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB prevents Node.js JSON serialization bottlenecks and keeps your AI coding agent snappy.</li>
+        <li><strong>Network Bytes (Payload Size):</strong> Vision LLM API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB prevents serialization bottlenecks and keeps your AI coding agent snappy.</li>
       </ol>
     </blockquote>
 
