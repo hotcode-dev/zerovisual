@@ -40,6 +40,7 @@ export default defineConfig({
 						{ label: 'How It Works (Deep Dive)', slug: 'guides/how-it-works' },
 						{ label: 'Model Vision Grids & Tokens', slug: 'guides/model-vision-grids' },
 						{ label: 'Empirical LLM Benchmarks', slug: 'guides/benchmarks' },
+						{ label: 'Using with Impeccable', slug: 'guides/with-impeccable' },
 					],
 				},
 				{

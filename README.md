@@ -209,6 +209,32 @@ npx zerovisual estimate --width 1920 --height 1080 --provider anthropic --json
 
 ---
 
+### 4. Example: Using ZeroVisual with [Impeccable](https://impeccable.style/)
+
+Pair **ZeroVisual** (deterministic WCAG/grid/tap-target math + 1-tile WebP screenshots) with **[Impeccable](https://impeccable.style/)** (frontend design craft, hierarchy, and refinement commands like `polish`, `layout`, `adapt`, and `critique`) so your coding agent never wastes tokens eyeballing contrast or pixel spacing:
+
+```bash
+# 1. Install both Agent Skills
+npx skills add hotcode-dev/zerovisual
+npx skills add pbakaus/impeccable
+
+# 2. Run deterministic Design QA + generate model-aligned WebP screenshots
+npx zerovisual design-qa --url http://localhost:3000 --provider anthropic --json
+```
+
+Then prompt your coding agent (Cursor, Claude Code, Windsurf, or Antigravity):
+
+```text
+Inspect `./test-results/design-qa-ready.json` and its optimized `.webp` screenshot
+from ZeroVisual. Use the `impeccable` skill (`polish` and `layout`) to fix every
+WCAG contrast, 8pt spacing, tap-target, and overflow violation while elevating the
+overall visual hierarchy. Re-run `zerovisual design-qa` once afterward to verify.
+```
+
+> 📖 See the full **[Using ZeroVisual with Impeccable Guide](https://hotcode-dev.github.io/zerovisual/guides/with-impeccable)** for multi-viewport redesign checks and Playwright regression guardrails.
+
+---
+
 ## 📊 Token & Payload Efficiency Comparison
 
 ### Raw Full-HD PNG vs. ZeroVisual Model-Aligned WebP
@@ -261,6 +287,7 @@ Our full documentation website is located in [`/web`](file:///Users/ntsd/git/hot
 * ⚙️ **[How It Works (Deep Dive)](https://hotcode-dev.github.io/zerovisual/guides/how-it-works):** The 10 core architectural features under the hood (Zero-Token Law, Bounding Box detection + context padding, `withoutEnlargement: true`, WebP quality 80 byte savings vs. token savings, multi-viewport aggregation, scoped AOM extraction, and heuristic linter math).
 * 📐 **[Model Vision Grids & Tokens](https://hotcode-dev.github.io/zerovisual/guides/model-vision-grids):** In-depth analysis of OpenAI (512px), Anthropic (28px patch grid / 504px max), Gemini (768px / 384px), and Local VLM token calculations.
 * 🎛️ **[Configuration & CLI Reference](https://hotcode-dev.github.io/zerovisual/reference/configuration):** Complete parameter reference tables for Playwright Reporter, `zerovisual regression`, `zerovisual design-qa`, `zerovisual optimize`, and `zerovisual estimate`.
+* 🎨 **[Using ZeroVisual with Impeccable](https://hotcode-dev.github.io/zerovisual/guides/with-impeccable):** End-to-end workflows pairing ZeroVisual's deterministic math & 1-tile WebP screenshots with Impeccable's `polish`, `layout`, `adapt`, and `critique` commands.
 * 🧠 **[Agent Skills Reference](https://hotcode-dev.github.io/zerovisual/reference/skills):** Schemas, bundled scripts, and instructions for `zerovisual-regression`, `zerovisual-design-qa`, and `zerovisual-optimize`.
 
 ---
