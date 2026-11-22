@@ -21,9 +21,9 @@ ZeroVisual solves two major pain points in modern software engineering:
 Standard Playwright `toHaveScreenshot()` pixel-diffing is fast and free, but fails on harmless sub-pixel font anti-aliasing or minor OS rendering shifts. Conversely, sending raw `1920x1080` screenshots across Desktop, Tablet, and Mobile viewports to a Vision LLM to triage failures will burn through your token budget and slow CI/CD to a crawl.
 * **The ZeroVisual Solution:** Let Playwright's deterministic pixel math run first for free. Only when a test fails does ZeroVisual intercept the diff, crop it to the exact failure bounding box, downscale it to your target LLM's exact vision tile grid, extract the localized Accessibility Tree (`ariaSnapshot`), and group all failing viewports into a single `triage-ready.json` bundle.
 
-### 2. For Engineers With Zero Design Skills: Automated Design QA (`design-qa` mode)
-If you are a developer building a web or mobile app without a dedicated designer—or trying to match an open-source **Penpot** design file—guessing spacing, contrast, and visual hierarchy in CSS is frustrating.
-* **The ZeroVisual Solution:** Point `zerovisual design-qa` at your localhost URL (and optional Penpot SVG/JSON export). ZeroVisual runs deterministic math checks on your live DOM (verifying WCAG 2.1 contrast ratios, `4px`/`8px` spatial grid rhythm, `44x44px` mobile tap targets, and typographic scales) and packages the violations alongside a token-optimized screenshot so your coding agent can give you exact CSS/Tailwind fixes.
+### 2. For Engineers & AI Coding Agents: Automated Design QA & Rendered Anti-Slop (`design-qa` mode)
+If you are a developer building a web or mobile app with an AI coding agent—or trying to match an **[Impeccable](https://impeccable.style/) `DESIGN.md`** or open-source **Penpot** design file—static code linters cannot see actual rendered bounding boxes, computed gradients, or below-the-fold overflow.
+* **The ZeroVisual Solution:** Point `zerovisual design-qa` at your localhost URL (with auto-discovered `DESIGN.md` and optional Penpot SVG/JSON export). ZeroVisual evaluates 26 deterministic rules on your live rendered DOM (WCAG 2.1 contrast ratios, `4px`/`8px` spatial grid rhythm, `44x44px` mobile tap targets, **rendered AI-slop patterns** like gradient text, purple/violet gradients, chromatic glow halos, side-tab borders, nested cards, icon-tile stacks, and banned eyebrows, plus text occlusion, clipped overflow, and `DESIGN.md` drift), captures both a 1-tile viewport overview and up to **4 clustered 1-tile `.webp` violation crops**, and routes every finding directly to its target `/impeccable` command.
 
 ---
 
@@ -49,20 +49,21 @@ If you are a developer building a web or mobile app without a dedicated designer
 
 ```text
 [Stage 1: Deterministic Engine (0 Tokens)]
-Playwright Pixel Diff / CSS Heuristic Math / Penpot Token Diff
+Playwright Pixel Diff / 26 Rendered Anti-Slop & A11y Rules / DESIGN.md & Penpot Token Diff
        │
        ├──► PASS ──► Workflow Ends Immediately (0 AI Tokens Used)
        │
        └──► FAIL / AUDIT ──► Triggers ZeroVisual Pre-Processor
                                     │
 [Stage 2: ZeroVisual Optimizer]     ▼
-  1. Detects diff bounding box + 32px context padding
+  1. Detects diff or clustered violation bounding boxes + 32px context padding
   2. Resizes & encodes to WebP based on Model Tile Grid (512px / 504px / 768px)
-  3. Scopes Accessibility Tree (ariaSnapshot) & Computed CSS
+  3. Scopes Accessibility Tree (ariaSnapshot), Computed CSS & /impeccable routing
   4. Aggregates Desktop + Tablet + Mobile viewports by testId
                                     │
                                     ▼
-              Outputs ./test-results/triage-ready.json + ./test-results/artifacts/*.webp
+              Outputs ./test-results/triage-ready.json (or design-qa-ready.json)
+                      + ./test-results/artifacts/*.webp (Overview + Violation Crops)
                                     │
             ┌───────────────────────┴───────────────────────┐
             ▼                                               ▼
@@ -104,7 +105,7 @@ npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 
 This installs three self-contained skills with bundled `scripts/*.mjs` runners:
 * **`skills/zerovisual-optimize`** (`scripts/optimize.mjs`): Teaches agents how and when to optimize user screenshots and UI images to eliminate token waste and payload latency.
-* **`skills/zerovisual-design-qa`** (`scripts/design-qa.mjs`): Teaches agents objective UI/UX mentoring guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind fixes).
+* **`skills/zerovisual-design-qa`** (`scripts/design-qa.mjs`): Teaches agents objective UI/UX mentoring and **rendered anti-slop** guidelines (8pt spacing grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, eliminating AI purple gradients/glows/nested cards/eyebrows, `DESIGN.md` token drift, clustered 1-tile `.webp` violation crops, and `/impeccable` command routing).
 * **`skills/zerovisual-regression`** (`scripts/regression.mjs`): Teaches agents strict code-to-code regression triage (cross-viewport correlation, semantic AOM validation, anti-aliasing noise filtering).
 
 ---
@@ -173,15 +174,22 @@ npx zerovisual-optimize ./bug-report.png --provider openai
 npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
 ```
 
-#### Mode B: Audit Live UI Design for Engineers (`zerovisual design-qa`)
-Audit a live local or staging URL against objective UI/UX heuristics (8pt spacing grid, WCAG contrast, tap target size, font scale) and optional open-source **Penpot** design exports:
+#### Mode B: Audit Live UI Design & Eliminate Rendered AI Slop (`zerovisual design-qa`)
+Audit a live local or staging URL against 26 deterministic UI/UX and rendered anti-slop rules (8pt spacing grid, WCAG contrast, tap target size, font scale, gradient text, AI purple gradients, chromatic glow shadows, side-tab borders, nested cards, icon-tile stacks, banned eyebrows, text occlusion, clipped overflow, broken images), auto-discovered **[Impeccable](https://impeccable.style/) `DESIGN.md`** specs, and optional open-source **Penpot** design exports:
 
 ```bash
-# Standalone Engineer UI Audit (No design file needed!)
+# Standalone Engineer UI & Rendered Anti-Slop Audit (Auto-discovers DESIGN.md!)
 npx zerovisual design-qa \
   --url http://localhost:3000 \
-  --provider gemini \
-  --low-token
+  --provider anthropic \
+  --json
+
+# Specify an explicit DESIGN.md file and custom max clustered violation crops
+npx zerovisual design-qa \
+  --url http://localhost:3000 \
+  --design-md ./DESIGN.md \
+  --max-crops 4 \
+  --provider anthropic
 
 # Compare Live UI against an Open-Source Penpot Export
 npx zerovisual design-qa \
@@ -211,24 +219,26 @@ npx zerovisual estimate --width 1920 --height 1080 --provider anthropic --json
 
 ### 4. Example: Using ZeroVisual with [Impeccable](https://impeccable.style/)
 
-Pair **ZeroVisual** (deterministic WCAG/grid/tap-target math + 1-tile WebP screenshots) with **[Impeccable](https://impeccable.style/)** (frontend design craft, hierarchy, and refinement commands like `polish`, `layout`, `adapt`, and `critique`) so your coding agent never wastes tokens eyeballing contrast or pixel spacing:
+Pair **ZeroVisual** (deterministic WCAG/grid/tap-target math, **rendered AI-slop detection**, auto-discovered `DESIGN.md` drift checking, and clustered 1-tile WebP violation crops) with **[Impeccable](https://impeccable.style/)** (frontend design craft, hierarchy, and refinement commands like `polish`, `layout`, `typeset`, `colorize`, `distill`, `quieter`, `adapt`, and `critique`) so your coding agent never wastes tokens on raw full-page Retina screenshots:
 
 ```bash
 # 1. Install both Agent Skills
 npx skills add hotcode-dev/zerovisual
 npx skills add pbakaus/impeccable
 
-# 2. Run deterministic Design QA + generate model-aligned WebP screenshots
+# 2. Run deterministic Design QA + Anti-Slop + generate clustered 1-tile WebP crops
 npx zerovisual design-qa --url http://localhost:3000 --provider anthropic --json
 ```
 
 Then prompt your coding agent (Cursor, Claude Code, Windsurf, or Antigravity):
 
 ```text
-Inspect `./test-results/design-qa-ready.json` and its optimized `.webp` screenshot
-from ZeroVisual. Use the `impeccable` skill (`polish` and `layout`) to fix every
-WCAG contrast, 8pt spacing, tap-target, and overflow violation while elevating the
-overall visual hierarchy. Re-run `zerovisual design-qa` once afterward to verify.
+Inspect `./test-results/design-qa-ready.json`, the viewport overview `.webp` tiles,
+and each clustered 1-tile violation crop in `viewports[].violationCrops` from ZeroVisual.
+Follow `suggestedImpeccableCommands` using the `impeccable` skill (`distill`, `colorize`,
+`typeset`, `layout`, `adapt`, `polish`) to fix every WCAG contrast, 8pt spacing,
+tap-target, render-integrity, and rendered AI-slop violation while honoring `DESIGN.md`.
+Re-run `zerovisual design-qa` once afterward to verify.
 ```
 
 > 📖 See the full **[Using ZeroVisual with Impeccable Guide](https://hotcode-dev.github.io/zerovisual/guides/with-impeccable)** for multi-viewport redesign checks and Playwright regression guardrails.
