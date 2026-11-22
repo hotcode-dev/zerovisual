@@ -12,193 +12,300 @@ import '../styles/custom.css';
     description: 'Zero-waste, zero-API-key visual regression and automated UI design QA pre-processor for AI Agents.',
     template: 'splash',
     hero: {
-      tagline: 'Cut Vision LLM token consumption by up to 90% and shrink payload bytes by 99%—without requiring a single AI API key.',
+      tagline: 'Cut Vision LLM token spend by up to 90% and shrink screenshot payloads by 99%—100% locally, with zero AI API keys.',
       actions: [
         { text: 'Get Started', link: '/guides/getting-started/', icon: 'right-arrow' },
-        { text: 'Benchmarks (-85.1% ViT)', link: '/guides/benchmarks/', variant: 'secondary' },
-        { text: 'How It Works', link: '/guides/how-it-works/', variant: 'minimal' },
-        { text: 'View on GitHub', link: 'https://github.com/hotcode-dev/zerovisual', icon: 'external', variant: 'minimal' },
+        { text: 'Explore Benchmarks (-85.1% ViT)', link: '/guides/benchmarks/', variant: 'secondary' },
       ],
     },
   }}
 >
-  <div class="not-content">
-    <ImageCompare />
+  <div class="not-content space-y-16">
+    <!-- Section 1: Real-World Visual Regression Comparison -->
+    <section aria-labelledby="showcase-heading">
+      <ImageCompare />
+    </section>
 
-  <TokenCalculator />
+    <!-- Section 2: Interactive Token & Byte Savings Calculator -->
+    <section aria-labelledby="calculator-heading">
+      <TokenCalculator />
+    </section>
 
-  <!-- Feature Callout: Interactive Benchmark & AI Session Explorer -->
-  <div class="my-10 p-6 rounded-2xl bg-gradient-to-r from-indigo-950/70 via-slate-900 to-slate-950 border border-indigo-500/30 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-    <div>
-      <div class="flex items-center gap-2 mb-2">
-        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-          New: Real-World Web Benchmarks
-        </span>
-        <span class="text-xs text-slate-400 font-mono">11 Live & Synthetic Scenarios</span>
-      </div>
-      <h3 class="text-xl font-bold text-white tracking-tight">Interactive Benchmark & AI Session Explorer</h3>
-      <p class="text-sm text-slate-300 mt-1 max-w-2xl">
-        Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on <code>RadixArk/Qwen3.8-27B-NVFP4</code>.
-      </p>
-    </div>
-    <a href="/guides/benchmarks/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all shadow-md shadow-indigo-500/25 whitespace-nowrap">
-      <span>Launch Benchmark Explorer</span>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-      </svg>
-    </a>
-  </div>
-
-  <div class="border-t border-slate-800 my-12"></div>
-
-  <section class="my-12">
-    <h2 class="text-2xl font-bold text-slate-100 tracking-tight mb-6">Why ZeroVisual?</h2>
-    <CardGrid stagger>
-      <Card title="Zero API Keys Required (BYOA)" icon="key">
-        ZeroVisual never calls LLM APIs directly. It runs 100% locally on your machine or CI/CD runner and outputs structured JSON and model-aligned WebP artifacts for your coding agent via 1-command Skills + Scripts.
-      </Card>
-      <Card title="Model-Aware Grid Math" icon="setting">
-        Aligns failure diffs to exact Vision Transformer grids: 512px for OpenAI, 504px for Anthropic (28px patches), 768px/384px for Gemini, and 448px for Local models.
-      </Card>
-      <Card title="Multi-Viewport Aggregation" icon="laptop">
-        Correlates broken layouts across Desktop, Tablet, and Mobile viewports under a single normalized <code>testId</code>. Your AI agent diagnoses the breakpoint bug in one single prompt.
-      </Card>
-      <Card title="Scoped Semantic Context" icon="document">
-        Captures the component's Playwright <code>ariaSnapshot</code> YAML and 14 computed layout CSS properties instead of dumping 100,000+ characters of raw HTML.
-      </Card>
-      <Card title="Heuristic UI Linter + Penpot" icon="pencil">
-        Objective math checks for WCAG 2.1 AA contrast ratios, 8pt spacing rhythm, and 44px tap targets, plus native SVG/JSON token diffing for open-source Penpot designs.
-      </Card>
-      <Card title="Dual Isolated Agent Skills" icon="star">
-        Separate <code>zerovisual-regression</code> (strict triage forensics) and <code>zerovisual-design-qa</code> (UI/UX coaching) skills to prevent prompt pollution and hallucinations.
-      </Card>
-    </CardGrid>
-  </section>
-
-  <div class="border-t border-slate-800 my-12"></div>
-
-  <section class="my-12">
-    <h2 class="text-2xl font-bold text-slate-100 tracking-tight mb-2">Token & Payload Efficiency</h2>
-    <h3 class="text-base font-semibold text-slate-400 mb-6">Raw Full-HD PNG vs. ZeroVisual Model-Aligned WebP</h3>
-
-    <div class="overflow-x-auto my-6">
-      <table class="w-full text-left rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md">
-        <thead>
-          <tr class="bg-slate-800/90 text-slate-100 uppercase text-xs tracking-wider">
-            <th>Metric</th>
-            <th>Raw Full-HD PNG (1920×1080)</th>
-            <th>ZeroVisual WebP (<code>quality: 80</code>)</th>
-            <th>Engineering Advantage</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="font-bold text-slate-200">Vision LLM Tokens</td>
-            <td>~1,600 – 2,691 tokens / viewport</td>
-            <td class="font-bold text-emerald-400">~28 – 324 tokens / viewport</td>
-            <td class="font-bold text-emerald-400">Up to ~90% token savings (crops & fits exact 1-tile grid)</td>
-          </tr>
-          <tr>
-            <td class="font-bold text-slate-200">Payload Size</td>
-            <td>~4,000 KB (5.3 MB Base64)</td>
-            <td class="font-bold text-emerald-400">~35 KB (~47 KB Base64)</td>
-            <td class="font-bold text-emerald-400">99% byte reduction (instant IPC & network upload)</td>
-          </tr>
-          <tr>
-            <td class="font-bold text-slate-200">JSON Parse Time</td>
-            <td>~100–300 ms (pipe congestion)</td>
-            <td class="font-bold text-emerald-400">&lt; 1 ms</td>
-            <td class="font-bold text-emerald-400">Zero UI lag or event loop blocking in IDE</td>
-          </tr>
-          <tr>
-            <td class="font-bold text-slate-200">Model UI Readability</td>
-            <td>Full canvas noise</td>
-            <td class="font-bold text-emerald-400">Isolated diff bounding box + 32px padding</td>
-            <td class="font-bold text-emerald-400">Eliminates VLM hallucinations on subtle UI shifts</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <blockquote class="border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-950/50 to-slate-900/80 rounded-r-xl p-5 my-6 text-slate-300">
-      <strong class="text-indigo-100 font-semibold block mb-2">Why Both Token Count and Network Bytes Matter:</strong>
-      <ol class="list-decimal pl-5 space-y-2 text-sm leading-relaxed">
-        <li><strong>Vision Tokens (Pixel Dimensions):</strong> Vision Transformers (ViTs) calculate tokens based on geometric patch grids (e.g. Anthropic's 28×28px patches, OpenAI's 512×512px tiles)—not file bytes. Cropping and downscaling ensures failure diffs fit inside a <strong>single vision tile</strong>.</li>
-        <li><strong>Network Bytes (Payload Size):</strong> Vision LLM API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB prevents serialization bottlenecks and keeps your AI coding agent snappy.</li>
-      </ol>
-    </blockquote>
-
-    <div class="mt-8 mb-4">
-      <h3 class="text-base font-semibold text-slate-300 mb-3">Live Empirical Validation (Qwen 3.8 27B & Live Websites)</h3>
-      <p class="text-slate-400 mb-4">Tested against a local Vision LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:</p>
-      <ul class="list-disc pl-5 space-y-1.5 text-slate-300 text-sm">
-        <li><strong>Vision Image Tokens:</strong> 8,756 tokens ➔ <strong class="text-emerald-400">1,304 tokens</strong> (-85.1% ViT Token Reduction)</li>
-        <li><strong>Network Payload Transfer:</strong> 638.9 KB ➔ <strong class="text-emerald-400">71.8 KB</strong> (-88.8% Bandwidth Saved)</li>
-        <li><strong>Total Tokens Consumed:</strong> 25,748 tokens ➔ <strong class="text-emerald-400">18,105 tokens</strong> (-29.7% Total Token Reduction)</li>
-        <li><strong>Diagnostic Triage Accuracy:</strong> 59.1% ➔ <strong class="text-emerald-400">68.2%</strong> (+9.1% Accuracy Boost)</li>
-      </ul>
-      <div class="mt-4">
-        <a href="/guides/benchmarks/" class="text-indigo-400 hover:text-indigo-300 underline font-semibold inline-flex items-center gap-1.5">
-          Read the full Empirical LLM Benchmark Report →
+    <!-- Section 3: Benchmark Explorer Callout -->
+    <section aria-labelledby="benchmark-callout-heading">
+      <div class="zv-callout-banner">
+        <div class="space-y-2 max-w-2xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="zv-eyebrow-pill">Empirical Benchmarks</span>
+            <span class="text-xs text-slate-400 font-mono">11 Live &amp; Synthetic Scenarios</span>
+          </div>
+          <h2 id="benchmark-callout-heading" class="text-xl sm:text-2xl font-bold text-slate-50 tracking-tight m-0">
+            Interactive Benchmark &amp; AI Session Explorer
+          </h2>
+          <p class="text-base text-slate-300 leading-relaxed m-0">
+            Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on <code>RadixArk/Qwen3.8-27B-NVFP4</code>.
+          </p>
+        </div>
+        <a
+          href="/guides/benchmarks/"
+          class="zv-cta-button"
+        >
+          <span>Launch Benchmark Explorer</span>
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
         </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="border-t border-slate-800 my-12"></div>
+    <!-- Section 4: Core Capabilities -->
+    <section aria-labelledby="capabilities-heading" class="pt-4 border-t border-slate-800/80">
+      <div class="mb-6">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Architecture</span>
+        <h2 id="capabilities-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+          Why ZeroVisual?
+        </h2>
+      </div>
+      <CardGrid>
+        <Card title="Zero API Keys Required (BYOA)" icon="key">
+          Runs 100% locally on your machine or CI/CD runner. Outputs structured JSON and model-aligned WebP artifacts for your coding agent via 1-command Skills + Scripts.
+        </Card>
+        <Card title="Model-Aware Grid Math" icon="setting">
+          Aligns failure diffs to exact Vision Transformer grids: 512px for OpenAI, 504px for Anthropic (28px patches), 768px/384px for Gemini, and 448px for Local models.
+        </Card>
+        <Card title="Multi-Viewport Aggregation" icon="laptop">
+          Correlates broken layouts across Desktop, Tablet, and Mobile viewports under a single normalized <code>testId</code> so your agent diagnoses breakpoint bugs in one prompt.
+        </Card>
+        <Card title="Scoped Semantic Context" icon="document">
+          Captures the component's Playwright <code>ariaSnapshot</code> YAML and 14 computed layout CSS properties instead of dumping 100,000+ characters of raw HTML.
+        </Card>
+        <Card title="Heuristic UI Linter + Penpot" icon="pencil">
+          Objective math checks for WCAG 2.1 AA contrast ratios, 4px/8px spacing rhythm, and 44px tap targets, plus native SVG/JSON token diffing for open-source Penpot designs.
+        </Card>
+        <Card title="Dual Isolated Agent Skills" icon="star">
+          Separate <code>zerovisual-regression</code> (strict triage forensics) and <code>zerovisual-design-qa</code> (UI/UX coaching) skills to prevent prompt pollution and hallucinations.
+        </Card>
+      </CardGrid>
+    </section>
 
-  <section class="my-12">
-    <h2 class="text-2xl font-bold text-slate-100 tracking-tight mb-6">Model Vision Grid Reference</h2>
-    <div class="overflow-x-auto my-6">
-      <table class="w-full text-left rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md">
-        <thead>
-          <tr class="bg-slate-800/90 text-slate-100 uppercase text-xs tracking-wider">
-            <th>Provider Setting</th>
-            <th>Target Max Bounding Box</th>
-            <th>Vision Grid Mechanics</th>
-            <th>Approx. Token Cost per Diff</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>openai</code></td>
-            <td><code>512 × 512 px</code></td>
-            <td>Fits inside 1 standard OpenAI <code>512px</code> tile</td>
-            <td class="text-emerald-400 font-semibold">~85 – 255 tokens</td>
-          </tr>
-          <tr>
-            <td><code>anthropic</code></td>
-            <td><code>504 × 504 px</code></td>
-            <td>Exact <code>18 × 18</code> grid of <code>28×28 px</code> patches</td>
-            <td class="text-emerald-400 font-semibold">~28 – 324 tokens</td>
-          </tr>
-          <tr>
-            <td><code>gemma</code> / <code>gemini</code></td>
-            <td><code>768 × 768 px</code></td>
-            <td>Fits 1 native Gemma / Gemini multimodal tile</td>
-            <td class="text-emerald-400 font-semibold">~258 tokens</td>
-          </tr>
-          <tr>
-            <td><code>gemma</code> (<code>lowTokenMode</code>)</td>
-            <td><code>384 × 384 px</code></td>
-            <td>Sub-384px single base tile optimization</td>
-            <td class="text-emerald-400 font-semibold">~258 tokens (ultra-fast)</td>
-          </tr>
-          <tr>
-            <td><code>qwen</code></td>
-            <td><code>504 × 504 px</code></td>
-            <td>Dynamic 2D spatial patch grid (<code>28×28 px</code>)</td>
-            <td class="text-emerald-400 font-semibold">~28 – 324 tokens</td>
-          </tr>
-          <tr>
-            <td><code>local</code></td>
-            <td><code>448 × 448 px</code> (configurable)</td>
-            <td>Optimized for local VLMs (<code>28px</code> / <code>14px</code> patch ViTs)</td>
-            <td class="text-slate-300">Local compute</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+    <!-- Section 5: Token & Payload Efficiency -->
+    <section aria-labelledby="efficiency-heading" class="pt-4 border-t border-slate-800/80">
+      <div class="mb-6">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Performance</span>
+        <h2 id="efficiency-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+          Token &amp; Payload Efficiency
+        </h2>
+        <p class="text-base text-slate-400 mt-1">
+          Raw Full-HD PNG (1920×1080) vs. ZeroVisual Model-Aligned WebP
+        </p>
+      </div>
+
+      <div class="overflow-x-auto my-6">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Metric</th>
+              <th scope="col">Raw Full-HD PNG (1920×1080)</th>
+              <th scope="col">ZeroVisual WebP (<code>quality: 80</code>)</th>
+              <th scope="col">Engineering Advantage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="font-semibold text-slate-100">Vision LLM Tokens</td>
+              <td class="tabular-nums">~1,600 – 2,691 tokens / viewport</td>
+              <td class="font-semibold text-emerald-400 tabular-nums">~28 – 324 tokens / viewport</td>
+              <td class="font-medium text-emerald-300">Up to ~90% token savings (fits 1-tile grid)</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-slate-100">Payload Size</td>
+              <td class="tabular-nums">~4,000 KB (5.3 MB Base64)</td>
+              <td class="font-semibold text-emerald-400 tabular-nums">~35 KB (~47 KB Base64)</td>
+              <td class="font-medium text-emerald-300">99% byte reduction (instant IPC &amp; upload)</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-slate-100">JSON Parse Time</td>
+              <td class="tabular-nums">~100 – 300 ms (pipe congestion)</td>
+              <td class="font-semibold text-emerald-400 tabular-nums">&lt; 1 ms</td>
+              <td class="font-medium text-emerald-300">Zero UI lag or event loop blocking in IDE</td>
+            </tr>
+            <tr>
+              <td class="font-semibold text-slate-100">Model UI Readability</td>
+              <td>Full canvas noise</td>
+              <td class="font-semibold text-emerald-400">Isolated diff box + 32px padding</td>
+              <td class="font-medium text-emerald-300">Eliminates VLM hallucinations on subtle shifts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <blockquote>
+        <strong class="block mb-2 text-slate-100">Why Both Token Count and Network Bytes Matter</strong>
+        <ol class="list-decimal pl-5 space-y-2 text-base leading-relaxed text-slate-300 m-0">
+          <li><strong>Vision Tokens (Pixel Dimensions):</strong> Vision Transformers (ViTs) calculate tokens from geometric patch grids (e.g., Anthropic's 28×28px patches, OpenAI's 512×512px tiles)—not file bytes. Cropping and downscaling ensures failure diffs fit inside a <strong>single vision tile</strong>.</li>
+          <li><strong>Network Bytes (Payload Size):</strong> Vision LLM API requests transfer images as Base64 strings (+33% byte expansion). Dropping images from 4 MB to 35 KB eliminates serialization bottlenecks and keeps your AI coding agent responsive.</li>
+        </ol>
+      </blockquote>
+
+      <div class="mt-8 p-6 rounded-xl bg-[#0f141e] border border-[#1e2736]">
+        <h3 class="text-lg font-bold text-slate-100 mb-2">
+          Live Empirical Validation (Qwen 3.8 27B &amp; Live Websites)
+        </h3>
+        <p class="text-base text-slate-400 mb-5">
+          Tested against a local Vision LLM endpoint (<code>RadixArk/Qwen3.8-27B-NVFP4</code> via SGLang) and live production websites (Wikipedia, Hacker News, GitHub, MDN) across 11 visual regression scenarios:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          <div class="p-4 rounded-lg bg-[#090c12] border border-[#1e2736]">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Vision Image Tokens</div>
+            <div class="text-xl font-extrabold text-emerald-400 tabular-nums mt-1">-85.1%</div>
+            <div class="text-xs text-slate-400 font-mono tabular-nums mt-0.5">8,756 → 1,304 tok</div>
+          </div>
+          <div class="p-4 rounded-lg bg-[#090c12] border border-[#1e2736]">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Network Payload</div>
+            <div class="text-xl font-extrabold text-cyan-400 tabular-nums mt-1">-88.8%</div>
+            <div class="text-xs text-slate-400 font-mono tabular-nums mt-0.5">638.9 → 71.8 KB</div>
+          </div>
+          <div class="p-4 rounded-lg bg-[#090c12] border border-[#1e2736]">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Total Tokens</div>
+            <div class="text-xl font-extrabold text-slate-100 tabular-nums mt-1">-29.7%</div>
+            <div class="text-xs text-slate-400 font-mono tabular-nums mt-0.5">25,748 → 18,105 tok</div>
+          </div>
+          <div class="p-4 rounded-lg bg-[#090c12] border border-[#1e2736]">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Triage Accuracy</div>
+            <div class="text-xl font-extrabold text-emerald-400 tabular-nums mt-1">+9.1%</div>
+            <div class="text-xs text-slate-400 font-mono tabular-nums mt-0.5">59.1% → 68.2%</div>
+          </div>
+        </div>
+        <a
+          href="/guides/benchmarks/"
+          class="inline-flex items-center gap-2 min-h-[44px] text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors no-underline"
+        >
+          <span>Read the full Empirical LLM Benchmark Report</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Section 6: Model Vision Grid Reference -->
+    <section aria-labelledby="grid-ref-heading" class="pt-4 border-t border-slate-800/80">
+      <div class="mb-6">
+        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Specification</span>
+        <h2 id="grid-ref-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+          Model Vision Grid Reference
+        </h2>
+      </div>
+      <div class="overflow-x-auto my-6">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Provider Setting</th>
+              <th scope="col">Target Max Bounding Box</th>
+              <th scope="col">Vision Grid Mechanics</th>
+              <th scope="col">Approx. Token Cost per Diff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>openai</code></td>
+              <td><code>512 × 512 px</code></td>
+              <td>Fits inside 1 standard OpenAI <code>512px</code> tile</td>
+              <td class="text-emerald-400 font-semibold tabular-nums">~85 – 255 tokens</td>
+            </tr>
+            <tr>
+              <td><code>anthropic</code></td>
+              <td><code>504 × 504 px</code></td>
+              <td>Exact <code>18 × 18</code> grid of <code>28×28 px</code> patches</td>
+              <td class="text-emerald-400 font-semibold tabular-nums">~28 – 324 tokens</td>
+            </tr>
+            <tr>
+              <td><code>gemma</code> / <code>gemini</code></td>
+              <td><code>768 × 768 px</code></td>
+              <td>Fits 1 native Gemma / Gemini multimodal tile</td>
+              <td class="text-emerald-400 font-semibold tabular-nums">~258 tokens</td>
+            </tr>
+            <tr>
+              <td><code>gemma</code> (<code>lowTokenMode</code>)</td>
+              <td><code>384 × 384 px</code></td>
+              <td>Sub-384px single base tile optimization</td>
+              <td class="text-emerald-400 font-semibold tabular-nums">~258 tokens (ultra-fast)</td>
+            </tr>
+            <tr>
+              <td><code>qwen</code></td>
+              <td><code>504 × 504 px</code></td>
+              <td>Dynamic 2D spatial patch grid (<code>28×28 px</code>)</td>
+              <td class="text-emerald-400 font-semibold tabular-nums">~28 – 324 tokens</td>
+            </tr>
+            <tr>
+              <td><code>local</code></td>
+              <td><code>448 × 448 px</code> (configurable)</td>
+              <td>Optimized for local VLMs (<code>28px</code> / <code>14px</code> patch ViTs)</td>
+              <td class="text-slate-300">Local compute</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </StarlightPage>
+
+<style>
+  .zv-callout-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-radius: var(--zv-radius-lg);
+    background: linear-gradient(135deg, #0f1722 0%, #0d131d 60%, rgba(16, 185, 129, 0.08) 100%);
+    border: 1px solid var(--zv-border-strong);
+  }
+
+  @media (min-width: 768px) {
+    .zv-callout-banner {
+      flex-direction: row;
+      align-items: center;
+      padding: 1.75rem 2rem;
+    }
+  }
+
+  .zv-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.14);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .zv-cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 12px 20px;
+    border-radius: var(--zv-radius-md);
+    background: #10b981;
+    color: #03150e;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid #34d399;
+    transition: background-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out);
+  }
+
+  .zv-cta-button:hover {
+    background: #34d399;
+    color: #03150e;
+    transform: translateY(-1px);
+  }
+
+  .zv-cta-button:active {
+    transform: scale(0.98);
+  }
+</style>

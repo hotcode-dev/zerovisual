@@ -2,18 +2,24 @@
 import Default from '@astrojs/starlight/components/SocialIcons.astro';
 ---
 
-<nav class="hidden md:flex items-center gap-6 mr-2">
+<nav aria-label="Primary documentation" class="hidden md:flex items-center gap-1 mr-2">
   <a
     href="/guides/getting-started/"
-    class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-150 no-underline"
+    class="inline-flex items-center min-h-[44px] px-3 text-sm font-medium text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors duration-150 no-underline"
   >
     Getting Started
   </a>
   <a
     href="/guides/how-it-works/"
-    class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-150 no-underline"
+    class="inline-flex items-center min-h-[44px] px-3 text-sm font-medium text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors duration-150 no-underline"
   >
     How It Works
+  </a>
+  <a
+    href="/guides/benchmarks/"
+    class="inline-flex items-center min-h-[44px] px-3 text-sm font-medium text-slate-300 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors duration-150 no-underline"
+  >
+    Benchmarks
   </a>
 </nav>
 

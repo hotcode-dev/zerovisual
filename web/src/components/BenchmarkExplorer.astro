@@ -5,54 +5,52 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
 <div class="benchmark-explorer not-content" id="benchmark-explorer-root">
   <!-- Top Banner / Live Status -->
-  <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-xl mb-6 backdrop-blur-md">
-    <div class="flex items-center gap-2.5">
-      <span class="relative flex h-2.5 w-2.5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+  <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-[#0f141e] border border-[#1e2736] rounded-xl mb-6">
+    <div class="flex flex-wrap items-center gap-2.5">
+      <span class="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
         <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
       </span>
-      <span class="text-xs font-semibold tracking-wide uppercase text-slate-300">Empirical VLM Evaluation</span>
-      <span class="text-slate-600">|</span>
-      <span class="text-xs text-slate-400 font-mono">Model: RadixArk/Qwen3.8-27B-NVFP4</span>
+      <span class="text-xs font-semibold tracking-wide uppercase text-slate-200">Empirical VLM Evaluation</span>
+      <span class="text-slate-600" aria-hidden="true">|</span>
+      <span class="text-xs text-slate-400 font-mono">RadixArk/Qwen3.8-27B-NVFP4</span>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-      <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-medium">
-        11 Scenarios (5 Live Websites)
+      <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-200 font-medium font-mono">
+        11 Scenarios (5 Live)
       </span>
-      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium">
-        Avg -85% Vision Tokens
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 font-semibold font-mono tabular-nums">
+        Avg -85% ViT Tokens
       </span>
-      <!-- GitHub /benchmark Link -->
       <a
         href="https://github.com/hotcode-dev/zerovisual/tree/main/benchmark"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white transition-all font-medium shadow-sm cursor-pointer"
+        class="inline-flex items-center gap-1.5 min-h-[36px] text-xs px-3 py-1 rounded-lg bg-[#161d2b] hover:bg-slate-800 border border-[#2d3a4f] hover:border-emerald-500/50 text-slate-200 hover:text-white transition-colors font-medium no-underline cursor-pointer"
         title="View Benchmark Source Code on GitHub"
       >
-        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
         </svg>
         <span>GitHub /benchmark</span>
-        <span class="text-slate-400">↗</span>
+        <span class="text-slate-400" aria-hidden="true">↗</span>
       </a>
     </div>
   </div>
 
-  <!-- Filter & Case Selector Carousel -->
+  <!-- Filter & Case Selector -->
   <div class="mb-6">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-semibold text-slate-200">Select Benchmark Scenario:</span>
-        <div class="inline-flex rounded-lg bg-slate-900/90 p-1 border border-slate-800 text-xs gap-1" role="tablist">
-          <button type="button" class="filter-btn active" data-filter="all">
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="text-sm font-semibold text-slate-200" id="scenario-filter-label">Select Benchmark Scenario:</span>
+        <div class="inline-flex flex-wrap rounded-lg bg-[#090c12] p-1 border border-[#1e2736] text-xs gap-1" role="group" aria-labelledby="scenario-filter-label">
+          <button type="button" class="filter-btn active" aria-pressed="true" data-filter="all">
             All (11)
           </button>
-          <button type="button" class="filter-btn" data-filter="real">
-            🌐 Live Websites (5)
+          <button type="button" class="filter-btn" aria-pressed="false" data-filter="real">
+            Live Websites (5)
           </button>
-          <button type="button" class="filter-btn" data-filter="synthetic">
-            🧪 Synthetic (6)
+          <button type="button" class="filter-btn" aria-pressed="false" data-filter="synthetic">
+            Synthetic (6)
           </button>
         </div>
       </div>
@@ -65,29 +63,30 @@ import benchmarkData from '../data/benchmark-sessions.json';
         return (
           <button
             type="button"
-            class={`case-card text-left p-2.5 rounded-lg border transition-all cursor-pointer bg-slate-900/60 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 ${
+            class={`case-card text-left p-3 rounded-lg border cursor-pointer bg-[#0f141e] border-[#1e2736] hover:bg-[#161d2b] hover:border-[#2d3a4f] ${
               index === 0 ? 'active' : ''
             }`}
+            aria-pressed={index === 0 ? 'true' : 'false'}
             data-case-id={item.id}
             data-case-index={index}
             data-is-real={isReal ? 'true' : 'false'}
           >
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/50">
+              <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[#090c12] text-slate-400 border border-[#1e2736] tabular-nums">
                 #{String(index + 1).padStart(2, '0')}
               </span>
-              <span class={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
-                isReal ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-slate-800 text-slate-400'
+              <span class={`text-[11px] font-semibold px-1.5 py-0.5 rounded font-mono ${
+                isReal ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/25' : 'bg-slate-800/80 text-slate-300 border border-slate-700/60'
               }`}>
-                {isReal ? '🌐 Live' : '🧪 Synthetic'}
+                {isReal ? 'Live' : 'Synthetic'}
               </span>
             </div>
-            <div class="text-xs font-medium text-slate-200 line-clamp-1 mb-1" title={item.name}>
+            <div class="text-xs font-semibold text-slate-100 line-clamp-1 mb-1.5" title={item.name}>
               {item.name}
             </div>
-            <div class="flex items-center justify-between text-[10px] text-slate-400">
-              <span>{item.device.includes('Mobile') ? '📱 Mobile' : '🖥️ Desktop'}</span>
-              <span class="font-semibold text-emerald-400">-{item.savings.imageTokens}</span>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono tabular-nums">
+              <span>{item.device.includes('Mobile') ? 'Mobile' : 'Desktop'}</span>
+              <span class="font-bold text-emerald-400">-{item.savings.imageTokens}</span>
             </div>
           </button>
         );
@@ -95,20 +94,20 @@ import benchmarkData from '../data/benchmark-sessions.json';
     </div>
   </div>
 
-  <!-- Active Case Showcase Main Stage: Vertical Stacked Layout (Top to Bottom) -->
-  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 mb-8 backdrop-blur-md shadow-2xl">
+  <!-- Active Case Showcase Main Stage -->
+  <div class="bg-[#0f141e] border border-[#1e2736] rounded-2xl p-4 sm:p-6 mb-8">
     
     <!-- Active Case Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#1e2736] mb-6">
       <div>
-        <div class="flex flex-wrap items-center gap-2 mb-1.5">
-          <span id="active-device-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span id="active-device-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#161d2b] text-slate-200 border border-[#2d3a4f]">
             Desktop (1280×800)
           </span>
-          <span id="active-category-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+          <span id="active-category-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
             Layout Shift
           </span>
-          <span class="text-xs text-slate-500 font-mono" id="active-case-id">
+          <span class="text-xs text-slate-400 font-mono" id="active-case-id">
             01-wikipedia-search-offset
           </span>
           <a
@@ -116,192 +115,193 @@ import benchmarkData from '../data/benchmark-sessions.json';
             href="https://github.com/hotcode-dev/zerovisual/tree/main/benchmark/testdata/01-wikipedia-search-offset"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-xs text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1 font-mono transition-colors"
+            class="text-xs text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 font-mono transition-colors no-underline"
           >
             <span>testdata/01 ↗</span>
           </a>
         </div>
-        <h3 id="active-case-name" class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+        <h3 id="active-case-name" class="text-xl sm:text-2xl font-bold text-slate-50 tracking-tight m-0">
           Wikipedia Portal Search Bar Shift
         </h3>
-        <p id="active-ground-truth-defect" class="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl">
+        <p id="active-ground-truth-defect" class="text-sm text-slate-400 mt-1 max-w-3xl m-0">
           The search box container is shifted right by 60px with red border override.
         </p>
       </div>
 
       <!-- Quick Savings Pill -->
-      <div class="flex items-center gap-3 bg-slate-950/70 border border-slate-800 px-4 py-2.5 rounded-xl self-start md:self-auto">
+      <div class="flex items-center gap-4 bg-[#090c12] border border-[#1e2736] px-4 py-2.5 rounded-xl self-start md:self-auto">
         <div class="text-right">
-          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">ViT Token Savings</div>
-          <div class="text-lg font-bold text-emerald-400" id="active-token-savings">-80.8%</div>
+          <div class="text-[11px] uppercase font-bold tracking-wider text-slate-400 font-mono">ViT Savings</div>
+          <div class="text-lg font-extrabold text-emerald-400 tabular-nums" id="active-token-savings">-80.8%</div>
         </div>
-        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="h-8 w-px bg-[#1e2736]" aria-hidden="true"></div>
         <div class="text-right">
-          <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Payload Reduction</div>
-          <div class="text-lg font-bold text-cyan-400" id="active-byte-savings">-75.6%</div>
+          <div class="text-[11px] uppercase font-bold tracking-wider text-slate-400 font-mono">Payload</div>
+          <div class="text-lg font-extrabold text-cyan-400 tabular-nums" id="active-byte-savings">-75.6%</div>
         </div>
       </div>
     </div>
 
-    <!-- Vertical Stacked Sections: Screenshot Visualizer (Top) -> AI Session Inspector (Bottom) -->
+    <!-- Vertical Stacked Sections -->
     <div class="flex flex-col gap-8">
       
-      <!-- TOP SECTION: Interactive Screenshot Visualizer (Full Width) -->
+      <!-- TOP SECTION: Interactive Screenshot Visualizer -->
       <div class="w-full flex flex-col">
-        <!-- Section Title Header -->
-        <div class="flex items-center justify-between mb-2 px-1">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-200 flex flex-wrap items-center gap-2">
             <span>Visual Regression Triage Stage</span>
-            <span class="text-[11px] font-normal text-slate-500">(Compare Baselines, Bugs, Diffs & Crops)</span>
+            <span class="text-xs font-normal text-slate-400">(Compare Baselines, Defects, Diffs &amp; Crops)</span>
           </span>
-          <span class="text-xs text-slate-400 font-mono" id="current-viewport-dims">1280 × 800</span>
+          <span class="text-xs text-slate-400 font-mono tabular-nums" id="current-viewport-dims">1280 × 800</span>
         </div>
 
         <!-- Browser Chrome Toolbar -->
-        <div class="bg-slate-950 border border-slate-800 rounded-t-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+        <div class="bg-[#161d2b] border border-[#1e2736] rounded-t-xl px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5" aria-hidden="true">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-400/80 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400/80 inline-block"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400/80 inline-block"></span>
           </div>
-          <div class="flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-md text-xs text-slate-400 font-mono flex-1 max-w-md truncate">
-            <svg class="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center gap-2 px-3 py-1 bg-[#090c12] border border-[#1e2736] rounded-md text-xs text-slate-300 font-mono flex-1 min-w-[180px] max-w-md truncate">
+            <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
             </svg>
             <span id="browser-url-text" class="truncate">https://www.wikipedia.org/</span>
           </div>
-          <div class="flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded border border-rose-500/20 font-medium">
-            <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+          <div class="flex items-center gap-1.5 text-xs text-rose-300 bg-rose-500/15 px-2.5 py-1 rounded border border-rose-500/30 font-mono font-semibold">
+            <span class="w-2 h-2 rounded-full bg-rose-400" aria-hidden="true"></span>
             <span>PLAYWRIGHT FAILED</span>
           </div>
         </div>
 
         <!-- View Mode Switcher -->
-        <div class="bg-slate-950/80 border-x border-slate-800 px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80">
-          <div class="inline-flex rounded-lg bg-slate-900/90 p-1 border border-slate-800 text-xs gap-1" role="tablist">
-            <button type="button" class="img-view-tab" data-view="baseline">
+        <div class="bg-[#090c12] border-x border-[#1e2736] px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-3 border-b">
+          <div class="inline-flex flex-wrap rounded-lg bg-[#0f141e] p-1 border border-[#1e2736] text-xs gap-1" role="tablist" aria-label="Screenshot view mode">
+            <button type="button" role="tab" aria-selected="false" class="img-view-tab" data-view="baseline">
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-sm"></span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block" aria-hidden="true"></span>
                 <span>Baseline</span>
               </span>
             </button>
-            <button type="button" class="img-view-tab" data-view="actual">
+            <button type="button" role="tab" aria-selected="false" class="img-view-tab" data-view="actual">
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-rose-500 inline-block shadow-sm"></span>
+                <span class="w-2 h-2 rounded-full bg-rose-400 inline-block" aria-hidden="true"></span>
                 <span>Actual (Defect)</span>
               </span>
             </button>
-            <button type="button" class="img-view-tab" data-view="diff">
+            <button type="button" role="tab" aria-selected="false" class="img-view-tab" data-view="diff">
               <span class="inline-flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-purple-400 inline-block shadow-sm"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block" aria-hidden="true"></span>
                 <span>Pixel Diff</span>
               </span>
             </button>
-            <button type="button" class="img-view-tab active" data-view="crop">
+            <button type="button" role="tab" aria-selected="true" class="img-view-tab active" data-view="crop">
               <span class="inline-flex items-center gap-1.5">
-                <span class="text-amber-300">⚡</span>
+                <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block" aria-hidden="true"></span>
                 <span>ZeroVisual Crop (VLM)</span>
               </span>
             </button>
           </div>
 
           <!-- Bounding Box Overlay Toggle -->
-          <button type="button" id="toggle-bbox-btn" class="toggle-bbox-btn" title="Toggle bounding box highlight">
-            <span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block shadow-sm"></span>
+          <button type="button" id="toggle-bbox-btn" class="toggle-bbox-btn" aria-pressed="false" title="Toggle bounding box highlight">
+            <span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block" aria-hidden="true"></span>
             <span id="bbox-toggle-text">Show Diff Bounding Box</span>
           </button>
         </div>
 
-        <!-- Image Display Stage Frame (Spacious Full Width) -->
-        <div class="relative bg-slate-950 border-x border-b border-slate-800 rounded-b-xl overflow-hidden min-h-[380px] sm:min-h-[460px] flex items-center justify-center p-4 select-none">
-          <div class="relative max-w-full max-h-[500px] flex items-center justify-center" id="image-container">
+        <!-- Image Display Stage Frame -->
+        <div class="relative bg-[#06080d] border-x border-b border-[#1e2736] rounded-b-xl overflow-hidden min-h-[360px] sm:min-h-[440px] flex items-center justify-center p-4 pb-14 select-none">
+          <div class="relative max-w-full max-h-[480px] flex items-center justify-center" id="image-container">
             <img
               id="main-stage-img"
               src={benchmarkData[0].cropPath}
               alt="Benchmark screenshot view"
-              class="max-w-full max-h-[480px] w-auto h-auto rounded-lg object-contain transition-opacity duration-200 shadow-lg"
+              class="max-w-full max-h-[440px] w-auto h-auto rounded-lg object-contain transition-opacity duration-200 shadow-lg"
               loading="eager"
             />
             
             <!-- Dynamic Diff Bounding Box Overlay -->
             <div
               id="bbox-overlay"
-              class="absolute border-2 border-rose-500 bg-rose-500/15 pointer-events-none transition-all duration-300 hidden rounded-sm"
+              class="absolute border-2 border-rose-500 bg-rose-500/15 pointer-events-none transition-all duration-200 hidden rounded-sm"
               style="left: 0%; top: 0%; width: 0%; height: 0%;"
             >
-              <span class="absolute -top-6 left-0 text-[10px] font-mono font-bold bg-rose-600 text-white px-2 py-0.5 rounded shadow whitespace-nowrap" id="bbox-coord-chip">
+              <span class="absolute -top-6 left-0 text-[11px] font-mono font-bold bg-rose-600 text-white px-2 py-0.5 rounded shadow whitespace-nowrap" id="bbox-coord-chip">
                 Diff Box
               </span>
             </div>
           </div>
 
           <!-- Stage View Floating Badge -->
-          <div class="absolute bottom-4 left-4 px-3 py-1.5 rounded-md bg-slate-900/90 border border-slate-700/80 backdrop-blur-sm text-xs text-slate-300 flex items-center gap-2.5 shadow-md">
+          <div class="absolute bottom-3 left-3 right-3 sm:right-auto px-3 py-1.5 rounded-md bg-[#0f141e]/95 border border-[#2d3a4f] text-xs text-slate-300 flex flex-wrap items-center gap-2">
             <span class="font-semibold text-white" id="stage-view-label">ZeroVisual ViT Crop (WebP)</span>
-            <span class="text-slate-600">|</span>
-            <span class="font-mono text-slate-400" id="stage-view-dims">504 × 389 px</span>
-            <span class="text-slate-600">|</span>
-            <span class="font-mono text-emerald-400 font-semibold" id="stage-view-bytes">6.0 KB</span>
+            <span class="text-slate-600" aria-hidden="true">|</span>
+            <span class="font-mono text-slate-300 tabular-nums" id="stage-view-dims">504 × 389 px</span>
+            <span class="text-slate-600" aria-hidden="true">|</span>
+            <span class="font-mono text-emerald-400 font-semibold tabular-nums" id="stage-view-bytes">6.0 KB</span>
           </div>
         </div>
 
         <!-- Token Comparison Metrics Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">ViT Image Tokens</div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-emerald-400" id="metric-opt-img-tokens">192</span>
+          <div class="bg-[#090c12] border border-[#1e2736] rounded-xl p-3.5">
+            <div class="text-[11px] uppercase font-bold text-slate-400 font-mono mb-1">ViT Image Tokens</div>
+            <div class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-lg font-extrabold text-emerald-400" id="metric-opt-img-tokens">192</span>
               <span class="text-xs text-slate-500 line-through" id="metric-raw-img-tokens">1,000</span>
             </div>
-            <div class="text-xs text-emerald-400 font-medium mt-1" id="metric-img-token-saved">-80.8% ViT Tokens</div>
+            <div class="text-xs text-emerald-300 font-medium mt-1 tabular-nums" id="metric-img-token-saved">-80.8% ViT Tokens</div>
           </div>
 
-          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Payload Transfer</div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-cyan-400" id="metric-opt-bytes">6.1 KB</span>
+          <div class="bg-[#090c12] border border-[#1e2736] rounded-xl p-3.5">
+            <div class="text-[11px] uppercase font-bold text-slate-400 font-mono mb-1">Payload Transfer</div>
+            <div class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-lg font-extrabold text-cyan-400" id="metric-opt-bytes">6.1 KB</span>
               <span class="text-xs text-slate-500 line-through" id="metric-raw-bytes">25.2 KB</span>
             </div>
-            <div class="text-xs text-cyan-400 font-medium mt-1" id="metric-bytes-saved">-75.6% Bandwidth</div>
+            <div class="text-xs text-cyan-300 font-medium mt-1 tabular-nums" id="metric-bytes-saved">-75.6% Bandwidth</div>
           </div>
 
-          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Total Tokens</div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-indigo-400" id="metric-opt-total-tokens">2,378</span>
+          <div class="bg-[#090c12] border border-[#1e2736] rounded-xl p-3.5">
+            <div class="text-[11px] uppercase font-bold text-slate-400 font-mono mb-1">Total Tokens</div>
+            <div class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-lg font-extrabold text-slate-100" id="metric-opt-total-tokens">2,378</span>
               <span class="text-xs text-slate-500 line-through" id="metric-raw-total-tokens">3,186</span>
             </div>
-            <div class="text-xs text-indigo-400 font-medium mt-1" id="metric-total-token-saved">-25.4% Tokens</div>
+            <div class="text-xs text-slate-300 font-medium mt-1 tabular-nums" id="metric-total-token-saved">-25.4% Tokens</div>
           </div>
 
-          <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5">
-            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Inference Latency</div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-slate-200" id="metric-opt-latency">96.8s</span>
+          <div class="bg-[#090c12] border border-[#1e2736] rounded-xl p-3.5">
+            <div class="text-[11px] uppercase font-bold text-slate-400 font-mono mb-1">Inference Latency</div>
+            <div class="flex items-baseline gap-2 tabular-nums">
+              <span class="text-lg font-extrabold text-slate-100" id="metric-opt-latency">96.8s</span>
               <span class="text-xs text-slate-500 line-through" id="metric-raw-latency">103.4s</span>
             </div>
-            <div class="text-xs text-slate-400 font-medium mt-1" id="metric-latency-saved">6% Faster</div>
+            <div class="text-xs text-slate-400 font-medium mt-1 tabular-nums" id="metric-latency-saved">6% Faster</div>
           </div>
         </div>
       </div>
 
-      <!-- BOTTOM SECTION: AI Session & Reasoning Inspector (Full Width, Vertical Stack) -->
-      <div class="w-full flex flex-col pt-2 border-t border-slate-800/60">
+      <!-- BOTTOM SECTION: AI Session & Reasoning Inspector -->
+      <div class="w-full flex flex-col pt-4 border-t border-[#1e2736]">
         <!-- Inspector Top Navigation Bar -->
-        <div class="bg-slate-950 border border-slate-800 rounded-t-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span>🧠</span>
-              <span>AI Session Trace & VLM Diagnosis</span>
+        <div class="bg-[#161d2b] border border-[#1e2736] rounded-t-xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider inline-flex items-center gap-1.5 font-mono">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span>AI Session Trace &amp; VLM Diagnosis</span>
             </span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700/80 font-semibold" id="session-model-chip">
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-[#090c12] text-slate-200 border border-[#2d3a4f] font-semibold" id="session-model-chip">
               Qwen3.8-27B
             </span>
             <a
               href="https://github.com/hotcode-dev/zerovisual/tree/main/benchmark/results/sessions"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-xs text-slate-400 hover:text-slate-200 inline-flex items-center gap-1 font-mono transition-colors"
+              class="text-xs text-slate-300 hover:text-white inline-flex items-center gap-1 font-mono transition-colors no-underline"
               title="View archived session JSONs on GitHub"
             >
               <span>sessions/ ↗</span>
@@ -309,55 +309,55 @@ import benchmarkData from '../data/benchmark-sessions.json';
           </div>
 
           <!-- Mode Switcher: With vs Without ZeroVisual -->
-          <div class="inline-flex rounded-lg bg-slate-900/90 p-1 border border-slate-800 text-xs gap-1" role="tablist">
-            <button type="button" id="session-mode-opt" class="session-mode-btn active" data-mode="with">
+          <div class="inline-flex flex-wrap rounded-lg bg-[#090c12] p-1 border border-[#1e2736] text-xs gap-1" role="tablist" aria-label="Session comparison mode">
+            <button type="button" role="tab" aria-selected="true" id="session-mode-opt" class="session-mode-btn active" data-mode="with">
               With ZeroVisual (Cropped ViT)
             </button>
-            <button type="button" id="session-mode-raw" class="session-mode-btn" data-mode="without">
+            <button type="button" role="tab" aria-selected="false" id="session-mode-raw" class="session-mode-btn" data-mode="without">
               Without (Raw Viewport)
             </button>
           </div>
         </div>
 
         <!-- Session Content Body Frame -->
-        <div class="bg-slate-950 border-x border-b border-slate-800 rounded-b-xl p-5 flex flex-col gap-5 overflow-hidden">
+        <div class="bg-[#090c12] border-x border-b border-[#1e2736] rounded-b-xl p-4 sm:p-5 flex flex-col gap-5 overflow-hidden">
           
           <!-- Accuracy Score & Triage Status Card -->
-          <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-[#0f141e] border border-[#1e2736]">
             <div>
-              <div class="text-[10px] uppercase font-bold text-slate-400 mb-0.5">Triage Accuracy Score</div>
-              <div class="text-xl font-bold text-white flex items-center gap-2.5">
+              <div class="text-[11px] uppercase font-bold text-slate-400 font-mono mb-0.5">Triage Accuracy Score</div>
+              <div class="text-xl font-bold text-white flex flex-wrap items-center gap-2.5 tabular-nums">
                 <span id="session-accuracy-score">65%</span>
-                <span class="text-xs font-normal text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30" id="session-match-status">
+                <span class="text-xs font-medium text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/35" id="session-match-status">
                   ✓ Defect Correctly Identified
                 </span>
               </div>
             </div>
-            <div class="flex items-center gap-6 text-xs text-slate-400">
+            <div class="flex flex-wrap items-center gap-5 text-xs text-slate-400">
               <div>
-                <div class="text-[10px] uppercase font-bold text-slate-500">Reasoning Tokens</div>
-                <span class="font-mono text-slate-200 font-semibold" id="session-reasoning-tokens">1,815</span> tok
+                <div class="text-[11px] uppercase font-bold text-slate-500 font-mono">Reasoning</div>
+                <span class="font-mono text-slate-200 font-semibold tabular-nums" id="session-reasoning-tokens">1,815</span> tok
               </div>
               <div>
-                <div class="text-[10px] uppercase font-bold text-slate-500">Completion Tokens</div>
-                <span class="font-mono text-slate-200 font-semibold" id="session-completion-tokens">2,048</span> tok
+                <div class="text-[11px] uppercase font-bold text-slate-500 font-mono">Completion</div>
+                <span class="font-mono text-slate-200 font-semibold tabular-nums" id="session-completion-tokens">2,048</span> tok
               </div>
               <div>
-                <div class="text-[10px] uppercase font-bold text-slate-500">Session ID</div>
-                <span class="font-mono text-slate-400 text-[11px]" id="session-id-display">session-01-wikipedia</span>
+                <div class="text-[11px] uppercase font-bold text-slate-500 font-mono">Session ID</div>
+                <span class="font-mono text-slate-300 text-xs" id="session-id-display">session-01-wikipedia</span>
               </div>
             </div>
           </div>
 
-          <!-- AI Model Diagnosis Response (Answer) -->
+          <!-- AI Model Diagnosis Response -->
           <div>
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Model Triage Diagnosis (Final Answer)</span>
-              <span class="text-[11px] text-slate-500 font-mono">Structured Output</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Model Triage Diagnosis (Final Answer)</span>
+              <span class="text-xs text-slate-400 font-mono">Structured Output</span>
             </div>
             <div
               id="model-diagnosis-text"
-              class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/90 text-xs sm:text-sm text-slate-300 font-mono leading-relaxed max-h-[220px] overflow-y-auto whitespace-pre-wrap select-text shadow-inner"
+              class="p-4 rounded-xl bg-[#0f141e] border border-[#1e2736] text-xs sm:text-sm text-slate-200 font-mono leading-relaxed max-h-[220px] overflow-y-auto whitespace-pre-wrap select-text"
             >
               1. Affected Element: .search-box
               2. Defect: Red outline wrapping search box and button
@@ -368,23 +368,25 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
           <!-- Collapsible Reasoning Trace (<think>) -->
           <div class="flex flex-col">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
               <button
                 type="button"
                 id="toggle-reasoning-btn"
-                class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider text-indigo-300 hover:text-white bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 hover:border-indigo-400/60 transition-all cursor-pointer shadow-sm"
+                aria-expanded="true"
+                aria-controls="reasoning-trace-box"
+                class="inline-flex items-center gap-2 min-h-[44px] px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider text-emerald-300 hover:text-white bg-[#0f141e] hover:bg-[#161d2b] border border-[#2d3a4f] hover:border-emerald-500/50 transition-colors cursor-pointer"
               >
-                <svg id="reasoning-arrow" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg id="reasoning-arrow" class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
                 <span>VLM Chain-of-Thought Reasoning (&lt;think&gt;)</span>
               </button>
-              <span class="text-xs text-slate-500 font-mono" id="think-token-count">1,815 tokens</span>
+              <span class="text-xs text-slate-400 font-mono tabular-nums" id="think-token-count">1,815 tokens</span>
             </div>
 
             <div
               id="reasoning-trace-box"
-              class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-400 leading-relaxed overflow-y-auto max-h-[240px] select-text shadow-inner"
+              class="p-4 rounded-xl bg-[#06080d] border border-[#1e2736] text-xs font-mono text-slate-300 leading-relaxed overflow-y-auto max-h-[240px] select-text"
             >
               <div id="model-reasoning-text" class="whitespace-pre-wrap">
                 Thinking trace loading...
@@ -393,32 +395,32 @@ import benchmarkData from '../data/benchmark-sessions.json';
           </div>
 
           <!-- Ground Truth Reference Box -->
-          <div class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/60 text-xs">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-              Ground Truth Defect & Suggested Fix
+          <div class="p-4 rounded-xl bg-[#0f141e] border border-[#1e2736] text-xs">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono mb-1.5">
+              Ground Truth Defect &amp; Suggested Fix
             </div>
-            <div class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-2" id="ground-truth-desc">
+            <div class="text-slate-200 text-xs sm:text-sm leading-relaxed mb-2.5" id="ground-truth-desc">
               The .search-box container is shifted right by 60px with red border.
             </div>
-            <div class="font-mono text-xs text-indigo-300 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800" id="ground-truth-fix">
+            <div class="font-mono text-xs text-emerald-300 bg-[#06080d] p-3 rounded-lg border border-[#1e2736]" id="ground-truth-fix">
               Fix: Remove margin-left: 60px, restore input padding to 12px 16px, restore button color to #36c
             </div>
           </div>
 
           <!-- Footer GitHub Benchmark Repo Link Banner -->
-          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-              <span class="text-indigo-400 font-semibold">Reproduce locally:</span>
+          <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-[#0f141e] border border-[#1e2736] text-xs text-slate-300">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-emerald-400 font-semibold font-mono">Reproduce locally:</span>
               <span>All 11 datasets, Playwright test specs, and VLM runner are open-source.</span>
             </div>
             <a
               href="https://github.com/hotcode-dev/zerovisual/tree/main/benchmark"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 text-xs px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/40 border border-indigo-400/40 no-underline whitespace-nowrap cursor-pointer"
+              class="inline-flex items-center gap-2 min-h-[44px] text-xs px-4 py-3 rounded-lg bg-[#10b981] hover:bg-[#34d399] text-[#03150e] font-bold transition-colors border border-emerald-300 no-underline whitespace-nowrap cursor-pointer"
             >
               <span>Explore /benchmark on GitHub</span>
-              <span>→</span>
+              <span aria-hidden="true">→</span>
             </a>
           </div>
 
@@ -437,171 +439,162 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
   /* Scenario Picker Cards */
   .case-card {
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 84px;
+    transition: background-color 160ms var(--zv-ease-out), border-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out);
   }
 
   .case-card:hover:not(.active) {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-color: rgba(99, 102, 241, 0.4) !important;
     transform: translateY(-1px);
   }
 
+  .case-card:active {
+    transform: scale(0.985);
+  }
+
   .case-card.active {
-    border-color: #6366f1 !important;
-    background: rgba(49, 46, 129, 0.5) !important;
-    box-shadow: 0 0 16px -2px rgba(99, 102, 241, 0.5) !important;
+    border-color: rgba(16, 185, 129, 0.7) !important;
+    background: rgba(16, 185, 129, 0.1) !important;
+    box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
   }
 
-  .case-card:not(.active) {
-    box-shadow: none !important;
-  }
-
-  /* Scenario Filter Buttons */
+  /* Scenario Filter Buttons — 44px touch targets */
   .filter-btn {
-    padding: 0.35rem 0.8rem;
-    border-radius: 0.375rem;
+    min-height: 44px;
+    padding: 0 0.875rem;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 500;
     color: #cbd5e1;
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
-  .filter-btn:hover {
+  .filter-btn:hover:not(.active) {
     color: #ffffff;
-    background: rgba(51, 65, 85, 0.45);
+    background: #161d2b;
   }
 
   .filter-btn.active {
-    background: #4f46e5 !important;
-    color: #ffffff !important;
+    background: #161d2b;
+    color: #a7f3d0;
     font-weight: 600;
-    border-color: rgba(165, 180, 252, 0.35) !important;
-    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35), 0 0 10px -2px rgba(99, 102, 241, 0.45) !important;
+    border-color: rgba(16, 185, 129, 0.45);
   }
 
-  /* Image View Tabs */
+  /* Image View Tabs — 44px touch targets */
   .img-view-tab {
     display: inline-flex;
     align-items: center;
-    padding: 0.4rem 0.85rem;
-    border-radius: 0.375rem;
+    min-height: 44px;
+    padding: 0 0.875rem;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 500;
     color: #cbd5e1;
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
-  .img-view-tab:hover {
+  .img-view-tab:hover:not(.active) {
     color: #ffffff;
-    background: rgba(30, 41, 59, 0.7);
+    background: #161d2b;
   }
 
-  /* Baseline Active: Emerald */
   .img-view-tab[data-view="baseline"].active {
-    background: #059669 !important;
-    color: #ffffff !important;
+    background: rgba(16, 185, 129, 0.18);
+    color: #a7f3d0;
     font-weight: 600;
-    border-color: rgba(110, 231, 183, 0.5) !important;
-    box-shadow: 0 0 14px -2px rgba(16, 185, 129, 0.5) !important;
+    border-color: rgba(16, 185, 129, 0.55);
   }
 
-  /* Actual Active: Rose */
   .img-view-tab[data-view="actual"].active {
-    background: #e11d48 !important;
-    color: #ffffff !important;
+    background: rgba(225, 29, 72, 0.22);
+    color: #fecdd3;
     font-weight: 600;
-    border-color: rgba(253, 164, 175, 0.5) !important;
-    box-shadow: 0 0 14px -2px rgba(244, 63, 94, 0.5) !important;
+    border-color: rgba(251, 113, 133, 0.55);
   }
 
-  /* Diff Active: Purple */
   .img-view-tab[data-view="diff"].active {
-    background: #9333ea !important;
-    color: #ffffff !important;
+    background: rgba(245, 158, 11, 0.18);
+    color: #fde68a;
     font-weight: 600;
-    border-color: rgba(216, 180, 254, 0.5) !important;
-    box-shadow: 0 0 14px -2px rgba(168, 85, 247, 0.5) !important;
+    border-color: rgba(251, 191, 36, 0.55);
   }
 
-  /* Crop Active: Indigo */
   .img-view-tab[data-view="crop"].active {
-    background: #4f46e5 !important;
-    color: #ffffff !important;
+    background: rgba(6, 182, 212, 0.18);
+    color: #a5f3fc;
     font-weight: 600;
-    border-color: rgba(165, 180, 252, 0.5) !important;
-    box-shadow: 0 0 14px -2px rgba(99, 102, 241, 0.5) !important;
+    border-color: rgba(34, 211, 238, 0.55);
   }
 
-  /* Diff Bounding Box Toggle Button */
+  /* Diff Bounding Box Toggle Button — 44px touch target */
   #toggle-bbox-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
     font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.4rem 0.85rem;
-    border-radius: 0.375rem;
-    background: rgba(30, 41, 59, 0.8);
+    font-weight: 600;
+    padding: 0 0.875rem;
+    border-radius: 8px;
+    background: #0f141e;
     color: #cbd5e1;
-    border: 1px solid rgba(71, 85, 105, 0.6);
+    border: 1px solid #2d3a4f;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
   #toggle-bbox-btn:hover {
-    background: rgba(51, 65, 85, 0.9);
+    background: #161d2b;
     color: #ffffff;
-    border-color: rgba(148, 163, 184, 0.6);
+    border-color: #475569;
   }
 
   #toggle-bbox-btn.active {
-    background: rgba(225, 29, 72, 0.25) !important;
-    border-color: rgba(244, 63, 94, 0.7) !important;
-    color: #fecdd3 !important;
-    box-shadow: 0 0 12px -2px rgba(244, 63, 94, 0.45) !important;
+    background: rgba(225, 29, 72, 0.2);
+    border-color: rgba(251, 113, 133, 0.65);
+    color: #fecdd3;
   }
 
-  /* Session Mode Buttons */
+  /* Session Mode Buttons — 44px touch targets */
   .session-mode-btn {
-    padding: 0.35rem 0.85rem;
-    border-radius: 0.375rem;
+    min-height: 44px;
+    padding: 0 0.875rem;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 500;
     color: #cbd5e1;
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
-  .session-mode-btn:hover {
+  .session-mode-btn:hover:not(.active) {
     color: #ffffff;
-    background: rgba(51, 65, 85, 0.45);
+    background: #161d2b;
   }
 
   .session-mode-btn[data-mode="with"].active {
-    background: #4f46e5 !important;
-    color: #ffffff !important;
+    background: rgba(16, 185, 129, 0.16);
+    color: #a7f3d0;
     font-weight: 600;
-    border-color: rgba(165, 180, 252, 0.35) !important;
-    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.35), 0 0 10px -2px rgba(99, 102, 241, 0.45) !important;
+    border-color: rgba(16, 185, 129, 0.5);
   }
 
   .session-mode-btn[data-mode="without"].active {
-    background: #334155 !important;
-    color: #f8fafc !important;
+    background: #1e293b;
+    color: #f8fafc;
     font-weight: 600;
-    border-color: rgba(148, 163, 184, 0.4) !important;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.4) !important;
+    border-color: #475569;
   }
 
-  /* Custom scrollbars for code and terminal trace boxes */
+  /* Custom scrollbars for trace boxes */
   #model-diagnosis-text::-webkit-scrollbar,
   #reasoning-trace-box::-webkit-scrollbar {
     width: 6px;
@@ -609,29 +602,28 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
   #model-diagnosis-text::-webkit-scrollbar-track,
   #reasoning-trace-box::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
+    background: #090c12;
   }
 
   #model-diagnosis-text::-webkit-scrollbar-thumb,
   #reasoning-trace-box::-webkit-scrollbar-thumb {
-    background: rgba(71, 85, 105, 0.5);
+    background: #2d3a4f;
     border-radius: 3px;
   }
 
   #model-diagnosis-text::-webkit-scrollbar-thumb:hover,
   #reasoning-trace-box::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.6);
+    background: #10b981;
   }
 </style>
 
 <script is:inline define:vars={{ benchmarkData }}>
   (function () {
     let currentCaseIndex = 0;
-    let currentViewMode = 'crop'; // 'baseline' | 'actual' | 'diff' | 'crop'
-    let currentSessionMode = 'with'; // 'with' | 'without'
+    let currentViewMode = 'crop';
+    let currentSessionMode = 'with';
     let showBoundingBox = false;
 
-    // DOM Elements
     const caseCards = document.querySelectorAll('.case-card');
     const filterBtns = document.querySelectorAll('.filter-btn');
     const imgViewTabs = document.querySelectorAll('.img-view-tab');
@@ -642,7 +634,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const reasoningArrow = document.getElementById('reasoning-arrow');
     const reasoningTraceBox = document.getElementById('reasoning-trace-box');
 
-    // Header & Meta Elements
     const activeDeviceBadge = document.getElementById('active-device-badge');
     const activeCategoryBadge = document.getElementById('active-category-badge');
     const activeCaseId = document.getElementById('active-case-id');
@@ -654,7 +645,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const browserUrlText = document.getElementById('browser-url-text');
     const currentViewportDims = document.getElementById('current-viewport-dims');
 
-    // Stage Elements
     const mainStageImg = document.getElementById('main-stage-img');
     const bboxOverlay = document.getElementById('bbox-overlay');
     const bboxCoordChip = document.getElementById('bbox-coord-chip');
@@ -662,7 +652,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const stageViewDims = document.getElementById('stage-view-dims');
     const stageViewBytes = document.getElementById('stage-view-bytes');
 
-    // Metric Elements
     const metricOptImgTokens = document.getElementById('metric-opt-img-tokens');
     const metricRawImgTokens = document.getElementById('metric-raw-img-tokens');
     const metricImgTokenSaved = document.getElementById('metric-img-token-saved');
@@ -676,7 +665,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const metricRawLatency = document.getElementById('metric-raw-latency');
     const metricLatencySaved = document.getElementById('metric-latency-saved');
 
-    // Session Elements
     const sessionAccuracyScore = document.getElementById('session-accuracy-score');
     const sessionMatchStatus = document.getElementById('session-match-status');
     const sessionReasoningTokens = document.getElementById('session-reasoning-tokens');
@@ -704,7 +692,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
       const item = benchmarkData[currentCaseIndex];
       if (!item) return;
 
-      // Update Case Header
       if (activeDeviceBadge) activeDeviceBadge.textContent = `${item.device} (${item.viewport.width}×${item.viewport.height})`;
       if (activeCategoryBadge) activeCategoryBadge.textContent = item.category;
       if (activeCaseId) activeCaseId.textContent = item.id;
@@ -719,7 +706,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
       if (browserUrlText) browserUrlText.textContent = getDomainForCase(item);
       if (currentViewportDims) currentViewportDims.textContent = `${item.viewport.width} × ${item.viewport.height} px`;
 
-      // Update Metrics Grid
       if (metricOptImgTokens) metricOptImgTokens.textContent = item.with.imageTokens.toLocaleString();
       if (metricRawImgTokens) metricRawImgTokens.textContent = item.without.imageTokens.toLocaleString();
       if (metricImgTokenSaved) metricImgTokenSaved.textContent = `-${item.savings.imageTokens} ViT Tokens`;
@@ -736,23 +722,16 @@ import benchmarkData from '../data/benchmark-sessions.json';
       if (metricRawLatency) metricRawLatency.textContent = `${(item.without.latencyMs / 1000).toFixed(1)}s`;
       if (metricLatencySaved) metricLatencySaved.textContent = item.savings.latency;
 
-      // Update Ground Truth
       if (groundTruthDesc) groundTruthDesc.textContent = item.groundTruth.defect;
       if (groundTruthFix) groundTruthFix.textContent = `Expected: ${item.groundTruth.suggestedFix}`;
 
-      // Update Image Stage
       renderImageStage(item);
-
-      // Update AI Session Inspector
       renderSessionInspector(item);
 
-      // Cleanly Toggle Active State on Scenario Picker Cards
       caseCards.forEach((card, idx) => {
-        if (idx === currentCaseIndex) {
-          card.classList.add('active');
-        } else {
-          card.classList.remove('active');
-        }
+        const isActive = idx === currentCaseIndex;
+        card.classList.toggle('active', isActive);
+        card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       });
     }
 
@@ -786,7 +765,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
       if (stageViewDims) stageViewDims.textContent = dims;
       if (stageViewBytes) stageViewBytes.textContent = bytes;
 
-      // Update Bounding Box Overlay
       if (bboxOverlay && bboxCoordChip) {
         if (showBoundingBox && currentViewMode !== 'crop') {
           bboxOverlay.classList.remove('hidden');
@@ -815,10 +793,10 @@ import benchmarkData from '../data/benchmark-sessions.json';
       if (sessionMatchStatus) {
         if (session.accuracyScore >= 65) {
           sessionMatchStatus.textContent = '✓ Defect Correctly Identified';
-          sessionMatchStatus.className = 'text-xs font-normal text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30';
+          sessionMatchStatus.className = 'text-xs font-medium text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/35';
         } else {
           sessionMatchStatus.textContent = '⚠ Partial / Missed Defect';
-          sessionMatchStatus.className = 'text-xs font-normal text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30';
+          sessionMatchStatus.className = 'text-xs font-medium text-amber-300 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/35';
         }
       }
 
@@ -836,7 +814,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
       }
     }
 
-    // Attach Event Listeners
     caseCards.forEach((card) => {
       card.addEventListener('click', () => {
         const idx = parseInt(card.getAttribute('data-case-index') || '0', 10);
@@ -847,8 +824,12 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     filterBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        filterBtns.forEach((b) => b.classList.remove('active'));
+        filterBtns.forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
 
         const filter = btn.getAttribute('data-filter');
         caseCards.forEach((card) => {
@@ -866,8 +847,12 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     imgViewTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        imgViewTabs.forEach((t) => t.classList.remove('active'));
+        imgViewTabs.forEach((t) => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
 
         currentViewMode = tab.getAttribute('data-view') || 'crop';
         renderActiveCase();
@@ -876,8 +861,12 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     sessionModeBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        sessionModeBtns.forEach((b) => b.classList.remove('active'));
+        sessionModeBtns.forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
 
         currentSessionMode = btn.getAttribute('data-mode') || 'with';
         const item = benchmarkData[currentCaseIndex];
@@ -892,6 +881,7 @@ import benchmarkData from '../data/benchmark-sessions.json';
           bboxToggleText.textContent = showBoundingBox ? 'Hide Diff Bounding Box' : 'Show Diff Bounding Box';
         }
         toggleBboxBtn.classList.toggle('active', showBoundingBox);
+        toggleBboxBtn.setAttribute('aria-pressed', showBoundingBox ? 'true' : 'false');
         renderActiveCase();
       });
     }
@@ -902,10 +892,10 @@ import benchmarkData from '../data/benchmark-sessions.json';
         reasoningExpanded = !reasoningExpanded;
         reasoningTraceBox.style.display = reasoningExpanded ? 'block' : 'none';
         reasoningArrow.style.transform = reasoningExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+        toggleReasoningBtn.setAttribute('aria-expanded', reasoningExpanded ? 'true' : 'false');
       });
     }
 
-    // Initial Render
     renderActiveCase();
   })();
 </script>

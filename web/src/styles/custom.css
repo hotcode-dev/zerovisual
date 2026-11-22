@@ -1,7 +1,7 @@
 /* Define cascade layers order to keep Starlight styles playing nice with Tailwind */
 @layer base, starlight, theme, components, utilities;
 
-/* Premium typography & modern design system tokens for ZeroVisual */
+/* Typography for ZeroVisual: Plus Jakarta Sans + JetBrains Mono */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @import '@astrojs/starlight-tailwind';
@@ -15,19 +15,44 @@
 	--font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
 }
 
-/* Starlight Design Tokens */
+/* ZeroVisual Technical Design System Tokens */
 :root {
-	--sl-color-accent-low: #1e1b4b;
-	--sl-color-accent: #6366f1;
-	--sl-color-accent-high: #c7d2fe;
+	/* Brand & Semantic Accents (Emerald / Signal Teal — precision engineering, no violet) */
+	--sl-color-accent-low: #052e22;
+	--sl-color-accent: #10b981;
+	--sl-color-accent-high: #6ee7b7;
+
+	/* Neutral Carbon Scale (WCAG AA+ contrast on dark ground) */
 	--sl-color-white: #f8fafc;
 	--sl-color-gray-1: #e2e8f0;
 	--sl-color-gray-2: #cbd5e1;
 	--sl-color-gray-3: #94a3b8;
 	--sl-color-gray-4: #64748b;
-	--sl-color-gray-5: #334155;
-	--sl-color-gray-6: #1e293b;
-	--sl-color-black: #0b0f19;
+	--sl-color-gray-5: #273244;
+	--sl-color-gray-6: #131924;
+	--sl-color-black: #090c12;
+
+	/* ZeroVisual Surface & Motion Tokens */
+	--zv-bg: #090c12;
+	--zv-surface: #0f141e;
+	--zv-surface-elevated: #161d2b;
+	--zv-surface-subtle: #0c1018;
+	--zv-border: #1e2736;
+	--zv-border-strong: #2d3a4f;
+	--zv-accent: #10b981;
+	--zv-accent-strong: #059669;
+	--zv-accent-soft: rgba(16, 185, 129, 0.12);
+	--zv-cyan: #22d3ee;
+	--zv-rose: #fb7185;
+	--zv-rose-strong: #e11d48;
+	--zv-amber: #fbbf24;
+	--zv-text: #f1f5f9;
+	--zv-text-secondary: #cbd5e1;
+	--zv-text-muted: #94a3b8;
+	--zv-radius-sm: 6px;
+	--zv-radius-md: 10px;
+	--zv-radius-lg: 14px;
+	--zv-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
 	--sl-font-system: var(--font-system);
 	--sl-font-mono: var(--font-mono);
@@ -47,113 +72,267 @@ starlight-theme-select,
 	@apply hidden;
 }
 
-/* Background ambient glow */
+/* Base ground with subtle architectural grid + faint emerald zenith light */
 body {
-	@apply bg-slate-950 text-slate-200 tracking-tight;
-	background-color: #0b0f19 !important;
-	background-image: 
-		radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent),
-		radial-gradient(ellipse 60% 40% at 90% 80%, rgba(6, 182, 212, 0.08), transparent) !important;
+	background-color: var(--zv-bg) !important;
+	color: var(--zv-text-secondary);
+	letter-spacing: -0.01em;
+	background-image:
+		radial-gradient(ellipse 70% 40% at 50% -12%, rgba(16, 185, 129, 0.11), transparent 70%),
+		linear-gradient(to bottom, rgba(16, 185, 129, 0.02) 0%, transparent 400px) !important;
 	background-attachment: fixed;
 }
 
-/* Hero section upgrades using Tailwind utilities */
+/* Accessible Focus Rings across all interactive elements */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+	outline: 2px solid var(--zv-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* Ensure Starlight site-title meets 44px touch target */
+a.site-title {
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+}
+
+/* Tabular numbers utility for metrics and tables */
+.tabular-nums {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Hero Section */
 .hero {
-	@apply py-12 px-0;
+	padding-block: clamp(2.5rem, 6vw, 4.5rem) !important;
+	padding-inline: 0;
 }
 
 .hero h1 {
-	@apply font-extrabold tracking-tight bg-gradient-to-br from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent;
-	font-size: clamp(2.25rem, 4vw, 3.25rem) !important;
-	line-height: 1.15 !important;
+	font-weight: 800;
+	letter-spacing: -0.035em;
+	color: #f8fafc;
+	font-size: clamp(2.5rem, 4.5vw, 3.75rem) !important;
+	line-height: 1.08 !important;
 }
 
 .hero .tagline {
-	@apply text-slate-400 text-lg max-w-2xl mx-auto mt-4 mb-8 leading-relaxed;
+	color: var(--zv-text-muted);
+	font-size: clamp(1rem, 1.5vw, 1.1875rem);
+	max-width: 40rem;
+	margin-top: 1rem;
+	margin-bottom: 2rem;
+	line-height: 1.6;
 }
 
-/* Hero Action Buttons using Tailwind */
+.hero .actions {
+	gap: 0.75rem !important;
+}
+
+/* Hero Action Buttons — override Starlight .sl-link-button with 8pt grid, 44px+ tap targets, WCAG AAA contrast */
+.sl-link-button.primary,
 .action.primary {
-	@apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/50 rounded-xl transition-all duration-200 border border-indigo-300/40 cursor-pointer no-underline text-sm;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 8px !important;
+	min-height: 44px !important;
+	padding: 12px 24px !important;
+	background-color: #10b981 !important;
+	color: #03150e !important;
+	font-weight: 700 !important;
+	font-size: 0.9375rem !important;
+	line-height: 1.25 !important;
+	border-radius: var(--zv-radius-md) !important;
+	border: 1px solid #34d399 !important;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out), box-shadow 160ms var(--zv-ease-out);
 }
 
+.sl-link-button.primary:hover,
 .action.primary:hover {
-	@apply -translate-y-0.5 scale-102 shadow-indigo-500/70;
+	background-color: #34d399 !important;
+	color: #03150e !important;
+	transform: translateY(-1px);
+	box-shadow: 0 8px 24px -6px rgba(16, 185, 129, 0.45) !important;
 }
 
+.sl-link-button.primary:active,
+.action.primary:active {
+	transform: scale(0.98);
+}
+
+.sl-link-button.secondary,
 .action.secondary {
-	@apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-slate-600/70 bg-slate-800/70 hover:bg-slate-700/90 hover:border-indigo-400 hover:text-white backdrop-blur-md text-slate-200 font-semibold rounded-xl transition-all duration-200 cursor-pointer no-underline text-sm;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 8px !important;
+	min-height: 44px !important;
+	padding: 12px 24px !important;
+	background-color: var(--zv-surface) !important;
+	color: var(--zv-text) !important;
+	font-weight: 600 !important;
+	font-size: 0.9375rem !important;
+	line-height: 1.25 !important;
+	border-radius: var(--zv-radius-md) !important;
+	border: 1px solid var(--zv-border-strong) !important;
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: background-color 160ms var(--zv-ease-out), border-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out);
 }
 
-/* Glassmorphism cards using Tailwind */
+.sl-link-button.secondary:hover,
+.action.secondary:hover {
+	background-color: var(--zv-surface-elevated) !important;
+	border-color: var(--zv-accent) !important;
+	color: #ffffff !important;
+	transform: translateY(-1px);
+}
+
+.sl-link-button.secondary:active,
+.action.secondary:active {
+	transform: scale(0.98);
+}
+
+/* Starlight Feature Cards — Clean technical surface, 1px hairline border */
 .card {
-	@apply bg-slate-900/50 backdrop-blur-xl border border-indigo-500/20 rounded-2xl shadow-xl transition-all duration-200;
+	background: var(--zv-surface) !important;
+	border: 1px solid var(--zv-border) !important;
+	border-radius: var(--zv-radius-lg) !important;
+	padding: 1.5rem !important;
+	transition: border-color 180ms var(--zv-ease-out), transform 180ms var(--zv-ease-out), background-color 180ms var(--zv-ease-out);
 }
 
 .card:hover {
-	@apply -translate-y-1 border-indigo-500/50 shadow-2xl shadow-indigo-500/20;
+	border-color: var(--zv-border-strong) !important;
+	background: var(--zv-surface-elevated) !important;
+	transform: translateY(-2px);
 }
 
 .card .title {
-	@apply text-slate-50 font-bold text-lg;
+	color: var(--zv-text);
+	font-weight: 700;
+	font-size: 1.0625rem;
+	line-height: 1.4 !important;
+	letter-spacing: -0.015em;
 }
 
 .card .body {
-	@apply text-slate-400 text-sm leading-relaxed;
+	color: var(--zv-text-muted);
+	font-size: 1rem;
+	line-height: 1.6;
 }
 
-/* Modern tables using Tailwind */
+.card .icon {
+	border-color: var(--zv-border-strong) !important;
+	background-color: var(--zv-accent-soft) !important;
+	color: var(--zv-accent) !important;
+}
+
+/* Data Tables — Crisp technical styling with tabular numbers */
 table {
-	@apply w-full my-6 rounded-xl overflow-hidden border border-slate-700/60 bg-slate-900/60 backdrop-blur-md text-left;
+	width: 100%;
+	margin-block: 1.5rem;
+	border-radius: var(--zv-radius-md);
+	overflow: hidden;
+	border: 1px solid var(--zv-border);
+	background: var(--zv-surface);
+	text-align: left;
 	border-collapse: separate;
 	border-spacing: 0;
+	font-variant-numeric: tabular-nums;
 }
 
 th {
-	@apply bg-slate-800/90 text-slate-100 font-bold text-xs uppercase tracking-wider p-3.5 border-b border-slate-700/50;
+	background: var(--zv-surface-elevated);
+	color: var(--zv-text);
+	font-weight: 700;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	padding: 0.875rem 1rem;
+	border-bottom: 1px solid var(--zv-border-strong);
 }
 
 td {
-	@apply p-3.5 border-b border-slate-700/40 text-slate-300 text-sm;
+	padding: 0.875rem 1rem;
+	border-bottom: 1px solid var(--zv-border);
+	color: var(--zv-text-secondary);
+	font-size: 0.875rem;
+	line-height: 1.5;
 }
 
 tr:last-child td {
-	@apply border-b-0;
+	border-bottom: 0;
 }
 
-tr:nth-child(even) td {
-	@apply bg-slate-800/20;
+tbody tr {
+	transition: background-color 140ms var(--zv-ease-out);
 }
 
-/* Callouts / Blockquotes using Tailwind */
+tbody tr:nth-child(even) td {
+	background: rgba(22, 29, 43, 0.35);
+}
+
+tbody tr:hover td {
+	background: rgba(16, 185, 129, 0.04);
+}
+
+/* Callouts / Blockquotes */
 blockquote {
-	@apply border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-950/50 to-slate-900/80 rounded-r-xl p-4 my-6 text-slate-300;
+	border-left: 3px solid var(--zv-accent);
+	background: var(--zv-surface);
+	border-top: 1px solid var(--zv-border);
+	border-right: 1px solid var(--zv-border);
+	border-bottom: 1px solid var(--zv-border);
+	border-radius: 0 var(--zv-radius-md) var(--zv-radius-md) 0;
+	padding: 1.25rem 1.5rem;
+	margin-block: 1.5rem;
+	color: var(--zv-text-secondary);
 }
 
 blockquote strong {
-	@apply text-indigo-100 font-semibold;
+	color: var(--zv-text);
+	font-weight: 600;
 }
 
-/* Code blocks using Tailwind */
+/* Code blocks */
 pre {
-	@apply rounded-xl border border-slate-700/40 bg-[#090d16];
+	border-radius: var(--zv-radius-md);
+	border: 1px solid var(--zv-border);
+	background: #070a0f;
+}
+
+/* Inline code */
+:not(pre) > code {
+	font-family: var(--sl-font-mono);
+	font-size: 0.85em;
+	background: rgba(30, 41, 59, 0.65);
+	border: 1px solid var(--zv-border);
+	border-radius: 4px;
+	padding: 0.1em 0.35em;
+	color: #e2e8f0;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-	@apply w-2 h-2;
+	width: 8px;
+	height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-	@apply bg-[#090d16];
+	background: var(--zv-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-slate-700 rounded;
+	background: var(--zv-border-strong);
+	border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	@apply bg-indigo-500;
+	background: var(--zv-accent);
 }
 
 /* Prevent Starlight markdown sibling spacing rules from altering custom interactive components */
@@ -168,4 +347,16 @@ pre {
 .not-content .scenario-nav > * {
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
+}
+
+/* Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
 }
