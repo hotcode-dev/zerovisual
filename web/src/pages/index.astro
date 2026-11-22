@@ -35,15 +35,11 @@ import '../styles/custom.css';
     <section aria-labelledby="benchmark-callout-heading">
       <div class="zv-callout-banner">
         <div class="space-y-2 max-w-2xl">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="zv-eyebrow-pill">Empirical Benchmarks</span>
-            <span class="text-xs text-slate-400 font-mono">11 Live &amp; Synthetic Scenarios</span>
-          </div>
           <h2 id="benchmark-callout-heading" class="text-xl sm:text-2xl font-bold text-slate-50 tracking-tight m-0">
             Interactive Benchmark &amp; AI Session Explorer
           </h2>
           <p class="text-base text-slate-300 leading-relaxed m-0">
-            Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across live websites (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on <code>RadixArk/Qwen3.8-27B-NVFP4</code>.
+            Inspect side-by-side screenshots (Baseline, Actual, Diff, Crop) across 11 live website scenarios (Wikipedia, Hacker News, GitHub, MDN) and examine real VLM reasoning traces (<code>&lt;think&gt;</code>) and token metrics on <code>RadixArk/Qwen3.8-27B-NVFP4</code>.
           </p>
         </div>
         <a
@@ -61,8 +57,7 @@ import '../styles/custom.css';
     <!-- Section 4: Core Capabilities -->
     <section aria-labelledby="capabilities-heading" class="pt-4 border-t border-slate-800/80">
       <div class="mb-6">
-        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Architecture</span>
-        <h2 id="capabilities-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+        <h2 id="capabilities-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight m-0">
           Why ZeroVisual?
         </h2>
       </div>
@@ -77,22 +72,76 @@ import '../styles/custom.css';
           Correlates broken layouts across Desktop, Tablet, and Mobile viewports under a single normalized <code>testId</code> so your agent diagnoses breakpoint bugs in one prompt.
         </Card>
         <Card title="Scoped Semantic Context" icon="document">
-          Captures the component's Playwright <code>ariaSnapshot</code> YAML and 14 computed layout CSS properties instead of dumping 100,000+ characters of raw HTML.
+          Captures the component's Playwright <code>ariaSnapshot</code> YAML and 31 computed layout &amp; visual CSS properties instead of dumping 100,000+ characters of raw HTML.
         </Card>
-        <Card title="Heuristic UI Linter + Penpot" icon="pencil">
-          Objective math checks for WCAG 2.1 AA contrast ratios, 4px/8px spacing rhythm, and 44px tap targets, plus native SVG/JSON token diffing for open-source Penpot designs.
+        <Card title="Rendered Anti-Slop + DESIGN.md" icon="pencil">
+          Catches 26 deterministic DOM rules—including rendered AI slop (gradient text, violet gradients, glow halos, side-tab borders, nested cards, eyebrows), WCAG 2.1 AA contrast, 8pt grid, and native <code>DESIGN.md</code> / Penpot drift.
         </Card>
-        <Card title="Dual Isolated Agent Skills" icon="star">
-          Separate <code>zerovisual-regression</code> (strict triage forensics) and <code>zerovisual-design-qa</code> (UI/UX coaching) skills to prevent prompt pollution and hallucinations.
+        <Card title="Clustered Violation Crops &amp; Impeccable Routing" icon="star">
+          Crops up to 4 clustered 1-tile <code>.webp</code> defect snapshots per viewport (even below the fold) and routes every violation directly to its target <code>/impeccable</code> command.
         </Card>
       </CardGrid>
+    </section>
+
+    <!-- Section 4b: Rendered Anti-Slop & Impeccable Companion -->
+    <section aria-labelledby="antislop-heading" class="pt-4 border-t border-slate-800/80">
+      <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 id="antislop-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight m-0">
+            Rendered Anti-Slop Engine + Impeccable Companion
+          </h2>
+          <p class="text-base text-slate-400 mt-2 max-w-3xl">
+            Static source linters cannot see actual bounding boxes, computed gradients, or below-the-fold overflow. ZeroVisual audits the live rendered browser DOM at 0 AI tokens, crops clustered defects into 1-tile WebPs, and maps fixes to <strong>Impeccable</strong> commands.
+          </p>
+        </div>
+        <a
+          href="/guides/with-impeccable/"
+          class="zv-cta-button shrink-0"
+        >
+          <span>Impeccable Integration Guide</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+        <div class="p-5 rounded-xl bg-[#0f141e] border border-[#1e2736] space-y-2">
+          <h3 class="text-base font-bold text-slate-100 m-0">1. Kill AI Palette &amp; Glow Tells</h3>
+          <p class="text-sm text-slate-400 leading-relaxed m-0">
+            Detects <code>GRADIENT_TEXT</code>, <code>AI_SLOP_COLOR</code> (purple/violet gradients), <code>DARK_GLOW</code> (chromatic halos &amp; radial spotlights), <code>SIDE_TAB_BORDER</code>, and <code>GRAY_ON_COLOR</code>.
+          </p>
+          <div class="pt-1 text-xs font-mono text-cyan-400">→ /impeccable colorize · quieter · distill</div>
+        </div>
+
+        <div class="p-5 rounded-xl bg-[#0f141e] border border-[#1e2736] space-y-2">
+          <h3 class="text-base font-bold text-slate-100 m-0">2. Break Template Reflexes</h3>
+          <p class="text-sm text-slate-400 leading-relaxed m-0">
+            Flags <code>NESTED_CARDS</code> (card-in-card), <code>ICON_TILE_STACK</code> (3-column icon-box above heading grids), <code>BANNED_EYEBROW</code> (kicker pills &amp; <code>01/02/03</code> badges), and <code>EMOJI_ICON</code>.
+          </p>
+          <div class="pt-1 text-xs font-mono text-cyan-400">→ /impeccable distill · layout · polish</div>
+        </div>
+
+        <div class="p-5 rounded-xl bg-[#0f141e] border border-[#1e2736] space-y-2">
+          <h3 class="text-base font-bold text-slate-100 m-0">3. Enforce Hierarchy &amp; Measure</h3>
+          <p class="text-sm text-slate-400 leading-relaxed m-0">
+            Verifies <code>FLAT_TYPE_HIERARCHY</code> (&ge;1.25&times; scale), <code>HEADING_RHYTHM</code> (space above &gt; space below), <code>LINE_LENGTH</code> (65–75ch &amp; viewport gutters), <code>CRAMPED_PADDING</code>, and 8pt <code>SPACING_GRID</code>.
+          </p>
+          <div class="pt-1 text-xs font-mono text-cyan-400">→ /impeccable typeset · layout</div>
+        </div>
+
+        <div class="p-5 rounded-xl bg-[#0f141e] border border-[#1e2736] space-y-2">
+          <h3 class="text-base font-bold text-slate-100 m-0">4. Live DOM + DESIGN.md Drift</h3>
+          <p class="text-sm text-slate-400 leading-relaxed m-0">
+            Catches <code>TEXT_OCCLUSION</code>, <code>CLIPPED_OVERFLOW</code>, <code>BROKEN_IMAGE</code>, <code>HIDDEN_AT_REST</code>, <code>COLUMN_OVERFLOW</code>, and auto-checks live styles against <code>DESIGN.md</code> (&ldquo;the brief wins&rdquo;).
+          </p>
+          <div class="pt-1 text-xs font-mono text-cyan-400">→ /impeccable adapt · harden · polish</div>
+        </div>
+      </div>
     </section>
 
     <!-- Section 5: Token & Payload Efficiency -->
     <section aria-labelledby="efficiency-heading" class="pt-4 border-t border-slate-800/80">
       <div class="mb-6">
-        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Performance</span>
-        <h2 id="efficiency-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+        <h2 id="efficiency-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight m-0">
           Token &amp; Payload Efficiency
         </h2>
         <p class="text-base text-slate-400 mt-1">
@@ -189,8 +238,7 @@ import '../styles/custom.css';
     <!-- Section 6: Model Vision Grid Reference -->
     <section aria-labelledby="grid-ref-heading" class="pt-4 border-t border-slate-800/80">
       <div class="mb-6">
-        <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">Specification</span>
-        <h2 id="grid-ref-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight mt-1">
+        <h2 id="grid-ref-heading" class="text-2xl sm:text-3xl font-bold text-slate-50 tracking-tight m-0">
           Model Vision Grid Reference
         </h2>
       </div>

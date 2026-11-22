@@ -116,28 +116,37 @@ ZeroVisual extracts targeted, scoped semantic context:
 
 ---
 
-## 7. Deterministic Design QA Heuristic Linter
+## 7. Deterministic Design QA & Rendered Anti-Slop Linter
 
-In `design-qa` mode, ZeroVisual runs a rigorous mathematical linter on your live DOM before engaging AI:
+In `design-qa` mode, ZeroVisual evaluates up to 250 rendered DOM elements per viewport across 26 deterministic rules before engaging AI—and routes every finding to its corresponding **[Impeccable](https://impeccable.style/)** command:
 
-- **WCAG 2.1 AA Contrast Ratio:** Calculates relative luminance using the official W3C formula:
+- **WCAG 2.1 AA Contrast Ratio (`CONTRAST`):** Calculates relative luminance (including OKLCH/OKLab/HSL and dark-mode canvas traversal) using the official W3C formula:
   $$L = 0.2126 \cdot R + 0.7152 \cdot G + 0.0722 \cdot B$$
   $$\text{Contrast Ratio} = \frac{L_1 + 0.05}{L_2 + 0.05}$$
-  Flags any normal text with contrast $< 4.5:1$ and large text $< 3:1$.
-- **8pt / 4px Spatial Grid Rhythm:** Checks whether element margins, paddings, and layout gaps adhere to multiples of 4px or 8px.
-- **Mobile Tap Target Compliance:** Validates that interactive buttons, links, and form inputs meet the minimum 44×44px physical touch target requirement.
-- **Typographic Scale Hierarchy:** Audits font sizes and line heights against balanced typographic progressions.
+  Flags normal text $< 4.5:1$ and large text $< 3:1$ ($\to$ `/impeccable colorize`).
+- **Surface & Color AI Slop (`GRADIENT_TEXT`, `AI_SLOP_COLOR`, `DARK_GLOW`, `SIDE_TAB_BORDER`, `GRAY_ON_COLOR`):**
+  Flags decorative `background-clip: text` gradients, unapproved purple/violet/indigo gradients, zero-offset chromatic glow shadows and radial spotlight halos, thick colored side-tab borders (`border-left > 1px`), and washed-out neutral gray text on saturated colored surfaces ($\to$ `/impeccable colorize`, `/impeccable quieter`, `/impeccable distill`, `/impeccable typeset`).
+- **Scaffold & Layout Structure Slop (`NESTED_CARDS`, `ICON_TILE_STACK`, `BANNED_EYEBROW`, `EMOJI_ICON`):**
+  Detects cards nested inside cards, repeated "small rounded icon box stacked above heading" card templates, kicker/eyebrow pills or `01/02/03` numeric badges above headings, and raw Unicode emoji used as UI icons ($\to$ `/impeccable distill`, `/impeccable layout`, `/impeccable polish`).
+- **Typography Hierarchy & Spatial Rhythm (`FLAT_TYPE_HIERARCHY`, `HEADING_RHYTHM`, `LINE_LENGTH`, `CRAMPED_PADDING`, `SPACING_GRID`, `TYPOGRAPHY_SCALE`):**
+  Audits heading-to-body scale progression ($\ge 1.25\times$ step, no inverted headings), verifies space above a heading exceeds space below it, enforces `65ch–75ch` reading measure and horizontal viewport gutters, checks for cramped container padding, and validates `4px`/`8px` grid rhythm ($\to$ `/impeccable typeset`, `/impeccable layout`).
+- **Rendered Visual Integrity & Accessibility (`TAP_TARGET`, `FOCUS_VISIBLE`, `ACCESSIBILITY`, `LAYOUT_OVERFLOW`, `TEXT_OCCLUSION`, `CLIPPED_OVERFLOW`, `BROKEN_IMAGE`, `HIDDEN_AT_REST`, `COLUMN_OVERFLOW`):**
+  Detects overlapping occluded text, unintended clipping (`scrollWidth > clientWidth` inside `overflow: hidden`), unloaded/0px `<img>` tags, content left at `opacity: 0` at rest, first-viewport column height imbalance, and mobile touch targets $< 44\times44\text{px}$ ($\to$ `/impeccable adapt`, `/impeccable harden`, `/impeccable layout`).
+- **Clustered 1-Tile Violation Crops (`violationCrops`):**
+  In addition to the 1-tile above-the-fold overview, ZeroVisual spatially clusters nearby violation bounding boxes (including below-the-fold defects), crops up to 4 clean regions (+32px context padding) from the full-page render, and encodes each as a model-aligned 1-tile `.webp` artifact.
 
 ---
 
-## 8. Open-Source Penpot SVG & Design Token Diffing
+## 8. Native `DESIGN.md` Drift Checking ("The Brief Wins") & Open-Source Penpot Diffing
 
-Proprietary design tools like Figma lock developer teams into paid subscription APIs. ZeroVisual natively supports **Penpot**, the leading open-source design tool:
+ZeroVisual supports both **[Impeccable](https://impeccable.style/) `DESIGN.md`** specifications and open-source **Penpot / W3C DTCG** design tokens:
 
-1. ZeroVisual parses exported Penpot SVG artboards and design token JSON files using `fast-xml-parser`.
-2. It extracts SVG presentation attributes: `fill`, `stroke`, `font-family`, `font-size`, `font-weight`, `rx`, and geometry.
-3. It performs a deterministic mathematical diff against the live computed CSS styles of matching DOM elements.
-4. Token discrepancies (e.g., `#6366f1` intended in Penpot vs. `#4f46e5` rendered in DOM) are listed directly in the `design-qa-ready.json` payload.
+1. **Auto-Discovered `DESIGN.md` (`DESIGN_SYSTEM_DRIFT`):**
+   - Extracts declared font families, palette colors (hex, rgb, hsl, oklch), border-radius scales, and font-size ramps from `DESIGN.md`.
+   - **"The Brief Wins":** If `DESIGN.md` explicitly commits to a violet/purple brand color or neobrutalist hard-offset shadows, ZeroVisual automatically exempts those tokens from AI-slop rules while flagging rendered DOM elements whose computed font, color, radius, or type size drifts outside `DESIGN.md`.
+   - **Shared Waivers:** Honors `data-impeccable-ignore`, `data-zerovisual-ignore`, and `.impeccable/config.json` (`detector.ignoreRules`).
+2. **Open-Source Penpot SVG & W3C DTCG Token Diffing:**
+   - Parses exported Penpot SVG artboards, Penpot JSON bundles, and W3C DTCG (`$value`, `$type`) files to compute deterministic property deltas (`penpotDeltas`) against live DOM `getComputedStyle` values.
 
 ---
 

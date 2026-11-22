@@ -31,7 +31,7 @@ npx skills add hotcode-dev/zerovisual/skills/zerovisual-regression
 ```
 
 - **`skills/zerovisual-optimize`** (`scripts/optimize.mjs`): Teaches agents how and when to optimize user screenshots and UI images to eliminate Vision LLM token waste and network payload latency.
-- **`skills/zerovisual-design-qa`** (`scripts/design-qa.mjs`): Teaches agents objective UI/UX mentoring guidelines (8pt spatial grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, and exact CSS/Tailwind classes).
+- **`skills/zerovisual-design-qa`** (`scripts/design-qa.mjs`): Teaches agents objective UI/UX mentoring guidelines (8pt spatial grid rhythm, WCAG 2.1 contrast math, 44x44px touch targets, **rendered AI-slop detection**, `DESIGN.md` token drift, clustered 1-tile `.webp` violation crops, and automatic `/impeccable` command routing).
 - **`skills/zerovisual-regression`** (`scripts/regression.mjs`): Teaches agents strict code-to-code visual regression forensics (filtering font anti-aliasing noise, cross-viewport correlation, semantic AOM validation).
 
 ---
@@ -116,13 +116,21 @@ npx zerovisual-optimize ./bug-report.png --provider openai
 npx zerovisual optimize ./screenshots-dir --provider gemini --low-token
 ```
 
-### B. Audit Live Web UI for Engineers (`zerovisual design-qa`)
-Run an automated design audit against your local dev server without needing any design files:
+### B. Audit Live Web UI & Eliminate Rendered AI Slop (`zerovisual design-qa`)
+Run an automated design and rendered anti-slop audit against your local dev server (auto-discovers `DESIGN.md` and `.impeccable/config.json` in your workspace, and emits both a 1-tile viewport overview and up to 4 clustered 1-tile `.webp` violation crops per viewport):
 
 ```bash
-# Standalone engineer design heuristic audit
+# Standalone engineer design heuristic + rendered anti-slop audit
 npx zerovisual design-qa \
   --url http://localhost:3000 \
+  --provider anthropic \
+  --json
+
+# Specify an explicit DESIGN.md file and custom max violation crops
+npx zerovisual design-qa \
+  --url http://localhost:3000 \
+  --design-md ./DESIGN.md \
+  --max-crops 4 \
   --provider anthropic
 
 # Audit against an open-source Penpot design export

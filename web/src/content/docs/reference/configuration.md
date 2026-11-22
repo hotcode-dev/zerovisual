@@ -65,7 +65,7 @@ npx zerovisual regression [options]
 
 ## 3. CLI: `zerovisual design-qa`
 
-Audits a live web page against objective UI/UX design heuristics (WCAG 2.1 contrast, 8pt spatial grid, tap target size, typography) and optional Penpot design tokens.
+Audits a live web page against 26 deterministic UI/UX and rendered AI-slop rules (WCAG 2.1 contrast, 8pt spatial grid, tap target size, gradient text, AI purple gradients, chromatic glow halos, side-tab borders, nested cards, icon-tile stacks, banned eyebrows, typography hierarchy, heading rhythm, line length, text occlusion, clipped overflow, broken images), auto-discovered **`DESIGN.md`** specifications, and optional Penpot design tokens.
 
 ```bash
 npx zerovisual design-qa [options]
@@ -76,10 +76,13 @@ npx zerovisual design-qa [options]
 | Flag | Shorthand | Type | Default | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | `--url` | `-u` | `string` | *Required* | The target URL to audit (e.g., `http://localhost:3000` or staging environment). |
-| `--penpot` | | `string` | `undefined` | Optional path to an exported Penpot SVG artboard or JSON design token file. |
-| `--output` | `-o` | `string` | `'./design-qa-ready.json'` | Destination file path for the design QA audit bundle. |
-| `--provider` | `-p` | `string` | `'anthropic'` | Target vision provider (`openai`, `anthropic`, `gemini`, `gemma`, `qwen`, `local`). |
+| `--designMd` | | `string` | Auto-discovered | Optional path to `DESIGN.md` (auto-discovered in `./DESIGN.md`, `./.impeccable/DESIGN.md`, or `./docs/DESIGN.md` if omitted). |
+| `--penpot` | | `string` | `undefined` | Optional path to an exported Penpot SVG artboard, Penpot JSON, or W3C DTCG token file. |
+| `--maxCrops` | | `number` | `4` | Maximum number of clustered 1-tile `.webp` violation crops generated per viewport (in addition to the 1-tile viewport overview). |
+| `--output` | `-o` | `string` | `'./test-results'` | Directory where `design-qa-ready.json` and `./artifacts/*.webp` tiles are written. |
+| `--provider` | `-p` | `string` | `'openai'` | Target vision provider (`openai`, `anthropic`, `gemini`, `gemma`, `qwen`, `llama`, `mistral`, `deepseek`, `local`). |
 | `--lowTokenMode` | | `boolean` | `false` | Enable aggressive low-token downscaling for design screenshots. |
+| `--json` | | `boolean` | `false` | Output concise JSON audit summary (including `suggestedImpeccableCommands`, `violationCrops`, and `designMdDeltas`) to stdout. |
 
 ---
 
