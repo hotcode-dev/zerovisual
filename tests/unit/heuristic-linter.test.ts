@@ -6,8 +6,11 @@ import {
   checkSpacingGrid,
   checkTapTarget,
   checkTypographyScale,
-  lintElementHeuristics
+  lintElementHeuristics,
+  lintPageLevelHeuristics,
+  clusterViolationBoundingBoxes
 } from '../../src/core/heuristic-linter.js';
+import { parseDesignMd, diffDesignMdAgainstDom } from '../../src/core/design-md-parser.js';
 
 describe('Deterministic UI Heuristic Linter', () => {
   describe('Color parsing and WCAG contrast', () => {
@@ -227,6 +230,261 @@ describe('Deterministic UI Heuristic Linter', () => {
       expect(rules).toContain('CONTRAST');
       expect(rules).toContain('SPACING_GRID');
       expect(rules).toContain('TAP_TARGET');
+    });
+  });
+
+  describe('Rendered AI-Slop & Visual Integrity Detectors (Impeccable Companion)', () => {
+    it('should detect GRADIENT_TEXT and AI_SLOP_COLOR on purple gradient headings', () => {
+      const violations = lintElementHeuristics({
+        selector: 'h1.hero-title',
+        tagName: 'h1',
+        computedStyles: {
+          backgroundImage: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
+          backgroundClip: 'text',
+          color: 'transparent',
+          fontSize: '48px'
+        },
+        boundingBox: { x: 40, y: 80, width: 600, height: 64 }
+      });
+
+      const rules = violations.map((v) => v.rule);
+      expect(rules).toContain('GRADIENT_TEXT');
+      expect(rules).toContain('AI_SLOP_COLOR');
+      expect(violations.find((v) => v.rule === 'GRADIENT_TEXT')?.suggestedCommand).toBe('/impeccable typeset');
+      expect(violations.find((v) => v.rule === 'AI_SLOP_COLOR')?.suggestedCommand).toBe('/impeccable colorize');
+    });
+
+    it('should exempt AI_SLOP_COLOR when DESIGN.md explicitly commits to a violet palette ("the brief wins")', () => {
+      const designMd = parseDesignMd('# Design System\nPrimary Brand Color: `#8b5cf6` (Electric Violet)');
+      expect(designMd.allowsVioletPalette).toBe(true);
+
+      const violations = lintElementHeuristics({
+        selector: 'div.hero-banner',
+        tagName: 'div',
+        designMd,
+        computedStyles: {
+          backgroundImage: 'linear-gradient(90deg, #8b5cf6, #6366f1)'
+        }
+      });
+
+      expect(violations.some((v) => v.rule === 'AI_SLOP_COLOR')).toBe(false);
+    });
+
+    it('should detect DARK_GLOW, SIDE_TAB_BORDER, and GRAY_ON_COLOR', () => {
+      const violations = lintElementHeuristics({
+        selector: 'div.ai-card',
+        tagName: 'div',
+        canvasBackground: '#090d16',
+        accessibility: { innerText: 'AI Powered Feature' },
+        computedStyles: {
+          color: '#808080',
+          backgroundColor: '#2563eb',
+          boxShadow: '0px 0px 24px rgba(56, 189, 248, 0.6)',
+          borderLeftWidth: '4px',
+          borderTopWidth: '0px',
+          borderRightWidth: '0px',
+          borderBottomWidth: '0px',
+          borderLeftColor: '#38bdf8'
+        }
+      });
+
+      const rules = violations.map((v) => v.rule);
+      expect(rules).toContain('DARK_GLOW');
+      expect(rules).toContain('SIDE_TAB_BORDER');
+      expect(rules).toContain('GRAY_ON_COLOR');
+      expect(violations.find((v) => v.rule === 'DARK_GLOW')?.suggestedCommand).toBe('/impeccable quieter');
+      expect(violations.find((v) => v.rule === 'SIDE_TAB_BORDER')?.suggestedCommand).toBe('/impeccable distill');
+    });
+
+    it('should detect NESTED_CARDS, ICON_TILE_STACK, BANNED_EYEBROW, and EMOJI_ICON', () => {
+      const violations = lintElementHeuristics({
+        selector: 'div.inner-feature-card',
+        tagName: 'div',
+        computedStyles: {},
+        accessibility: { innerText: '🚀' },
+        signals: {
+          isCard: true,
+          isInsideCard: true,
+          hasIconTileStack: true,
+          isEyebrowAboveHeading: true,
+          hasEmojiIcon: true
+        }
+      });
+
+      const rules = violations.map((v) => v.rule);
+      expect(rules).toContain('NESTED_CARDS');
+      expect(rules).toContain('ICON_TILE_STACK');
+      expect(rules).toContain('BANNED_EYEBROW');
+      expect(rules).toContain('EMOJI_ICON');
+    });
+
+    it('should detect HEADING_RHYTHM, LINE_LENGTH, and CRAMPED_PADDING', () => {
+      const headingViolations = lintElementHeuristics({
+        selector: 'h2.section-heading',
+        tagName: 'h2',
+        computedStyles: {
+          fontSize: '28px',
+          marginTop: '12px',
+          marginBottom: '24px'
+        }
+      });
+      expect(headingViolations.some((v) => v.rule === 'HEADING_RHYTHM')).toBe(true);
+
+      const longParagraphViolations = lintElementHeuristics({
+        selector: 'p.wide-copy',
+        tagName: 'p',
+        viewportWidth: 1440,
+        boundingBox: { x: 8, y: 200, width: 1100, height: 60 },
+        accessibility: {
+          innerText:
+            'This is an extremely wide paragraph of body text that stretches across the entire 1100px desktop container without a 65ch-75ch max-width constraint.'
+        },
+        computedStyles: {
+          fontSize: '16px',
+          lineHeight: '24px',
+          backgroundColor: '#f1f5f9',
+          borderTopWidth: '1px',
+          padding: '4px'
+        }
+      });
+
+      const pRules = longParagraphViolations.map((v) => v.rule);
+      expect(pRules).toContain('LINE_LENGTH');
+      expect(pRules).toContain('CRAMPED_PADDING');
+    });
+
+    it('should detect TEXT_OCCLUSION, CLIPPED_OVERFLOW, BROKEN_IMAGE, HIDDEN_AT_REST, and COLUMN_OVERFLOW', () => {
+      const imgViolations = lintElementHeuristics({
+        selector: 'img.avatar',
+        tagName: 'img',
+        computedStyles: {},
+        accessibility: { alt: 'User avatar' },
+        signals: {
+          imageBroken: true,
+          occludedBySelector: 'div.floating-badge',
+          hasUnintendedTextOverflow: true,
+          isHiddenAtRest: true,
+          hasColumnOverflowImbalance: true
+        }
+      });
+
+      const rules = imgViolations.map((v) => v.rule);
+      expect(rules).toContain('BROKEN_IMAGE');
+      expect(rules).toContain('TEXT_OCCLUSION');
+      expect(rules).toContain('CLIPPED_OVERFLOW');
+      expect(rules).toContain('HIDDEN_AT_REST');
+      expect(rules).toContain('COLUMN_OVERFLOW');
+    });
+
+    it('should honor data-impeccable-ignore and data-zerovisual-ignore rule waivers', () => {
+      const violations = lintElementHeuristics({
+        selector: 'h1.gradient-waived',
+        tagName: 'h1',
+        computedStyles: {
+          backgroundImage: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
+          backgroundClip: 'text',
+          color: 'transparent'
+        },
+        signals: {
+          ignoredRules: ['gradient-text', 'ai-color-palette']
+        }
+      });
+
+      expect(violations).toHaveLength(0);
+    });
+
+    it('should detect FLAT_TYPE_HIERARCHY and DESIGN_SYSTEM_DRIFT at page level', () => {
+      const designMd = parseDesignMd(`
+# DESIGN.md
+## Typography
+- Heading Font: \`Instrument Serif\`
+- Body Font: \`Plus Jakarta Sans\`
+- Type Scale: 16px, 24px, 40px
+## Palette
+- Ink: #0f172a
+- Surface: #f8fafc
+## Radius
+- Card radius: 12px
+      `);
+
+      const deltas = diffDesignMdAgainstDom(designMd, {
+        'div.drifted-card': {
+          fontFamily: 'Comic Sans MS, sans-serif',
+          color: '#ff0055',
+          borderRadius: '28px',
+          fontSize: '19px'
+        }
+      });
+      expect(deltas.length).toBeGreaterThanOrEqual(3);
+
+      const pageViolations = lintPageLevelHeuristics(
+        [
+          {
+            selector: 'h1.title',
+            tagName: 'h1',
+            computedStyles: { fontSize: '20px', fontFamily: 'Comic Sans MS' },
+            boundingBox: { x: 20, y: 20, width: 300, height: 30 }
+          },
+          {
+            selector: 'h2.subtitle',
+            tagName: 'h2',
+            computedStyles: { fontSize: '18px' },
+            boundingBox: { x: 20, y: 60, width: 300, height: 26 }
+          },
+          {
+            selector: 'p.body',
+            tagName: 'p',
+            computedStyles: { fontSize: '16px' },
+            boundingBox: { x: 20, y: 100, width: 300, height: 24 }
+          }
+        ],
+        { designMd, viewportName: 'Desktop' }
+      );
+
+      const rules = pageViolations.map((v) => v.rule);
+      expect(rules).toContain('FLAT_TYPE_HIERARCHY');
+      expect(rules).toContain('DESIGN_SYSTEM_DRIFT');
+    });
+
+    it('should cluster nearby violation bounding boxes into padded crop regions', () => {
+      const clusters = clusterViolationBoundingBoxes(
+        [
+          {
+            rule: 'GRADIENT_TEXT',
+            element: 'h1.hero',
+            expected: 'solid',
+            actual: 'gradient',
+            severity: 'warning',
+            suggestedCommand: '/impeccable typeset',
+            boundingBox: { x: 100, y: 100, width: 200, height: 50 }
+          },
+          {
+            rule: 'BANNED_EYEBROW',
+            element: 'span.kicker',
+            expected: 'none',
+            actual: 'eyebrow',
+            severity: 'warning',
+            suggestedCommand: '/impeccable distill',
+            boundingBox: { x: 100, y: 70, width: 120, height: 20 }
+          },
+          {
+            rule: 'CONTRAST',
+            element: 'footer p.copy',
+            expected: '>= 4.5:1',
+            actual: '2.1:1',
+            severity: 'critical',
+            suggestedCommand: '/impeccable colorize',
+            boundingBox: { x: 100, y: 1800, width: 300, height: 30 }
+          }
+        ],
+        { width: 1440, height: 2200 },
+        { maxCrops: 4, padding: 32 }
+      );
+
+      // First two violations (y=70..150) merge into one cluster; footer violation (y=1800) is a separate cluster and sorted first (critical)
+      expect(clusters).toHaveLength(2);
+      expect(clusters[0]?.rules).toContain('CONTRAST');
+      expect(clusters[1]?.rules).toEqual(expect.arrayContaining(['GRADIENT_TEXT', 'BANNED_EYEBROW']));
     });
   });
 });

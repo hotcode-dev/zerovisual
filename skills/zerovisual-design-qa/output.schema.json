@@ -31,10 +31,29 @@
                   "SPACING_GRID",
                   "TAP_TARGET",
                   "TYPOGRAPHY_SCALE",
-                  "PENPOT_TOKEN",
                   "ACCESSIBILITY",
                   "LAYOUT_OVERFLOW",
-                  "FOCUS_VISIBLE"
+                  "FOCUS_VISIBLE",
+                  "AI_SLOP_COLOR",
+                  "GRADIENT_TEXT",
+                  "DARK_GLOW",
+                  "SIDE_TAB_BORDER",
+                  "GRAY_ON_COLOR",
+                  "NESTED_CARDS",
+                  "ICON_TILE_STACK",
+                  "BANNED_EYEBROW",
+                  "EMOJI_ICON",
+                  "FLAT_TYPE_HIERARCHY",
+                  "HEADING_RHYTHM",
+                  "LINE_LENGTH",
+                  "CRAMPED_PADDING",
+                  "TEXT_OCCLUSION",
+                  "CLIPPED_OVERFLOW",
+                  "BROKEN_IMAGE",
+                  "HIDDEN_AT_REST",
+                  "COLUMN_OVERFLOW",
+                  "DESIGN_SYSTEM_DRIFT",
+                  "PENPOT_TOKEN"
                 ]
               },
               "element": {
@@ -45,13 +64,20 @@
                 "enum": [
                   "critical",
                   "warning",
-                  "info"
+                  "info",
+                  "advisory"
                 ]
               },
               "recommendation": {
                 "type": "string"
               },
               "cssFix": {
+                "type": "string"
+              },
+              "suggestedCommand": {
+                "type": "string"
+              },
+              "cropImagePath": {
                 "type": "string"
               }
             },
@@ -66,6 +92,12 @@
           }
         },
         "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "suggestedImpeccableCommands": {
           "type": "array",
           "items": {
             "type": "string"

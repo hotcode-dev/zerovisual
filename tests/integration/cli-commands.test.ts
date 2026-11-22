@@ -193,6 +193,14 @@ describe('ZeroVisual CLI Commands Integration', () => {
       const vpDiffPath = validated.failures[0]?.viewports[0]?.images.diffImagePath;
       expect(vpDiffPath).toBeDefined();
       expect(fs.existsSync(vpDiffPath!)).toBe(true);
+
+      // Should also generate clustered 1-tile violation crops and link cropImagePath + suggestedCommand
+      const vpCrops = validated.failures[0]?.viewports[0]?.violationCrops;
+      expect(vpCrops).toBeDefined();
+      expect(vpCrops!.length).toBeGreaterThan(0);
+      expect(fs.existsSync(vpCrops![0]!.imagePath)).toBe(true);
+      expect(audit.designContext?.heuristicViolations[0]?.suggestedCommand).toBeDefined();
+      expect(audit.designContext?.heuristicViolations[0]?.cropImagePath).toBeDefined();
     });
   });
 });

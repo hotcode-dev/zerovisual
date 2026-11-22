@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 import { defineCommand } from 'citty';
 import type { Browser } from '@playwright/test';
 import {
@@ -8,8 +9,10 @@ import {
   type TargetProvider,
   type TriagePayload,
   type ViewportArtifact,
+  type ViolationCropArtifact,
   type HeuristicViolation,
-  type PenpotDelta
+  type PenpotDelta,
+  type DesignMdDelta
 } from '../../core/schema.js';
 import {
   optimizeImageForProvider,
@@ -17,10 +20,18 @@ import {
 } from '../../core/image-optimizer.js';
 import { captureDomContext, auditPageHeuristics } from '../../core/dom-extractor.js';
 import { parsePenpotTokens, diffPenpotAgainstDom } from '../../core/penpot-parser.js';
+import {
+  loadDesignMdFromWorkspace,
+  loadImpeccableConfig,
+  diffDesignMdAgainstDom
+} from '../../core/design-md-parser.js';
+import { clusterViolationBoundingBoxes } from '../../core/heuristic-linter.js';
 
 export interface DesignQaOptions {
   url: string;
   penpotPath?: string;
+  designMdPath?: string;
+  maxCrops?: number;
   outputDir?: string;
   provider?: TargetProvider;
   lowTokenMode?: boolean;
@@ -34,7 +45,7 @@ export const DEFAULT_DESIGN_VIEWPORTS = [
 ];
 
 export async function runDesignQaCommand(options: DesignQaOptions): Promise<TriagePayload> {
-  const { url, penpotPath } = options;
+  const { url, penpotPath, designMdPath } = options;
   if (!url) {
     throw new Error('Missing required option: --url <url>');
   }
@@ -45,6 +56,13 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   const testId = `design-qa-${url.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
   const provider = options.provider ?? 'openai';
   const lowTokenMode = options.lowTokenMode ?? false;
+  const maxCrops = options.maxCrops ?? 4;
+
+  // Load Impeccable project config (.impeccable/config.json) and DESIGN.md if present
+  const impeccableConfig = loadImpeccableConfig(process.cwd());
+  const designMd = impeccableConfig.designSystemEnabled
+    ? loadDesignMdFromWorkspace(process.cwd(), designMdPath)
+    : undefined;
 
   let browser = options.browserInstance;
   let ownBrowser = false;
@@ -77,7 +95,6 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
       try {
         await page.goto(url, { waitUntil: 'load', timeout: 30000 });
       } catch {
-        // Fallback or retry on domcontentloaded
         try {
           await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
         } catch (e: any) {
@@ -85,15 +102,24 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         }
       }
 
-      // Collect DOM heuristics and computed styles
-      const { heuristicViolations, computedStylesMap } = await auditPageHeuristics(page, vp.isMobile);
-      aggregatedViolations.push(...heuristicViolations);
+      // Collect DOM heuristics, rendered AI-slop rules, and computed styles
+      const { heuristicViolations, computedStylesMap } = await auditPageHeuristics(page, {
+        isMobileViewport: vp.isMobile,
+        viewportName: vp.name,
+        designMd,
+        ignoreRules: impeccableConfig.ignoreRules
+      });
       Object.assign(combinedDomStyles, computedStylesMap);
 
       // Scoped DOM context
-      const domContext = await captureDomContext(page, 'body', { isMobileViewport: vp.isMobile });
+      const domContext = await captureDomContext(page, 'body', {
+        isMobileViewport: vp.isMobile,
+        viewportName: vp.name,
+        designMd,
+        ignoreRules: impeccableConfig.ignoreRules
+      });
 
-      // Capture screenshot and downscale to model-tile grid WebP
+      // Capture above-the-fold viewport screenshot and downscale to 1-tile WebP
       const rawScreenshot = await page.screenshot({ fullPage: false });
       const optimized = await optimizeImageForProvider(rawScreenshot, {
         provider,
@@ -103,6 +129,58 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
       const safeVpName = vp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const diffImagePath = path.join(artifactsDir, `${testId}-${safeVpName}.webp`);
       fs.writeFileSync(diffImagePath, optimized.buffer);
+
+      // Capture full-page buffer to generate clustered 1-tile violation crops (including below-the-fold)
+      const violationCrops: ViolationCropArtifact[] = [];
+      if (maxCrops > 0 && heuristicViolations.some((v) => v.boundingBox)) {
+        let fullPageBuffer = rawScreenshot;
+        try {
+          fullPageBuffer = await page.screenshot({ fullPage: true });
+        } catch {
+          fullPageBuffer = rawScreenshot;
+        }
+
+        const meta = await sharp(fullPageBuffer).metadata();
+        const fullW = meta.width ?? vp.width;
+        const fullH = meta.height ?? vp.height;
+
+        const clusters = clusterViolationBoundingBoxes(
+          heuristicViolations,
+          { width: fullW, height: fullH },
+          { maxCrops, padding: 32 }
+        );
+
+        for (const cluster of clusters) {
+          const croppedOpt = await optimizeImageForProvider(fullPageBuffer, {
+            provider,
+            lowTokenMode,
+            cropBox: cluster.boundingBox
+          });
+          const cropFilePath = path.join(
+            artifactsDir,
+            `${testId}-${safeVpName}-${cluster.id}.webp`
+          );
+          fs.writeFileSync(cropFilePath, croppedOpt.buffer);
+
+          for (const vIdx of cluster.violationIndices) {
+            if (heuristicViolations[vIdx]) {
+              heuristicViolations[vIdx]!.cropImagePath = cropFilePath;
+            }
+          }
+
+          violationCrops.push({
+            id: cluster.id,
+            boundingBox: cluster.boundingBox,
+            rules: cluster.rules,
+            elements: cluster.elements,
+            suggestedCommands: cluster.suggestedCommands,
+            imagePath: cropFilePath,
+            imageBase64: croppedOpt.dataUri
+          });
+        }
+      }
+
+      aggregatedViolations.push(...heuristicViolations);
 
       viewportsArtifacts.push({
         project: vp.name,
@@ -119,7 +197,8 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         images: {
           diffBase64: optimized.dataUri,
           diffImagePath
-        }
+        },
+        ...(violationCrops.length > 0 ? { violationCrops } : {})
       });
 
       await page.close();
@@ -140,6 +219,11 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
     penpotDeltas.push(...deltas);
   }
 
+  // Handle optional DESIGN.md comparison deltas
+  const designMdDeltas: DesignMdDelta[] = designMd
+    ? diffDesignMdAgainstDom(designMd, combinedDomStyles)
+    : [];
+
   const payload: TriagePayload = {
     version: '1.0.0',
     mode: 'design-qa',
@@ -155,7 +239,8 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         viewports: viewportsArtifacts,
         designContext: {
           heuristicViolations: aggregatedViolations,
-          penpotDeltas
+          penpotDeltas,
+          ...(designMdDeltas.length > 0 ? { designMdDeltas } : {})
         }
       }
     ]
@@ -165,6 +250,14 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   fs.mkdirSync(outputDir, { recursive: true });
   const outputFile = path.join(outputDir, 'design-qa-ready.json');
   fs.writeFileSync(outputFile, JSON.stringify(validated, null, 2), 'utf-8');
+
+  const suggestedImpeccableCommands = Array.from(
+    new Set(
+      aggregatedViolations
+        .map((v) => v.suggestedCommand)
+        .filter((cmd): cmd is string => Boolean(cmd))
+    )
+  );
 
   if (options.json) {
     console.log(
@@ -177,14 +270,25 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
           tileDimensions: validated.tileDimensions,
           heuristicViolationsCount: aggregatedViolations.length,
           penpotDeltasCount: penpotDeltas.length,
+          designMdDeltasCount: designMdDeltas.length,
+          suggestedImpeccableCommands,
           heuristicViolations: aggregatedViolations,
           penpotDeltas,
+          ...(designMdDeltas.length > 0 ? { designMdDeltas } : {}),
           viewports: viewportsArtifacts.map((v) => ({
             project: v.project,
             viewport: v.viewport,
             ariaSnapshot: v.ariaSnapshot,
             computedStyles: v.computedStyles,
-            diffImagePath: v.images.diffImagePath
+            diffImagePath: v.images.diffImagePath,
+            violationCrops: (v.violationCrops ?? []).map((c) => ({
+              id: c.id,
+              boundingBox: c.boundingBox,
+              rules: c.rules,
+              elements: c.elements,
+              suggestedCommands: c.suggestedCommands,
+              imagePath: c.imagePath
+            }))
           }))
         },
         null,
@@ -193,7 +297,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
     );
   } else {
     console.log(
-      `[ZeroVisual] Design QA audit complete for ${url}. Violations: ${aggregatedViolations.length}, Penpot deltas: ${penpotDeltas.length}. Wrote: ${outputFile}`
+      `[ZeroVisual] Design QA audit complete for ${url}. Violations: ${aggregatedViolations.length}, Penpot deltas: ${penpotDeltas.length}, DESIGN.md deltas: ${designMdDeltas.length}. Wrote: ${outputFile}`
     );
   }
 
@@ -203,7 +307,8 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
 export const designQaCommand = defineCommand({
   meta: {
     name: 'design-qa',
-    description: 'Audit a live URL against deterministic UI heuristics and Penpot design tokens'
+    description:
+      'Audit a live URL against deterministic UI heuristics, rendered AI-slop detectors, DESIGN.md, and Penpot tokens'
   },
   args: {
     url: {
@@ -216,6 +321,15 @@ export const designQaCommand = defineCommand({
       type: 'string',
       description: 'Path to Penpot SVG or JSON token export'
     },
+    designMd: {
+      type: 'string',
+      description: 'Path to DESIGN.md file (auto-discovered in workspace if omitted)'
+    },
+    maxCrops: {
+      type: 'string',
+      default: '4',
+      description: 'Maximum clustered 1-tile WebP violation crops per viewport (default: 4)'
+    },
     output: {
       type: 'string',
       alias: 'o',
@@ -226,7 +340,8 @@ export const designQaCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'openai',
-      description: 'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
+      description:
+        'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',
@@ -241,9 +356,12 @@ export const designQaCommand = defineCommand({
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);
+    const maxCrops = parseInt(String(args.maxCrops ?? '4'), 10);
     await runDesignQaCommand({
       url: args.url,
       penpotPath: args.penpot,
+      designMdPath: args.designMd,
+      maxCrops: Number.isNaN(maxCrops) ? 4 : maxCrops,
       outputDir: args.output,
       provider,
       lowTokenMode: args.lowTokenMode,
