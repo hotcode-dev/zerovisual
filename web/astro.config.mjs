@@ -38,11 +38,15 @@ export default defineConfig({
 				},
 				{
 					tag: 'meta',
-					attrs: { property: 'og:image', content: ogImageUrl },
+					attrs: { name: 'author', content: 'Hotcode' },
 				},
 				{
 					tag: 'meta',
-					attrs: { property: 'og:image:url', content: ogImageUrl },
+					attrs: { name: 'image', property: 'og:image', content: ogImageUrl },
+				},
+				{
+					tag: 'meta',
+					attrs: { property: 'og:image:secure_url', content: ogImageUrl },
 				},
 				{
 					tag: 'meta',
