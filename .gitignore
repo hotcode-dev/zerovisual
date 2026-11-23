@@ -4,6 +4,7 @@ test-results/
 test-results-*/
 *.log
 .DS_Store
+.node_modules-lock-hash
 
 .specs
 .env

@@ -140,7 +140,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.',
+      defect:
+        'The .search-box container is shifted right by 60px with red border, input height expanded by 24px padding, and search button color changed to red.',
       affectedElement: '.search-box',
       defectType: 'layout_shift',
       rootCause: 'Accidental margin-left: 60px, padding: 24px, and background: #e11d48 override in CSS',
@@ -209,7 +210,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.',
+      defect:
+        'The .btn-merge button has an oversized padding (24px 36px), orange background (#d97706), and dashed border instead of the canonical GitHub green button.',
       affectedElement: '.btn-merge',
       defectType: 'button_styling_regression',
       rootCause: 'Incorrect CSS rule overriding padding, font-size, and background color',
@@ -310,7 +312,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.',
+      defect:
+        'The Pro plan CTA button (.cta-pro) has illegible low contrast: light gray text (#cbd5e1) on light gray background (#e2e8f0), violating WCAG 2.1 AA.',
       affectedElement: '.cta-pro',
       defectType: 'accessibility_contrast_violation',
       rootCause: 'Improper color values: background: #e2e8f0; color: #cbd5e1',
@@ -379,7 +382,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.',
+      defect:
+        'The .total-row text overlaps directly on top of the .btn-pay button due to negative margin-bottom: -32px.',
       affectedElement: '.total-row and .btn-pay',
       defectType: 'layout_element_collision',
       rootCause: 'margin-bottom: -32px on .total-row causing overlapping layout collision',
@@ -447,7 +451,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The "Active Agents" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.',
+      defect:
+        'The "Active Agents" metric font size is oversized (64px) and colored red, causing it to clip and break the card layout.',
       affectedElement: '.kpi-card:nth-child(2) .kpi-val',
       defectType: 'typography_overflow_clipping',
       rootCause: 'font-size: 64px on metric value exceeds card dimensions',
@@ -515,7 +520,8 @@ const cases: BenchmarkCaseConfig[] = [
 </body>
 </html>`,
     groundTruth: {
-      defect: 'The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).',
+      defect:
+        'The .hamburger button has margin-right: -36px pushing it off the right edge of the mobile screen, with red background (#e11d48).',
       affectedElement: '.hamburger',
       defectType: 'mobile_viewport_overflow',
       rootCause: 'Negative margin margin-right: -36px causing off-screen overflow',
@@ -536,7 +542,8 @@ const cases: BenchmarkCaseConfig[] = [
       .pure-button-primary-progressive { background-color: #e11d48 !important; }
     `,
     groundTruth: {
-      defect: 'The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.',
+      defect:
+        'The .search-box / #search-form container is shifted right by 60px with a red border, and the search button background is overridden with #e11d48.',
       affectedElement: '#search-form',
       defectType: 'layout_shift',
       rootCause: 'Accidental CSS override applying margin-left: 60px and #e11d48 background color',
@@ -556,7 +563,8 @@ const cases: BenchmarkCaseConfig[] = [
       #js-lang-list-button { transform: translateY(-36px) scale(0.65) !important; opacity: 0.15 !important; }
     `,
     groundTruth: {
-      defect: 'The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.',
+      defect:
+        'The mobile language list toggle button (#js-lang-list-button) is displaced vertically by -36px, shrunk by 35%, and dimmed to 15% opacity.',
       affectedElement: '#js-lang-list-button',
       defectType: 'button_displacement',
       rootCause: 'Erroneous transform: translateY(-36px) scale(0.65) and opacity: 0.15 override',
@@ -576,7 +584,8 @@ const cases: BenchmarkCaseConfig[] = [
       .pagetop a { font-size: 0px !important; }
     `,
     groundTruth: {
-      defect: 'Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.',
+      defect:
+        'Top navigation bar expanded with excessive 36px padding and bright red background #dc2626, and all navigation link text is hidden with font-size: 0px.',
       affectedElement: '.pagetop',
       defectType: 'navigation_collapse',
       rootCause: 'Overridden padding and red background on main header td with font-size: 0px on .pagetop links',
@@ -595,7 +604,8 @@ const cases: BenchmarkCaseConfig[] = [
       a[href*="/join"], .btn-mktg.btn-primary-mktg { position: relative !important; z-index: -1 !important; transform: translateY(-30px) !important; background: #ea580c !important; }
     `,
     groundTruth: {
-      defect: 'Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.',
+      defect:
+        'Primary Call to Action signup button shifted vertically by -30px behind sibling elements with negative z-index: -1 and orange background.',
       affectedElement: '.btn-mktg',
       defectType: 'zindex_collision',
       rootCause: 'Negative z-index: -1 and translateY(-30px) causing button collision and occlusion',
@@ -615,7 +625,8 @@ const cases: BenchmarkCaseConfig[] = [
       .search-input-field, input[type="search"] { background-color: #f1f5f9 !important; color: #ffffff !important; padding: 2px 4px !important; border: 2px solid #ef4444 !important; }
     `,
     groundTruth: {
-      defect: 'Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.',
+      defect:
+        'Mobile search input field has white text (#ffffff) on light gray background (#f1f5f9) causing severe WCAG AA contrast failure, with collapsed 2px padding and red border.',
       affectedElement: 'input[type="search"]',
       defectType: 'contrast_violation',
       rootCause: 'White text on light gray background yields contrast ratio < 1.3:1 (fails WCAG AA 4.5:1 minimum)',
@@ -634,7 +645,7 @@ async function generateBenchmarkDataset() {
     const caseDir = path.join(baseDir, c.id);
     fs.mkdirSync(caseDir, { recursive: true });
 
-    const context = c.device 
+    const context = c.device
       ? await browser.newContext(devices[c.device])
       : await browser.newContext({ viewport: c.viewport });
 
@@ -670,11 +681,7 @@ async function generateBenchmarkDataset() {
 
     // 3. Compute Diff
     const diffPath = path.join(caseDir, 'diff.png');
-    const diffCount = await createPixelDiff(
-      baselinePng,
-      actualPng,
-      diffPath
-    );
+    const diffCount = await createPixelDiff(baselinePng, actualPng, diffPath);
 
     // 4. Compute or verify expectedBoundingBox
     let boundingBox = c.groundTruth.expectedBoundingBox;
@@ -696,12 +703,11 @@ async function generateBenchmarkDataset() {
         expectedBoundingBox: boundingBox
       }
     };
-    fs.writeFileSync(
-      path.join(caseDir, 'metadata.json'),
-      JSON.stringify(metadata, null, 2)
-    );
+    fs.writeFileSync(path.join(caseDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
 
-    console.log(`✓ [${c.id}] ${c.name} (Diff Pixels: ${diffCount}, Box: ${boundingBox.x},${boundingBox.y} ${boundingBox.width}x${boundingBox.height})`);
+    console.log(
+      `✓ [${c.id}] ${c.name} (Diff Pixels: ${diffCount}, Box: ${boundingBox.x},${boundingBox.y} ${boundingBox.width}x${boundingBox.height})`
+    );
     await context.close();
   }
 

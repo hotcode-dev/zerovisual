@@ -9,11 +9,7 @@ import {
   type ViewportArtifact,
   type TriagePayload
 } from '../core/schema.js';
-import {
-  detectDiffBoundingBox,
-  optimizeImageForProvider,
-  getProviderDimensions
-} from '../core/image-optimizer.js';
+import { detectDiffBoundingBox, optimizeImageForProvider, getProviderDimensions } from '../core/image-optimizer.js';
 
 export function normalizeTestId(titlePath: string[]): string {
   const full = titlePath.slice(1).join(' > ');
@@ -40,7 +36,7 @@ export class ZeroVisualReporter implements Reporter {
 
     // Look for visual diff attachments
     const diffAttachment = result.attachments.find(
-      (att) => att.name.endsWith('-diff.png') || att.name.endsWith('diff.png')
+      att => att.name.endsWith('-diff.png') || att.name.endsWith('diff.png')
     );
 
     if (!diffAttachment) {
@@ -92,10 +88,11 @@ export class ZeroVisualReporter implements Reporter {
     let actualBase64: string | undefined;
     let actualImagePath: string | undefined;
     const actualAttachment = result.attachments.find(
-      (att) => att.name.endsWith('-actual.png') || att.name.endsWith('actual.png')
+      att => att.name.endsWith('-actual.png') || att.name.endsWith('actual.png')
     );
     if (actualAttachment) {
-      const actualBuf = actualAttachment.body ?? (actualAttachment.path ? fs.readFileSync(actualAttachment.path) : null);
+      const actualBuf =
+        actualAttachment.body ?? (actualAttachment.path ? fs.readFileSync(actualAttachment.path) : null);
       if (actualBuf) {
         const opt = await optimizeImageForProvider(actualBuf, {
           provider: this.config.targetProvider,
@@ -112,10 +109,11 @@ export class ZeroVisualReporter implements Reporter {
     let expectedBase64: string | undefined;
     let expectedImagePath: string | undefined;
     const expectedAttachment = result.attachments.find(
-      (att) => att.name.endsWith('-expected.png') || att.name.endsWith('expected.png')
+      att => att.name.endsWith('-expected.png') || att.name.endsWith('expected.png')
     );
     if (expectedAttachment) {
-      const expectedBuf = expectedAttachment.body ?? (expectedAttachment.path ? fs.readFileSync(expectedAttachment.path) : null);
+      const expectedBuf =
+        expectedAttachment.body ?? (expectedAttachment.path ? fs.readFileSync(expectedAttachment.path) : null);
       if (expectedBuf) {
         const opt = await optimizeImageForProvider(expectedBuf, {
           provider: this.config.targetProvider,
@@ -136,7 +134,7 @@ export class ZeroVisualReporter implements Reporter {
     let realHeuristics: any[] | undefined;
 
     const contextAttachment = result.attachments.find(
-      (att) => att.name === 'zerovisual-context.json' || att.name.includes('zerovisual-context')
+      att => att.name === 'zerovisual-context.json' || att.name.includes('zerovisual-context')
     );
     if (contextAttachment) {
       try {
@@ -194,9 +192,10 @@ export class ZeroVisualReporter implements Reporter {
         filePath: test.location?.file ?? 'unknown.spec.ts',
         selector: realSelector || 'body',
         viewports: [viewportArtifact],
-        designContext: realHeuristics && realHeuristics.length > 0
-          ? { heuristicViolations: realHeuristics, penpotDeltas: [] }
-          : undefined
+        designContext:
+          realHeuristics && realHeuristics.length > 0
+            ? { heuristicViolations: realHeuristics, penpotDeltas: [] }
+            : undefined
       });
     }
   }

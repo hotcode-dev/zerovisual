@@ -107,7 +107,7 @@ export function parsePenpotSvg(svgContent: string): PenpotNodeToken[] {
     if (node['@_style'] && typeof node['@_style'] === 'string') {
       const declarations = node['@_style'].split(';');
       for (const decl of declarations) {
-        const [k, v] = decl.split(':').map((s) => s.trim());
+        const [k, v] = decl.split(':').map(s => s.trim());
         if (k && v) {
           properties[normalizePropName(k)] = v;
         }
@@ -220,14 +220,10 @@ export function parseDtcgTokens(jsonContent: string | object): PenpotNodeToken[]
 
       let propName = normalizePropName(propCandidate);
       if (type === 'color' && !['color', 'backgroundColor', 'borderColor'].includes(propName)) {
-        propName = propCandidate.includes('bg') || propCandidate.includes('background')
-          ? 'backgroundColor'
-          : 'color';
+        propName = propCandidate.includes('bg') || propCandidate.includes('background') ? 'backgroundColor' : 'color';
       }
 
-      const selector = selectorParts.length > 0
-        ? `.${selectorParts.join('-').toLowerCase()}`
-        : '*';
+      const selector = selectorParts.length > 0 ? `.${selectorParts.join('-').toLowerCase()}` : '*';
 
       const existing = componentMap.get(selector) ?? {};
       existing[propName] = String(val);
@@ -257,10 +253,7 @@ export function parseDtcgTokens(jsonContent: string | object): PenpotNodeToken[]
  * Main parser entry point supporting Penpot SVG exports, Penpot JSON token exports,
  * and standard W3C DTCG / Token Studio design tokens.
  */
-export function parsePenpotTokens(
-  fileContent: string,
-  format: 'svg' | 'json' | 'dtcg' = 'json'
-): PenpotNodeToken[] {
+export function parsePenpotTokens(fileContent: string, format: 'svg' | 'json' | 'dtcg' = 'json'): PenpotNodeToken[] {
   if (format === 'svg' || fileContent.trim().startsWith('<svg')) {
     return parsePenpotSvg(fileContent);
   }

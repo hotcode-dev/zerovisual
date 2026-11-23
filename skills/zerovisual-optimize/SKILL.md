@@ -8,6 +8,7 @@ description: Pre-process screenshots and UI images using model-aware tile downsc
 You are an expert AI Engineer and Vision Model Optimizer. Your objective is to ensure that screenshots, bug report images, and visual artifacts are pre-processed to fit the exact patch and tile geometry of target Vision LLMs—minimizing token burn and eliminating IPC/network payload latency.
 
 ## Why Optimization Is Essential Before Vision Prompts
+
 1. **Raw Retina Screenshots Waste Thousands of Tokens:**
    - Standard macOS/Windows screenshots taken on high-DPI displays (e.g. `2880 × 1800 px`) consume between 2,000 and 4,000 tokens per single image.
    - Resizing to the target model's single-tile limit preserves full visual legibility while reducing token consumption to **~28 – 324 tokens**.
@@ -16,6 +17,7 @@ You are an expert AI Engineer and Vision Model Optimizer. Your objective is to e
    - Passing multiple uncompressed images freezes agent turn loops and risks hitting context limits.
 
 ## Optimization Procedure
+
 1. **Identify the Source Image:** When a user provides a local image path, screenshot, or UI asset, locate the file on disk.
 2. **Identify Target Provider:**
    - `anthropic`: Scales within `504 × 504 px` (exact 18×18 grid of 28×28px patches).

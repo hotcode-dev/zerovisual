@@ -137,19 +137,19 @@ describe('Deterministic UI Heuristic Linter', () => {
     it('should flag body text with fontSize < 16px', () => {
       const res = checkTypographyScale(14, 20, 'p');
       expect(res.valid).toBe(false);
-      expect(res.violations.some((v) => v.actual.includes('14px'))).toBe(true);
+      expect(res.violations.some(v => v.actual.includes('14px'))).toBe(true);
     });
 
     it('should flag microcopy text < 12px as illegible across all elements', () => {
       const res = checkTypographyScale(10, 14, 'span');
       expect(res.valid).toBe(false);
-      expect(res.violations.some((v) => v.expected.includes('12px'))).toBe(true);
+      expect(res.violations.some(v => v.expected.includes('12px'))).toBe(true);
     });
 
     it('should flag body text with line-height < 1.4', () => {
       const res = checkTypographyScale(16, 18, 'p'); // 18 / 16 = 1.125
       expect(res.valid).toBe(false);
-      expect(res.violations.some((v) => v.rule === 'TYPOGRAPHY_SCALE')).toBe(true);
+      expect(res.violations.some(v => v.rule === 'TYPOGRAPHY_SCALE')).toBe(true);
     });
   });
 
@@ -162,7 +162,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         accessibility: {}
       });
 
-      expect(violations.some((v) => v.rule === 'ACCESSIBILITY')).toBe(true);
+      expect(violations.some(v => v.rule === 'ACCESSIBILITY')).toBe(true);
     });
 
     it('should flag buttons without accessible name or text', () => {
@@ -174,7 +174,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         accessibility: { innerText: '' }
       });
 
-      expect(violations.some((v) => v.rule === 'ACCESSIBILITY')).toBe(true);
+      expect(violations.some(v => v.rule === 'ACCESSIBILITY')).toBe(true);
     });
 
     it('should flag interactive elements with outline: none and no box-shadow alternative', () => {
@@ -188,7 +188,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      expect(violations.some((v) => v.rule === 'FOCUS_VISIBLE')).toBe(true);
+      expect(violations.some(v => v.rule === 'FOCUS_VISIBLE')).toBe(true);
     });
 
     it('should flag mobile layout horizontal overflow when element exceeds viewport width', () => {
@@ -201,7 +201,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         computedStyles: {}
       });
 
-      const overflow = violations.find((v) => v.rule === 'LAYOUT_OVERFLOW');
+      const overflow = violations.find(v => v.rule === 'LAYOUT_OVERFLOW');
       expect(overflow).toBeDefined();
       expect(overflow?.actual).toContain('overflows by 50px');
     });
@@ -226,7 +226,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      const rules = violations.map((v) => v.rule);
+      const rules = violations.map(v => v.rule);
       expect(rules).toContain('CONTRAST');
       expect(rules).toContain('SPACING_GRID');
       expect(rules).toContain('TAP_TARGET');
@@ -247,11 +247,11 @@ describe('Deterministic UI Heuristic Linter', () => {
         boundingBox: { x: 40, y: 80, width: 600, height: 64 }
       });
 
-      const rules = violations.map((v) => v.rule);
+      const rules = violations.map(v => v.rule);
       expect(rules).toContain('GRADIENT_TEXT');
       expect(rules).toContain('AI_SLOP_COLOR');
-      expect(violations.find((v) => v.rule === 'GRADIENT_TEXT')?.suggestedCommand).toBe('/impeccable typeset');
-      expect(violations.find((v) => v.rule === 'AI_SLOP_COLOR')?.suggestedCommand).toBe('/impeccable colorize');
+      expect(violations.find(v => v.rule === 'GRADIENT_TEXT')?.suggestedCommand).toBe('/impeccable typeset');
+      expect(violations.find(v => v.rule === 'AI_SLOP_COLOR')?.suggestedCommand).toBe('/impeccable colorize');
     });
 
     it('should exempt AI_SLOP_COLOR when DESIGN.md explicitly commits to a violet palette ("the brief wins")', () => {
@@ -267,7 +267,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      expect(violations.some((v) => v.rule === 'AI_SLOP_COLOR')).toBe(false);
+      expect(violations.some(v => v.rule === 'AI_SLOP_COLOR')).toBe(false);
     });
 
     it('should detect DARK_GLOW, SIDE_TAB_BORDER, and GRAY_ON_COLOR', () => {
@@ -288,12 +288,12 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      const rules = violations.map((v) => v.rule);
+      const rules = violations.map(v => v.rule);
       expect(rules).toContain('DARK_GLOW');
       expect(rules).toContain('SIDE_TAB_BORDER');
       expect(rules).toContain('GRAY_ON_COLOR');
-      expect(violations.find((v) => v.rule === 'DARK_GLOW')?.suggestedCommand).toBe('/impeccable quieter');
-      expect(violations.find((v) => v.rule === 'SIDE_TAB_BORDER')?.suggestedCommand).toBe('/impeccable distill');
+      expect(violations.find(v => v.rule === 'DARK_GLOW')?.suggestedCommand).toBe('/impeccable quieter');
+      expect(violations.find(v => v.rule === 'SIDE_TAB_BORDER')?.suggestedCommand).toBe('/impeccable distill');
     });
 
     it('should detect NESTED_CARDS, ICON_TILE_STACK, BANNED_EYEBROW, and EMOJI_ICON', () => {
@@ -311,7 +311,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      const rules = violations.map((v) => v.rule);
+      const rules = violations.map(v => v.rule);
       expect(rules).toContain('NESTED_CARDS');
       expect(rules).toContain('ICON_TILE_STACK');
       expect(rules).toContain('BANNED_EYEBROW');
@@ -328,7 +328,7 @@ describe('Deterministic UI Heuristic Linter', () => {
           marginBottom: '24px'
         }
       });
-      expect(headingViolations.some((v) => v.rule === 'HEADING_RHYTHM')).toBe(true);
+      expect(headingViolations.some(v => v.rule === 'HEADING_RHYTHM')).toBe(true);
 
       const longParagraphViolations = lintElementHeuristics({
         selector: 'p.wide-copy',
@@ -348,7 +348,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      const pRules = longParagraphViolations.map((v) => v.rule);
+      const pRules = longParagraphViolations.map(v => v.rule);
       expect(pRules).toContain('LINE_LENGTH');
       expect(pRules).toContain('CRAMPED_PADDING');
     });
@@ -368,7 +368,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         }
       });
 
-      const rules = imgViolations.map((v) => v.rule);
+      const rules = imgViolations.map(v => v.rule);
       expect(rules).toContain('BROKEN_IMAGE');
       expect(rules).toContain('TEXT_OCCLUSION');
       expect(rules).toContain('CLIPPED_OVERFLOW');
@@ -441,7 +441,7 @@ describe('Deterministic UI Heuristic Linter', () => {
         { designMd, viewportName: 'Desktop' }
       );
 
-      const rules = pageViolations.map((v) => v.rule);
+      const rules = pageViolations.map(v => v.rule);
       expect(rules).toContain('FLAT_TYPE_HIERARCHY');
       expect(rules).toContain('DESIGN_SYSTEM_DRIFT');
     });

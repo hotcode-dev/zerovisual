@@ -14,10 +14,7 @@ import {
   type PenpotDelta,
   type DesignMdDelta
 } from '../../core/schema.js';
-import {
-  optimizeImageForProvider,
-  getProviderDimensions
-} from '../../core/image-optimizer.js';
+import { optimizeImageForProvider, getProviderDimensions } from '../../core/image-optimizer.js';
 import { captureDomContext, auditPageHeuristics } from '../../core/dom-extractor.js';
 import { parsePenpotTokens, diffPenpotAgainstDom } from '../../core/penpot-parser.js';
 import {
@@ -132,7 +129,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
 
       // Capture full-page buffer to generate clustered 1-tile violation crops (including below-the-fold)
       const violationCrops: ViolationCropArtifact[] = [];
-      if (maxCrops > 0 && heuristicViolations.some((v) => v.boundingBox)) {
+      if (maxCrops > 0 && heuristicViolations.some(v => v.boundingBox)) {
         let fullPageBuffer = rawScreenshot;
         try {
           fullPageBuffer = await page.screenshot({ fullPage: true });
@@ -156,10 +153,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
             lowTokenMode,
             cropBox: cluster.boundingBox
           });
-          const cropFilePath = path.join(
-            artifactsDir,
-            `${testId}-${safeVpName}-${cluster.id}.webp`
-          );
+          const cropFilePath = path.join(artifactsDir, `${testId}-${safeVpName}-${cluster.id}.webp`);
           fs.writeFileSync(cropFilePath, croppedOpt.buffer);
 
           for (const vIdx of cluster.violationIndices) {
@@ -220,9 +214,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   }
 
   // Handle optional DESIGN.md comparison deltas
-  const designMdDeltas: DesignMdDelta[] = designMd
-    ? diffDesignMdAgainstDom(designMd, combinedDomStyles)
-    : [];
+  const designMdDeltas: DesignMdDelta[] = designMd ? diffDesignMdAgainstDom(designMd, combinedDomStyles) : [];
 
   const payload: TriagePayload = {
     version: '1.0.0',
@@ -252,11 +244,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   fs.writeFileSync(outputFile, JSON.stringify(validated, null, 2), 'utf-8');
 
   const suggestedImpeccableCommands = Array.from(
-    new Set(
-      aggregatedViolations
-        .map((v) => v.suggestedCommand)
-        .filter((cmd): cmd is string => Boolean(cmd))
-    )
+    new Set(aggregatedViolations.map(v => v.suggestedCommand).filter((cmd): cmd is string => Boolean(cmd)))
   );
 
   if (options.json) {
@@ -275,13 +263,13 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
           heuristicViolations: aggregatedViolations,
           penpotDeltas,
           ...(designMdDeltas.length > 0 ? { designMdDeltas } : {}),
-          viewports: viewportsArtifacts.map((v) => ({
+          viewports: viewportsArtifacts.map(v => ({
             project: v.project,
             viewport: v.viewport,
             ariaSnapshot: v.ariaSnapshot,
             computedStyles: v.computedStyles,
             diffImagePath: v.images.diffImagePath,
-            violationCrops: (v.violationCrops ?? []).map((c) => ({
+            violationCrops: (v.violationCrops ?? []).map(c => ({
               id: c.id,
               boundingBox: c.boundingBox,
               rules: c.rules,

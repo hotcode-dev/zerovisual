@@ -81,7 +81,8 @@ export const estimateCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'anthropic',
-      description: 'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
+      description:
+        'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',
@@ -110,4 +111,3 @@ export const estimateCommand = defineCommand({
     });
   }
 });
-

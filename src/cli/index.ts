@@ -24,4 +24,3 @@ if (isOptimizeDirect) {
 } else {
   runMain(mainCommand);
 }
-

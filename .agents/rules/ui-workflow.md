@@ -21,5 +21,6 @@ Never load all UI skills at once. Follow this 4-stage pipeline for frontend work
    - Run Playwright visual tests and load `zerovisual-regression` to triage `./test-results/triage-ready.json` if any diffs fail.
 
 ## Conflict Priority
+
 - Accessibility (ZeroVisual math + Vercel Guidelines) overrides aesthetics (Taste + Impeccable).
 - Emil Kowalski's Skills override Taste on animation timing and easing.

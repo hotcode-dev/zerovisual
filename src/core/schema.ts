@@ -126,11 +126,7 @@ export const ViolationCategorySchema = z.enum([
 ]);
 export type ViolationCategory = z.infer<typeof ViolationCategorySchema>;
 
-export const ViolationSeveritySchema = z.enum([
-  'critical',
-  'warning',
-  'advisory'
-]);
+export const ViolationSeveritySchema = z.enum(['critical', 'warning', 'advisory']);
 export type ViolationSeverity = z.infer<typeof ViolationSeveritySchema>;
 
 export const HeuristicViolationSchema = z.object({
@@ -205,10 +201,7 @@ export const RegressionVerdictSchema = z.object({
 export type RegressionVerdict = z.infer<typeof RegressionVerdictSchema>;
 
 export const DesignQaViolationVerdictSchema = z.object({
-  rule: z.enum([
-    ...HeuristicRuleSchema.options,
-    'PENPOT_TOKEN'
-  ]),
+  rule: z.enum([...HeuristicRuleSchema.options, 'PENPOT_TOKEN']),
   element: z.string(),
   severity: z.enum(['critical', 'warning', 'info', 'advisory']),
   recommendation: z.string(),

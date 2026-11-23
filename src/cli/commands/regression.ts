@@ -9,11 +9,7 @@ import {
   type ViewportArtifact,
   type TriagePayload
 } from '../../core/schema.js';
-import {
-  detectDiffBoundingBox,
-  optimizeImageForProvider,
-  getProviderDimensions
-} from '../../core/image-optimizer.js';
+import { detectDiffBoundingBox, optimizeImageForProvider, getProviderDimensions } from '../../core/image-optimizer.js';
 
 export interface RegressionOptions {
   inputDir?: string;
@@ -68,14 +64,15 @@ function inferTestId(filePath: string): { testId: string; testTitle: string } {
     .replace(/-(?:Desktop|Mobile|Tablet)[a-zA-Z0-9_-]*/gi, '')
     .replace(/-(?:chromium|firefox|webkit)/gi, '');
 
-  const testId = cleaned
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'visual-test';
+  const testId =
+    cleaned
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'visual-test';
 
   const testTitle = cleaned
     .split(/[-_]+/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 
   return { testId, testTitle };
@@ -145,7 +142,10 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
 
     // Check for companion -actual.png and -expected.png
     const dir = path.dirname(diffPath);
-    const baseName = path.basename(diffPath).replace(/-diff\.png$/, '').replace(/diff\.png$/, '');
+    const baseName = path
+      .basename(diffPath)
+      .replace(/-diff\.png$/, '')
+      .replace(/diff\.png$/, '');
 
     let actualBase64: string | undefined;
     let actualImagePath: string | undefined;
@@ -234,12 +234,12 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
           outputFile,
           targetProvider: validated.targetProvider,
           tileDimensions: validated.tileDimensions,
-          failures: validated.failures.map((f) => ({
+          failures: validated.failures.map(f => ({
             testId: f.testId,
             testTitle: f.testTitle,
             filePath: f.filePath,
             selector: f.selector,
-            viewports: f.viewports.map((v) => ({
+            viewports: f.viewports.map(v => ({
               project: v.project,
               viewport: v.viewport,
               diffPixelRatio: v.diffPixelRatio,
@@ -287,7 +287,8 @@ export const regressionCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'openai',
-      description: 'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
+      description:
+        'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',

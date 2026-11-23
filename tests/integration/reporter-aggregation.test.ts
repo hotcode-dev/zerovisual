@@ -29,7 +29,9 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
         channels: 4,
         background: { r: 255, g: 255, b: 255, alpha: 1 }
       }
-    }).png().toBuffer();
+    })
+      .png()
+      .toBuffer();
 
     const redDiff = await sharp({
       create: {
@@ -38,7 +40,9 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
         channels: 4,
         background: { r: 255, g: 0, b: 0, alpha: 1 }
       }
-    }).png().toBuffer();
+    })
+      .png()
+      .toBuffer();
 
     return sharp(base)
       .composite([{ input: redDiff, left: 100, top: 150 }])
@@ -46,7 +50,11 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
       .toBuffer();
   }
 
-  function createMockTestCase(titlePath: string[], projectName: string, viewport = { width: 1280, height: 720 }): TestCase {
+  function createMockTestCase(
+    titlePath: string[],
+    projectName: string,
+    viewport = { width: 1280, height: 720 }
+  ): TestCase {
     return {
       titlePath: () => titlePath,
       location: { file: 'tests/visual/checkout.spec.ts', line: 10, column: 1 },

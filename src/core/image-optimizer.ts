@@ -47,9 +47,7 @@ export function getProviderDimensions(
       return { maxWidth: 504, maxHeight: 504 };
     case 'gemini':
     case 'gemma':
-      return lowTokenMode
-        ? { maxWidth: 384, maxHeight: 384 }
-        : { maxWidth: 768, maxHeight: 768 };
+      return lowTokenMode ? { maxWidth: 384, maxHeight: 384 } : { maxWidth: 768, maxHeight: 768 };
     case 'llama':
       return { maxWidth: 560, maxHeight: 560 };
     case 'mistral':
@@ -74,7 +72,7 @@ export function defaultDiffPixelMatcher(r: number, g: number, b: number, a: numb
   // Standard magenta / pink / rose diff (e.g. Playwright magenta #ff00ff, #ff007f, #e11d48)
   const isMagentaDiff = r >= 190 && g <= 100 && b >= 100;
   // General high-saturation red-dominant diff
-  const isHighSatRed = r >= 180 && (r - g) >= 80 && (r - b) >= 60;
+  const isHighSatRed = r >= 180 && r - g >= 80 && r - b >= 60;
   return isRedDiff || isMagentaDiff || isHighSatRed;
 }
 
@@ -106,10 +104,7 @@ export async function detectDiffBoundingBox(
   }
 
   // Ensure raw RGBA channel extraction
-  const { data, info } = await image
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+  const { data, info } = await image.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 
   const channels = info.channels;
   let minX = imgWidth;
@@ -310,14 +305,10 @@ export async function optimizeImageStandalone(
   const optTokens = estimateVisionTokens(result.width, result.height, provider, lowTokenMode);
 
   const tokenSavingsPercent =
-    origTokens > 0
-      ? Math.max(0, Number((((origTokens - optTokens) / origTokens) * 100).toFixed(1)))
-      : 0;
+    origTokens > 0 ? Math.max(0, Number((((origTokens - optTokens) / origTokens) * 100).toFixed(1))) : 0;
 
   const byteSavingsPercent =
-    origBytes > 0
-      ? Math.max(0, Number((((origBytes - result.buffer.length) / origBytes) * 100).toFixed(1)))
-      : 0;
+    origBytes > 0 ? Math.max(0, Number((((origBytes - result.buffer.length) / origBytes) * 100).toFixed(1))) : 0;
 
   return {
     result,
@@ -335,4 +326,3 @@ export async function optimizeImageStandalone(
     }
   };
 }
-

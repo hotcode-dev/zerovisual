@@ -1,15 +1,5 @@
-import type {
-  BoundingBox,
-  HeuristicRule,
-  HeuristicViolation,
-  ViolationCategory,
-  ViolationSeverity
-} from './schema.js';
-import {
-  diffDesignMdAgainstDom,
-  rgbToHsl,
-  type DesignMdSpec
-} from './design-md-parser.js';
+import type { BoundingBox, HeuristicRule, HeuristicViolation, ViolationCategory, ViolationSeverity } from './schema.js';
+import { diffDesignMdAgainstDom, rgbToHsl, type DesignMdSpec } from './design-md-parser.js';
 
 export interface RgbColor {
   r: number;
@@ -180,12 +170,7 @@ export const RULE_METADATA: Record<HeuristicRule, RuleMetadata> = {
     category: 'design-system',
     severity: 'advisory',
     suggestedCommand: '/impeccable polish',
-    impeccableAliases: [
-      'design-system-font',
-      'design-system-color',
-      'design-system-radius',
-      'design-system-font-size'
-    ]
+    impeccableAliases: ['design-system-font', 'design-system-color', 'design-system-radius', 'design-system-font-size']
   }
 };
 
@@ -197,7 +182,10 @@ export function isRuleIgnored(rule: HeuristicRule, ignoredRules?: string[]): boo
   if (!ignoredRules || ignoredRules.length === 0) return false;
   const meta = RULE_METADATA[rule];
   const normalizedSet = new Set(
-    ignoredRules.flatMap((r) => r.split(/[\s,]+/)).map((s) => s.trim().toLowerCase()).filter(Boolean)
+    ignoredRules
+      .flatMap(r => r.split(/[\s,]+/))
+      .map(s => s.trim().toLowerCase())
+      .filter(Boolean)
   );
   if (normalizedSet.has('*') || normalizedSet.has('all')) return true;
   if (normalizedSet.has(rule.toLowerCase()) || normalizedSet.has(rule.toLowerCase().replace(/_/g, '-'))) {
@@ -209,9 +197,12 @@ export function isRuleIgnored(rule: HeuristicRule, ignoredRules?: string[]): boo
   return false;
 }
 
-function normalizeBoundingBox(
-  box?: { x?: number; y?: number; width: number; height: number }
-): BoundingBox | undefined {
+function normalizeBoundingBox(box?: {
+  x?: number;
+  y?: number;
+  width: number;
+  height: number;
+}): BoundingBox | undefined {
   if (!box || box.x === undefined || box.y === undefined) return undefined;
   if (box.width <= 0 || box.height <= 0) return undefined;
   return {
@@ -253,18 +244,35 @@ export function hslToRgb(h: number, s: number, l: number): [number, number, numb
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = l - c / 2;
-  let r1 = 0, g1 = 0, b1 = 0;
-  if (h < 60) { r1 = c; g1 = x; b1 = 0; }
-  else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
-  else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
-  else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
-  else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
-  else { r1 = c; g1 = 0; b1 = x; }
-  return [
-    Math.round((r1 + m) * 255),
-    Math.round((g1 + m) * 255),
-    Math.round((b1 + m) * 255)
-  ];
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
+  if (h < 60) {
+    r1 = c;
+    g1 = x;
+    b1 = 0;
+  } else if (h < 120) {
+    r1 = x;
+    g1 = c;
+    b1 = 0;
+  } else if (h < 180) {
+    r1 = 0;
+    g1 = c;
+    b1 = x;
+  } else if (h < 240) {
+    r1 = 0;
+    g1 = x;
+    b1 = c;
+  } else if (h < 300) {
+    r1 = x;
+    g1 = 0;
+    b1 = c;
+  } else {
+    r1 = c;
+    g1 = 0;
+    b1 = x;
+  }
+  return [Math.round((r1 + m) * 255), Math.round((g1 + m) * 255), Math.round((b1 + m) * 255)];
 }
 
 /**
@@ -273,7 +281,7 @@ export function hslToRgb(h: number, s: number, l: number): [number, number, numb
 export function oklabToRgb(L: number, a: number, b: number): [number, number, number] {
   const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
   const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
-  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+  const s_ = L - 0.0894841775 * a - 1.291485548 * b;
 
   const l = l_ * l_ * l_;
   const m = m_ * m_ * m_;
@@ -281,20 +289,14 @@ export function oklabToRgb(L: number, a: number, b: number): [number, number, nu
 
   const rLin = +4.0767434036 * l - 3.3077115913 * m + 0.2309699291 * s;
   const gLin = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
-  const bLin = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+  const bLin = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
 
   const toSrgb = (c: number): number => {
     const clamped = Math.max(0, Math.min(1, c));
-    return clamped <= 0.0031308
-      ? 12.92 * clamped
-      : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
+    return clamped <= 0.0031308 ? 12.92 * clamped : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
   };
 
-  return [
-    Math.round(toSrgb(rLin) * 255),
-    Math.round(toSrgb(gLin) * 255),
-    Math.round(toSrgb(bLin) * 255)
-  ];
+  return [Math.round(toSrgb(rLin) * 255), Math.round(toSrgb(gLin) * 255), Math.round(toSrgb(bLin) * 255)];
 }
 
 /**
@@ -356,7 +358,9 @@ export function parseColor(colorStr: string): RgbColor {
   }
 
   // hsl(...) or hsla(...) format
-  const hslMatch = str.match(/^hsla?\s*\(\s*([\d.]+)(?:deg)?[\s,]+([\d.]+)%[\s,]+([\d.]+)%(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+  const hslMatch = str.match(
+    /^hsla?\s*\(\s*([\d.]+)(?:deg)?[\s,]+([\d.]+)%[\s,]+([\d.]+)%(?:[\s,/]+([\d.]+%?))?\s*\)$/
+  );
   if (hslMatch) {
     const h = parseFloat(hslMatch[1]!);
     const s = parseFloat(hslMatch[2]!) / 100;
@@ -370,7 +374,9 @@ export function parseColor(colorStr: string): RgbColor {
   }
 
   // oklch(...) format: oklch(L C H [/ a])
-  const oklchMatch = str.match(/^oklch\s*\(\s*([\d.]+%?)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:deg)?(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+  const oklchMatch = str.match(
+    /^oklch\s*\(\s*([\d.]+%?)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:deg)?(?:[\s,/]+([\d.]+%?))?\s*\)$/
+  );
   if (oklchMatch) {
     let L = parseFloat(oklchMatch[1]!);
     if (oklchMatch[1]!.endsWith('%')) L /= 100;
@@ -415,7 +421,7 @@ export function extractColorsFromCssValue(cssVal: string): RgbColor[] {
     ...(cssVal.match(/oklch\([^)]+\)/gi) ?? []),
     ...(cssVal.match(/oklab\([^)]+\)/gi) ?? [])
   ];
-  return matches.map((m) => parseColor(m));
+  return matches.map(m => parseColor(m));
 }
 
 /**
@@ -594,11 +600,7 @@ export interface TypographyCheckResult {
  * - font-size >= 16px
  * - unitless line-height >= 1.4
  */
-export function checkTypographyScale(
-  fontSizePx: number,
-  lineHeightPx: number,
-  tagName = 'p'
-): TypographyCheckResult {
+export function checkTypographyScale(fontSizePx: number, lineHeightPx: number, tagName = 'p'): TypographyCheckResult {
   const bodyTags = ['p', 'li', 'input', 'textarea', 'label'];
   const isBody = bodyTags.includes(tagName.toLowerCase());
 
@@ -721,7 +723,7 @@ export function checkSurfaceAndColorSlop(input: LintElementInput): HeuristicViol
   // 1b. AI Slop Color Palette (purple/violet/indigo gradients or cyan-on-dark neon tells)
   if (hasGradient && !designMd?.allowsVioletPalette) {
     const gradColors = extractColorsFromCssValue(bgImage);
-    const hasVioletStop = gradColors.some((c) => {
+    const hasVioletStop = gradColors.some(c => {
       const [h, s, l] = rgbToHsl(c.r, c.g, c.b);
       return h >= 250 && h <= 315 && s >= 0.35 && l >= 0.15 && l <= 0.85;
     });
@@ -745,9 +747,9 @@ export function checkSurfaceAndColorSlop(input: LintElementInput): HeuristicViol
 
   if (boxShadow && boxShadow !== 'none') {
     const shadowColors = extractColorsFromCssValue(boxShadow);
-    const pxTokens = (boxShadow.replace(/rgba?\([^)]+\)|hsla?\([^)]+\)|#[0-9a-fA-F]{3,8}/gi, '').match(/-?\d+(?:\.\d+)?px/g) ?? []).map((t) =>
-      Math.abs(parseFloat(t))
-    );
+    const pxTokens = (
+      boxShadow.replace(/rgba?\([^)]+\)|hsla?\([^)]+\)|#[0-9a-fA-F]{3,8}/gi, '').match(/-?\d+(?:\.\d+)?px/g) ?? []
+    ).map(t => Math.abs(parseFloat(t)));
     const offsetX = pxTokens[0] ?? 0;
     const offsetY = pxTokens[1] ?? 0;
     const blur = pxTokens[2] ?? 0;
@@ -788,7 +790,7 @@ export function checkSurfaceAndColorSlop(input: LintElementInput): HeuristicViol
 
   if (textShadow && textShadow !== 'none') {
     const tsColors = extractColorsFromCssValue(textShadow);
-    if (tsColors.some((c) => rgbToHsl(c.r, c.g, c.b)[1] >= 0.35 && (c.a ?? 1) >= 0.2)) {
+    if (tsColors.some(c => rgbToHsl(c.r, c.g, c.b)[1] >= 0.35 && (c.a ?? 1) >= 0.2)) {
       violations.push(
         createViolation(
           'DARK_GLOW',
@@ -804,8 +806,8 @@ export function checkSurfaceAndColorSlop(input: LintElementInput): HeuristicViol
 
   if (bgImage.includes('radial-gradient(') && canvasLum < 0.12) {
     const radColors = extractColorsFromCssValue(bgImage);
-    const hasChromaticHalo = radColors.some((c) => rgbToHsl(c.r, c.g, c.b)[1] >= 0.35 && (c.a ?? 1) > 0.08);
-    const hasTransparentFade = bgImage.includes('transparent') || radColors.some((c) => (c.a ?? 1) < 0.05);
+    const hasChromaticHalo = radColors.some(c => rgbToHsl(c.r, c.g, c.b)[1] >= 0.35 && (c.a ?? 1) > 0.08);
+    const hasTransparentFade = bgImage.includes('transparent') || radColors.some(c => (c.a ?? 1) < 0.05);
     if (hasChromaticHalo && hasTransparentFade) {
       violations.push(
         createViolation(
@@ -828,7 +830,10 @@ export function checkSurfaceAndColorSlop(input: LintElementInput): HeuristicViol
   const radiusPx = parseFloat(computedStyles.borderRadius ?? '0') || 0;
 
   if ((blW >= 3 && btW <= 1 && bbW <= 1 && brW <= 1) || (brW >= 3 && btW <= 1 && bbW <= 1 && blW <= 1)) {
-    const sideColorStr = blW >= 3 ? (computedStyles.borderLeftColor ?? computedStyles.borderColor ?? '') : (computedStyles.borderRightColor ?? computedStyles.borderColor ?? '');
+    const sideColorStr =
+      blW >= 3
+        ? (computedStyles.borderLeftColor ?? computedStyles.borderColor ?? '')
+        : (computedStyles.borderRightColor ?? computedStyles.borderColor ?? '');
     violations.push(
       createViolation(
         'SIDE_TAB_BORDER',
@@ -984,11 +989,9 @@ export function checkTypographyAndRhythmSlop(input: LintElementInput): Heuristic
   // 3a. Heading Rhythm (space above a heading should exceed space below it)
   if (['h2', 'h3', 'h4'].includes(lowerTag)) {
     const spaceAbove =
-      signals?.spaceAbovePx ??
-      (computedStyles.marginTop ? parseFloat(computedStyles.marginTop) : undefined);
+      signals?.spaceAbovePx ?? (computedStyles.marginTop ? parseFloat(computedStyles.marginTop) : undefined);
     const spaceBelow =
-      signals?.spaceBelowPx ??
-      (computedStyles.marginBottom ? parseFloat(computedStyles.marginBottom) : undefined);
+      signals?.spaceBelowPx ?? (computedStyles.marginBottom ? parseFloat(computedStyles.marginBottom) : undefined);
 
     if (
       spaceAbove !== undefined &&
@@ -1035,10 +1038,7 @@ export function checkTypographyAndRhythmSlop(input: LintElementInput): Heuristic
       const minEdgeInset = isMobileViewport ? 12 : 16;
       const leftInset = boundingBox.x;
       const rightInset = viewportWidth - (boundingBox.x + boundingBox.width);
-      if (
-        (leftInset >= 0 && leftInset < minEdgeInset) ||
-        (rightInset >= 0 && rightInset < minEdgeInset)
-      ) {
+      if ((leftInset >= 0 && leftInset < minEdgeInset) || (rightInset >= 0 && rightInset < minEdgeInset)) {
         violations.push(
           createViolation(
             'LINE_LENGTH',
@@ -1069,7 +1069,7 @@ export function checkTypographyAndRhythmSlop(input: LintElementInput): Heuristic
     textLen > 0 &&
     ['button', 'a', 'div', 'section', 'article', 'aside', 'p', 'li', 'span', 'h1', 'h2', 'h3', 'h4'].includes(lowerTag)
   ) {
-    const padTokens = (computedStyles.padding ?? '').match(/\d+(?:\.\d+)?px/g)?.map((p) => parseFloat(p)) ?? [];
+    const padTokens = (computedStyles.padding ?? '').match(/\d+(?:\.\d+)?px/g)?.map(p => parseFloat(p)) ?? [];
     if (padTokens.length > 0) {
       const minPad = Math.min(...padTokens);
       if (minPad > 0 && minPad < 6 && fontSizePx >= 13) {
@@ -1235,22 +1235,13 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
   // 3. Tap target check for interactive elements on mobile
   const interactiveTags = ['button', 'a', 'input', 'select', 'textarea'];
   const isTargetInteractive =
-    isInteractive ||
-    interactiveTags.includes(tagName.toLowerCase()) ||
-    computedStyles.cursor === 'pointer';
+    isInteractive || interactiveTags.includes(tagName.toLowerCase()) || computedStyles.cursor === 'pointer';
 
   if (isTargetInteractive && isMobileViewport && boundingBox) {
     const tapRes = checkTapTarget({ width: boundingBox.width, height: boundingBox.height }, true);
     if (!tapRes.valid) {
       rawViolations.push(
-        createViolation(
-          'TAP_TARGET',
-          selector,
-          tapRes.expected,
-          tapRes.actual,
-          boundingBox,
-          viewportName
-        )
+        createViolation('TAP_TARGET', selector, tapRes.expected, tapRes.actual, boundingBox, viewportName)
       );
     }
   }
@@ -1263,16 +1254,7 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
   }
   const typoRes = checkTypographyScale(fontSizePx, lineHeightPx, tagName);
   for (const v of typoRes.violations) {
-    rawViolations.push(
-      createViolation(
-        'TYPOGRAPHY_SCALE',
-        selector,
-        v.expected,
-        v.actual,
-        boundingBox,
-        viewportName
-      )
-    );
+    rawViolations.push(createViolation('TYPOGRAPHY_SCALE', selector, v.expected, v.actual, boundingBox, viewportName));
   }
 
   // 5. Focus visibility check on interactive elements
@@ -1282,17 +1264,10 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
     const outline = computedStyles.outline;
     const boxShadow = computedStyles.boxShadow;
 
-    const removesOutline =
-      outlineStyle === 'none' ||
-      outlineWidth === '0px' ||
-      outline === 'none' ||
-      outline === '0';
+    const removesOutline = outlineStyle === 'none' || outlineWidth === '0px' || outline === 'none' || outline === '0';
 
     const hasBoxShadowAlternative =
-      boxShadow &&
-      boxShadow !== 'none' &&
-      boxShadow !== 'rgba(0, 0, 0, 0)' &&
-      boxShadow.trim() !== '';
+      boxShadow && boxShadow !== 'none' && boxShadow !== 'rgba(0, 0, 0, 0)' && boxShadow.trim() !== '';
 
     if (removesOutline && !hasBoxShadowAlternative) {
       rawViolations.push(
@@ -1404,7 +1379,7 @@ export function lintElementHeuristics(input: LintElementInput): HeuristicViolati
   rawViolations.push(...checkRenderedVisualIntegrity(input));
 
   // Filter out waived rules (data-impeccable-ignore / data-zerovisual-ignore / .impeccable/config.json)
-  return rawViolations.filter((v) => !isRuleIgnored(v.rule, signals?.ignoredRules));
+  return rawViolations.filter(v => !isRuleIgnored(v.rule, signals?.ignoredRules));
 }
 
 /**
@@ -1486,7 +1461,7 @@ export function lintPageLevelHeuristics(
         }
         if (maxStepRatio > 0 && maxStepRatio < 1.25) {
           const lead = ordered[0]!;
-          const summary = ordered.map((r) => `${r.size}px`).join(' -> ');
+          const summary = ordered.map(r => `${r.size}px`).join(' -> ');
           violations.push(
             createViolation(
               'FLAT_TYPE_HIERARCHY',
