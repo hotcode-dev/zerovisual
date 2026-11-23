@@ -233,9 +233,9 @@ export async function exportWebData() {
     });
   }
 
-  // Write full dataset to web data and public
+  // Write full dataset to web data (the Astro import target); the public copy was
+  // redundant since BenchmarkExplorer imports the src-side file directly.
   fs.writeFileSync(path.join(webDataDir, 'benchmark-sessions.json'), JSON.stringify(exports, null, 2));
-  fs.writeFileSync(path.join(webPublicDir, 'benchmark-sessions.json'), JSON.stringify(exports, null, 2));
   console.log(`✅ Successfully exported web benchmark data with ${exports.length} cases.`);
 }
 
