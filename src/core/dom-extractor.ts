@@ -1,10 +1,6 @@
 import type { Page } from '@playwright/test';
 import type { BoundingBox, HeuristicViolation } from './schema.js';
-import {
-  lintElementHeuristics,
-  lintPageLevelHeuristics,
-  type LintElementInput
-} from './heuristic-linter.js';
+import { lintElementHeuristics, lintPageLevelHeuristics, type LintElementInput } from './heuristic-linter.js';
 import type { DesignMdSpec } from './design-md-parser.js';
 
 export const ALLOWED_STYLE_PROPS = [
@@ -107,7 +103,7 @@ export async function captureDomContext(
         if (element.id) return `#${element.id}`;
         const tagName = element.tagName.toLowerCase();
         if (tagName === 'body' || tagName === 'html') return tagName;
-        const classes = Array.from(element.classList).filter((c) => !c.startsWith('ng-'));
+        const classes = Array.from(element.classList).filter(c => !c.startsWith('ng-'));
         if (classes.length > 0) return `${tagName}.${classes.join('.')}`;
         return tagName;
       }
@@ -141,7 +137,11 @@ export async function captureDomContext(
       }
 
       const effectiveBg = getEffectiveBg(el);
-      if (computed.backgroundColor === 'transparent' || computed.backgroundColor === 'rgba(0, 0, 0, 0)' || !computed.backgroundColor) {
+      if (
+        computed.backgroundColor === 'transparent' ||
+        computed.backgroundColor === 'rgba(0, 0, 0, 0)' ||
+        !computed.backgroundColor
+      ) {
         computed.backgroundColor = effectiveBg;
       }
 
@@ -249,9 +249,7 @@ export async function auditPageHeuristics(
   elementsData: LintElementInput[];
 }> {
   const opts: AuditPageOptions =
-    typeof isMobileOrOptions === 'boolean'
-      ? { isMobileViewport: isMobileOrOptions }
-      : isMobileOrOptions;
+    typeof isMobileOrOptions === 'boolean' ? { isMobileViewport: isMobileOrOptions } : isMobileOrOptions;
 
   const isMobileViewport = opts.isMobileViewport ?? false;
   const viewportName = opts.viewportName;
@@ -300,11 +298,7 @@ export async function auditPageHeuristics(
         const hasShadow = s.boxShadow && s.boxShadow !== 'none';
         const parentBg = el.parentElement ? getEffectiveBg(el.parentElement) : '';
         const ownBg = s.backgroundColor;
-        const hasDistinctBg =
-          ownBg &&
-          ownBg !== 'transparent' &&
-          ownBg !== 'rgba(0, 0, 0, 0)' &&
-          ownBg !== parentBg;
+        const hasDistinctBg = ownBg && ownBg !== 'transparent' && ownBg !== 'rgba(0, 0, 0, 0)' && ownBg !== parentBg;
         return (radius >= 4 || borderW >= 1) && Boolean(hasDistinctBg || borderW >= 1 || hasShadow);
       }
 
@@ -324,9 +318,13 @@ export async function auditPageHeuristics(
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
 
-      const filtered = candidates.filter((el) => {
+      const filtered = candidates.filter(el => {
         const tag = el.tagName.toLowerCase();
-        if (['button', 'a', 'input', 'select', 'textarea', 'img', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'].includes(tag)) {
+        if (
+          ['button', 'a', 'input', 'select', 'textarea', 'img', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'].includes(
+            tag
+          )
+        ) {
           return true;
         }
         const s = window.getComputedStyle(el);
@@ -339,13 +337,13 @@ export async function auditPageHeuristics(
           s.overflowX === 'hidden' ||
           s.overflow === 'clip';
         const directText = Array.from(el.childNodes)
-          .filter((n) => n.nodeType === Node.TEXT_NODE)
-          .map((n) => n.textContent?.trim() ?? '')
+          .filter(n => n.nodeType === Node.TEXT_NODE)
+          .map(n => n.textContent?.trim() ?? '')
           .join('');
         return hasVisualSurface || directText.length > 0;
       });
 
-      return filtered.slice(0, 250).map((el) => {
+      return filtered.slice(0, 250).map(el => {
         const styles = window.getComputedStyle(el);
         const computed: Record<string, string> = {};
         for (const prop of allowedProps) {
@@ -353,7 +351,11 @@ export async function auditPageHeuristics(
         }
 
         const effectiveBg = getEffectiveBg(el);
-        if (computed.backgroundColor === 'transparent' || computed.backgroundColor === 'rgba(0, 0, 0, 0)' || !computed.backgroundColor) {
+        if (
+          computed.backgroundColor === 'transparent' ||
+          computed.backgroundColor === 'rgba(0, 0, 0, 0)' ||
+          !computed.backgroundColor
+        ) {
           computed.backgroundColor = effectiveBg;
         }
 
@@ -399,8 +401,7 @@ export async function auditPageHeuristics(
               iconRect.width <= 72 &&
               iconRect.height >= 20 &&
               iconRect.height <= 72 &&
-              (parseFloat(iconStyle.borderRadius || '0') >= 4 ||
-                firstElem.querySelector('svg, img') !== null);
+              (parseFloat(iconStyle.borderRadius || '0') >= 4 || firstElem.querySelector('svg, img') !== null);
             const isStackedAbove = iconRect.bottom <= hRect.top + 8 && Math.abs(iconRect.left - hRect.left) <= 60;
             if (isSmallBox && isStackedAbove) {
               hasIconTileStack = true;
@@ -484,8 +485,8 @@ export async function auditPageHeuristics(
           el.children.length >= 2
         ) {
           const childRects = Array.from(el.children)
-            .map((c) => c.getBoundingClientRect())
-            .filter((r) => r.width >= 120 && r.height >= 40);
+            .map(c => c.getBoundingClientRect())
+            .filter(r => r.width >= 120 && r.height >= 40);
           if (childRects.length >= 2) {
             const first = childRects[0]!;
             const second = childRects[1]!;
@@ -504,8 +505,7 @@ export async function auditPageHeuristics(
           selector: getCssSelector(el),
           tagName: tag,
           isInteractive:
-            ['button', 'a', 'input', 'select', 'textarea'].includes(tag) ||
-            el.getAttribute('role') === 'button',
+            ['button', 'a', 'input', 'select', 'textarea'].includes(tag) || el.getAttribute('role') === 'button',
           computedStyles: computed,
           effectiveBg,
           viewportWidth,
@@ -550,10 +550,7 @@ export async function auditPageHeuristics(
 
   for (const item of elementsList) {
     computedStylesMap[item.selector] = item.computedStyles;
-    const combinedIgnores = [
-      ...(item.signals?.ignoredRules ?? []),
-      ...globalIgnores
-    ];
+    const combinedIgnores = [...(item.signals?.ignoredRules ?? []), ...globalIgnores];
 
     const lintInput: LintElementInput = {
       selector: item.selector,

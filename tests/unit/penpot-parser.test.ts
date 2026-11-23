@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  parsePenpotTokens,
-  diffPenpotAgainstDom,
-  type PenpotNodeToken
-} from '../../src/core/penpot-parser.js';
+import { parsePenpotTokens, diffPenpotAgainstDom, type PenpotNodeToken } from '../../src/core/penpot-parser.js';
 
 describe('Penpot Token Parser & Delta Comparator', () => {
   const samplePenpotSvg = `
@@ -43,14 +39,14 @@ describe('Penpot Token Parser & Delta Comparator', () => {
       const nodes = parsePenpotTokens(samplePenpotSvg, 'svg');
       expect(nodes.length).toBeGreaterThanOrEqual(2);
 
-      const button = nodes.find((n) => n.id === 'cta-button');
+      const button = nodes.find(n => n.id === 'cta-button');
       expect(button).toBeDefined();
       expect(button?.properties.backgroundColor).toBe('#0066cc');
       expect(button?.properties.borderRadius).toBe('8px');
       expect(button?.properties.width).toBe('200px');
       expect(button?.properties.height).toBe('48px');
 
-      const label = nodes.find((n) => n.id === 'cta-label');
+      const label = nodes.find(n => n.id === 'cta-label');
       expect(label).toBeDefined();
       expect(label?.properties.fontSize).toBe('16px');
       expect(label?.properties.fontWeight).toBe('700');
@@ -78,7 +74,7 @@ describe('Penpot Token Parser & Delta Comparator', () => {
 
       const nodes = parsePenpotTokens(dtcgJson);
       expect(nodes.length).toBeGreaterThan(0);
-      const btn = nodes.find((n) => n.selector === '.btn-primary');
+      const btn = nodes.find(n => n.selector === '.btn-primary');
       expect(btn).toBeDefined();
       expect(btn?.properties.backgroundColor).toBe('#2563eb');
       expect(btn?.properties.borderRadius).toBe('6px');

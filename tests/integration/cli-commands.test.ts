@@ -50,7 +50,9 @@ describe('ZeroVisual CLI Commands Integration', () => {
           channels: 4,
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const red = await sharp({
         create: {
@@ -59,7 +61,9 @@ describe('ZeroVisual CLI Commands Integration', () => {
           channels: 4,
           background: { r: 255, g: 0, b: 0, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const diffImg = await sharp(base)
         .composite([{ input: red, left: 100, top: 100 }])
@@ -112,7 +116,9 @@ describe('ZeroVisual CLI Commands Integration', () => {
           channels: 4,
           background: { r: 240, g: 240, b: 240, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       // Mock Page
       const mockPage = {

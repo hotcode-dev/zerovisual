@@ -96,7 +96,19 @@ function evaluateAccuracy(answer: string, reasoning: string, gt: GroundTruth): {
   // 2. Defect Type / Symptom Identification (up to 35 pts)
   const defectWords = gt.defectType.toLowerCase().split('_');
   const matchedDefect = defectWords.some(w => w.length > 3 && text.includes(w));
-  const generalDefectKeywords = ['shift', 'padding', 'margin', 'contrast', 'overlap', 'overflow', 'color', 'clip', 'broken', 'misaligned', 'collision'];
+  const generalDefectKeywords = [
+    'shift',
+    'padding',
+    'margin',
+    'contrast',
+    'overlap',
+    'overflow',
+    'color',
+    'clip',
+    'broken',
+    'misaligned',
+    'collision'
+  ];
   const matchedGeneral = generalDefectKeywords.some(k => gt.defect.toLowerCase().includes(k) && text.includes(k));
 
   if (matchedDefect || matchedGeneral) {
@@ -104,7 +116,11 @@ function evaluateAccuracy(answer: string, reasoning: string, gt: GroundTruth): {
   }
 
   // 3. Root Cause & Fix Recommendation (up to 30 pts)
-  const fixKeywords = gt.rootCause.toLowerCase().split(/\s+/).concat(gt.suggestedFix.toLowerCase().split(/\s+/)).filter(w => w.length > 3);
+  const fixKeywords = gt.rootCause
+    .toLowerCase()
+    .split(/\s+/)
+    .concat(gt.suggestedFix.toLowerCase().split(/\s+/))
+    .filter(w => w.length > 3);
   const matchedFix = fixKeywords.some(w => text.includes(w));
   if (matchedFix) {
     score += 30;
@@ -127,9 +143,7 @@ function extractText(v: unknown): string {
 // tags with no separate reasoning_content field. Split it out so the benchmark
 // records both a clean answer and the reasoning.
 function splitThoughtTags(text: string): { content: string; reasoning: string } {
-  const thoughts = [...text.matchAll(/<thought>([\s\S]*?)<\/thought>/g)]
-    .map(m => m[1]!.trim())
-    .filter(Boolean);
+  const thoughts = [...text.matchAll(/<thought>([\s\S]*?)<\/thought>/g)].map(m => m[1]!.trim()).filter(Boolean);
   if (thoughts.length === 0) return { content: text, reasoning: '' };
   return {
     content: text.replace(/<thought>[\s\S]*?<\/thought>/g, '').trim(),
@@ -222,8 +236,8 @@ async function callVlmWithRetry(...args: Parameters<typeof callVlm>): ReturnType
     try {
       return await callVlm(...args);
     } catch (err: any) {
-      const retryable = /API error \((429|5\d\d)\)/.test(err.message)
-        || err.message.includes('Unable to process input image');
+      const retryable =
+        /API error \((429|5\d\d)\)/.test(err.message) || err.message.includes('Unable to process input image');
       if (!retryable || i === attempts - 1) throw err;
       const delayMs = 3000 * 2 ** i + Math.round(Math.random() * 1000);
       console.warn(`      ↻ API error, retry ${i + 1}/${attempts - 1} in ${delayMs}ms`);
@@ -244,7 +258,10 @@ async function runBenchmark() {
   const sessionsDir = path.join(resultsDir, 'sessions');
   fs.mkdirSync(sessionsDir, { recursive: true });
 
-  const cases = fs.readdirSync(testdataDir).filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory()).sort();
+  const cases = fs
+    .readdirSync(testdataDir)
+    .filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory())
+    .sort();
 
   console.log(`Discovered ${cases.length} benchmark test cases:`);
   cases.forEach(c => console.log(` - ${c}`));
@@ -299,9 +316,10 @@ Identify:
     const evalA = evaluateAccuracy(resA.content, resA.reasoning, metadata.groundTruth);
     const traceSessionIdA = `session-${metadata.id}-without-${Date.now()}`;
 
-    const effectiveAnswerA = resA.content.trim().length > 10
-      ? resA.content.trim()
-      : (resA.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resA.reasoning.trim());
+    const effectiveAnswerA =
+      resA.content.trim().length > 10
+        ? resA.content.trim()
+        : resA.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resA.reasoning.trim();
 
     const resultA: BenchmarkRunResult = {
       mode: 'without_zerovisual',
@@ -325,7 +343,9 @@ Identify:
     };
     allResults.push(resultA);
 
-    console.log(`      ✓ Mode A Complete: ${resA.usage.total_tokens} tokens (Img: ${resA.usage.image_tokens}), Latency: ${resA.latencyMs}ms, Accuracy: ${evalA.score}%`);
+    console.log(
+      `      ✓ Mode A Complete: ${resA.usage.total_tokens} tokens (Img: ${resA.usage.image_tokens}), Latency: ${resA.latencyMs}ms, Accuracy: ${evalA.score}%`
+    );
 
     // Save Langfuse / Pi agent session trace for Mode A
     const traceA = {
@@ -372,7 +392,9 @@ Identify:
     // Determine target provider based on model architecture
     const targetProvider = model.toLowerCase().includes('gemma')
       ? 'gemini'
-      : (model.toLowerCase().includes('qwen') ? 'qwen' : 'local');
+      : model.toLowerCase().includes('qwen')
+        ? 'qwen'
+        : 'local';
 
     // Optimize image for target provider
     const optResult = await optimizeImageForProvider(actualPng, {
@@ -393,9 +415,10 @@ Identify:
     const evalB = evaluateAccuracy(resB.content, resB.reasoning, metadata.groundTruth);
     const traceSessionIdB = `session-${metadata.id}-with-${Date.now()}`;
 
-    const effectiveAnswerB = resB.content.trim().length > 10
-      ? resB.content.trim()
-      : (resB.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resB.reasoning.trim());
+    const effectiveAnswerB =
+      resB.content.trim().length > 10
+        ? resB.content.trim()
+        : resB.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resB.reasoning.trim();
 
     const resultB: BenchmarkRunResult = {
       mode: 'with_zerovisual',
@@ -420,13 +443,18 @@ Identify:
     allResults.push(resultB);
 
     const tokenSavedPct = (((resultA.totalTokens - resultB.totalTokens) / resultA.totalTokens) * 100).toFixed(1);
-    const imgTokenSavedPct = resultA.imageTokens > 0
-      ? (((resultA.imageTokens - resultB.imageTokens) / resultA.imageTokens) * 100).toFixed(1)
-      : '0.0';
+    const imgTokenSavedPct =
+      resultA.imageTokens > 0
+        ? (((resultA.imageTokens - resultB.imageTokens) / resultA.imageTokens) * 100).toFixed(1)
+        : '0.0';
     const bytesSavedPct = (((rawPayloadBytes - optPayloadBytes) / rawPayloadBytes) * 100).toFixed(1);
 
-    console.log(`      ✓ Mode B Complete: ${resB.usage.total_tokens} tokens (Img: ${resB.usage.image_tokens}), Latency: ${resB.latencyMs}ms, Accuracy: ${evalB.score}%`);
-    console.log(`      ⚡️ Savings: Total Tokens: -${tokenSavedPct}% | Vision Image Tokens: -${imgTokenSavedPct}% | Bytes: -${bytesSavedPct}%\n`);
+    console.log(
+      `      ✓ Mode B Complete: ${resB.usage.total_tokens} tokens (Img: ${resB.usage.image_tokens}), Latency: ${resB.latencyMs}ms, Accuracy: ${evalB.score}%`
+    );
+    console.log(
+      `      ⚡️ Savings: Total Tokens: -${tokenSavedPct}% | Vision Image Tokens: -${imgTokenSavedPct}% | Bytes: -${bytesSavedPct}%\n`
+    );
 
     // Save Langfuse / Pi agent session trace for Mode B
     const traceB = {
@@ -478,21 +506,28 @@ function generateReports(results: BenchmarkRunResult[], resultsDir: string, mode
 
   const totalRawTokens = rawRuns.reduce((sum, r) => sum + r.totalTokens, 0);
   const totalOptTokens = optRuns.reduce((sum, r) => sum + r.totalTokens, 0);
-  const totalTokenSavings = totalRawTokens > 0 ? (((totalRawTokens - totalOptTokens) / totalRawTokens) * 100).toFixed(1) : '0';
+  const totalTokenSavings =
+    totalRawTokens > 0 ? (((totalRawTokens - totalOptTokens) / totalRawTokens) * 100).toFixed(1) : '0';
 
   const totalRawImgTokens = rawRuns.reduce((sum, r) => sum + r.imageTokens, 0);
   const totalOptImgTokens = optRuns.reduce((sum, r) => sum + r.imageTokens, 0);
-  const totalImgTokenSavings = totalRawImgTokens > 0 ? (((totalRawImgTokens - totalOptImgTokens) / totalRawImgTokens) * 100).toFixed(1) : '0';
+  const totalImgTokenSavings =
+    totalRawImgTokens > 0 ? (((totalRawImgTokens - totalOptImgTokens) / totalRawImgTokens) * 100).toFixed(1) : '0';
 
   const totalRawBytes = rawRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
   const totalOptBytes = optRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
-  const totalByteSavings = totalRawBytes > 0 ? (((totalRawBytes - totalOptBytes) / totalRawBytes) * 100).toFixed(1) : '0';
+  const totalByteSavings =
+    totalRawBytes > 0 ? (((totalRawBytes - totalOptBytes) / totalRawBytes) * 100).toFixed(1) : '0';
 
-  const avgRawLatency = rawRuns.length > 0 ? Math.round(rawRuns.reduce((sum, r) => sum + r.latencyMs, 0) / rawRuns.length) : 0;
-  const avgOptLatency = optRuns.length > 0 ? Math.round(optRuns.reduce((sum, r) => sum + r.latencyMs, 0) / optRuns.length) : 0;
+  const avgRawLatency =
+    rawRuns.length > 0 ? Math.round(rawRuns.reduce((sum, r) => sum + r.latencyMs, 0) / rawRuns.length) : 0;
+  const avgOptLatency =
+    optRuns.length > 0 ? Math.round(optRuns.reduce((sum, r) => sum + r.latencyMs, 0) / optRuns.length) : 0;
 
-  const avgRawAccuracy = rawRuns.length > 0 ? (rawRuns.reduce((sum, r) => sum + r.accuracyScore, 0) / rawRuns.length).toFixed(1) : '0';
-  const avgOptAccuracy = optRuns.length > 0 ? (optRuns.reduce((sum, r) => sum + r.accuracyScore, 0) / optRuns.length).toFixed(1) : '0';
+  const avgRawAccuracy =
+    rawRuns.length > 0 ? (rawRuns.reduce((sum, r) => sum + r.accuracyScore, 0) / rawRuns.length).toFixed(1) : '0';
+  const avgOptAccuracy =
+    optRuns.length > 0 ? (optRuns.reduce((sum, r) => sum + r.accuracyScore, 0) / optRuns.length).toFixed(1) : '0';
 
   // Build Markdown Report
   let md = `# 📊 ZeroVisual Empirical Benchmark Report\n\n`;
@@ -535,7 +570,8 @@ function generateReports(results: BenchmarkRunResult[], resultsDir: string, mode
     md += `- **Without ZeroVisual Tokens:** ${raw.totalTokens} (Image: ${raw.imageTokens}) | Latency: ${raw.latencyMs}ms | Accuracy: ${raw.accuracyScore}%\n`;
     if (opt) {
       const savedPct = (((raw.totalTokens - opt.totalTokens) / raw.totalTokens) * 100).toFixed(1);
-      const imgSavedPct = raw.imageTokens > 0 ? (((raw.imageTokens - opt.imageTokens) / raw.imageTokens) * 100).toFixed(1) : '0';
+      const imgSavedPct =
+        raw.imageTokens > 0 ? (((raw.imageTokens - opt.imageTokens) / raw.imageTokens) * 100).toFixed(1) : '0';
       md += `- **With ZeroVisual Tokens:** **${opt.totalTokens}** (Image: **${opt.imageTokens}**) | Latency: ${opt.latencyMs}ms | Accuracy: ${opt.accuracyScore}%\n`;
       md += `- **Savings:** **${savedPct}% total tokens**, **${imgSavedPct}% vision image tokens**, **${(((raw.imagePayloadBytes - opt.imagePayloadBytes) / raw.imagePayloadBytes) * 100).toFixed(1)}% bandwidth**\n\n`;
 

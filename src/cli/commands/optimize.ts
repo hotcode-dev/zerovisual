@@ -113,8 +113,12 @@ export async function runOptimizeCommand(options: OptimizeOptions): Promise<Opti
       const origKb = Math.round(s.stats.originalBytes / 1024);
       const optKb = Math.round(s.stats.optimizedBytes / 1024);
       console.log(`\n  📄 ${path.basename(s.file)} ➔ ${path.basename(s.outputPath)}`);
-      console.log(`     Resolution: ${s.stats.originalWidth}×${s.stats.originalHeight} ➔ ${s.stats.optimizedWidth}×${s.stats.optimizedHeight}`);
-      console.log(`     Vision Tokens: ${s.stats.originalTokens} ➔ ${s.stats.optimizedTokens} (${s.stats.tokenSavingsPercent}% saved)`);
+      console.log(
+        `     Resolution: ${s.stats.originalWidth}×${s.stats.originalHeight} ➔ ${s.stats.optimizedWidth}×${s.stats.optimizedHeight}`
+      );
+      console.log(
+        `     Vision Tokens: ${s.stats.originalTokens} ➔ ${s.stats.optimizedTokens} (${s.stats.tokenSavingsPercent}% saved)`
+      );
       console.log(`     Payload Size:  ${origKb} KB ➔ ${optKb} KB (${s.stats.byteSavingsPercent}% reduced)`);
     }
   }
@@ -142,7 +146,8 @@ export const optimizeCommand = defineCommand({
       type: 'string',
       alias: 'p',
       default: 'anthropic',
-      description: 'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
+      description:
+        'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
     },
     lowTokenMode: {
       type: 'boolean',

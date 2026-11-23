@@ -15,7 +15,7 @@ const candidatePaths = [
   path.resolve(process.cwd(), 'node_modules/zerovisual/dist/cli/index.js')
 ];
 
-const localCli = candidatePaths.find((p) => fs.existsSync(p));
+const localCli = candidatePaths.find(p => fs.existsSync(p));
 
 if (localCli) {
   const res = spawnSync(process.execPath, [localCli, subcommand, ...forwardArgs], {
@@ -29,4 +29,3 @@ if (localCli) {
   });
   process.exit(res.status ?? 0);
 }
-

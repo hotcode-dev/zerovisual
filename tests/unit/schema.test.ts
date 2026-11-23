@@ -148,7 +148,8 @@ describe('ZeroVisual Canonical Schemas', () => {
 
     it('should reject non-webp base64 URI', () => {
       const invalid = JSON.parse(JSON.stringify(validPayload));
-      invalid.failures[0].viewports[0].images.diffBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      invalid.failures[0].viewports[0].images.diffBase64 =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
       expect(() => TriagePayloadSchema.parse(invalid)).toThrow();
     });
 

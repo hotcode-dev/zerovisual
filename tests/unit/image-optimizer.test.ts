@@ -51,7 +51,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       // Create a red diff patch at (200, 300) with size 100x50
       const redPatch = await sharp({
@@ -61,7 +63,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 255, g: 0, b: 0, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const diffImage = await sharp(base)
         .composite([{ input: redPatch, left: 200, top: 300 }])
@@ -88,7 +92,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const redPatch = await sharp({
         create: {
@@ -97,7 +103,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 255, g: 0, b: 0, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       // Put diff at (5, 5)
       const diffImage = await sharp(base)
@@ -121,7 +129,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 255, g: 255, b: 255, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const result = await detectDiffBoundingBox(base, 32);
 
@@ -140,7 +150,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 100, g: 150, b: 200, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const result = await optimizeImageForProvider(imageBuffer, { provider: 'openai' });
 
@@ -160,7 +172,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 50, g: 50, b: 50, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const result = await optimizeImageForProvider(imageBuffer, { provider: 'anthropic' });
 
@@ -178,7 +192,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 10, g: 20, b: 30, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const result = await optimizeImageForProvider(imageBuffer, {
         provider: 'gemini',
@@ -197,7 +213,9 @@ describe('Model-Aware Image Optimizer', () => {
           channels: 4,
           background: { r: 200, g: 200, b: 200, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       // Crop box is 200x150, smaller than 512x512
       const result = await optimizeImageForProvider(imageBuffer, {

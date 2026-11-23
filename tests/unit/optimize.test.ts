@@ -2,10 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
-import {
-  estimateVisionTokens,
-  optimizeImageStandalone
-} from '../../src/core/image-optimizer.js';
+import { estimateVisionTokens, optimizeImageStandalone } from '../../src/core/image-optimizer.js';
 import { runOptimizeCommand } from '../../src/cli/commands/optimize.js';
 
 describe('Image Optimization & Token Estimation', () => {
@@ -57,7 +54,9 @@ describe('Image Optimization & Token Estimation', () => {
           channels: 4,
           background: { r: 100, g: 150, b: 200, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const { result, stats } = await optimizeImageStandalone(buffer, {
         provider: 'anthropic'
@@ -80,7 +79,9 @@ describe('Image Optimization & Token Estimation', () => {
           channels: 4,
           background: { r: 255, g: 0, b: 0, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
 
       const { result, stats } = await optimizeImageStandalone(buffer, {
         provider: 'anthropic'
@@ -102,7 +103,9 @@ describe('Image Optimization & Token Estimation', () => {
           channels: 4,
           background: { r: 50, g: 100, b: 150, alpha: 1 }
         }
-      }).png().toBuffer();
+      })
+        .png()
+        .toBuffer();
       fs.writeFileSync(testImage, pngBuffer);
 
       const summaries = await runOptimizeCommand({

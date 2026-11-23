@@ -1,0 +1,14 @@
+# Prettier scope: the shippable `zerovisual` package only.
+# `web/` is a separate private package (own package.json / lockfile / Astro
+# toolchain) with hand-authored docs content — keep it out of the gate.
+web/
+# Lockfiles and build/coverage output.
+package-lock.json
+dist/
+node_modules/
+# Generated benchmark data (large, machine-written).
+benchmark/results/
+benchmark/testdata/
+# Test output.
+test-results/
+test-results-*/

@@ -3,7 +3,8 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
 
-function getBenchmarkProvider(): 'qwen' | 'gemini' | 'openai' | 'anthropic' | 'llama' | 'mistral' | 'deepseek' | 'local' {
+function getBenchmarkProvider():
+  'qwen' | 'gemini' | 'openai' | 'anthropic' | 'llama' | 'mistral' | 'deepseek' | 'local' {
   const envPath = path.resolve(process.cwd(), 'benchmark/.env');
   let model = 'RadixArk/Qwen3.8-27B-NVFP4';
   if (fs.existsSync(envPath)) {
@@ -88,7 +89,10 @@ export async function exportWebData() {
   fs.mkdirSync(webDataDir, { recursive: true });
   fs.mkdirSync(webPublicDir, { recursive: true });
 
-  const cases = fs.readdirSync(testdataDir).filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory()).sort();
+  const cases = fs
+    .readdirSync(testdataDir)
+    .filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory())
+    .sort();
 
   // Load all session files
   const sessionFiles = fs.existsSync(sessionsDir) ? fs.readdirSync(sessionsDir).filter(f => f.endsWith('.json')) : [];
@@ -166,14 +170,15 @@ export async function exportWebData() {
       sessionId: sessionWithout?.id || `simulated-${caseId}-without`,
       imageResolution: sessionWithout?.inputImage?.resolution || { width: rawWidth, height: rawHeight },
       imagePayloadBytes: sessionWithout?.inputImage?.bytes || actualBuffer.length,
-      promptTokens: sessionWithout?.metrics?.promptTokens || (rawTokensCalc + 120),
+      promptTokens: sessionWithout?.metrics?.promptTokens || rawTokensCalc + 120,
       imageTokens: sessionWithout?.metrics?.imageTokens > 0 ? sessionWithout.metrics.imageTokens : rawTokensCalc,
       completionTokens: sessionWithout?.metrics?.completionTokens || 1400,
       reasoningTokens: sessionWithout?.metrics?.reasoningTokens || 1200,
-      totalTokens: sessionWithout?.metrics?.totalTokens || (rawTokensCalc + 1520),
+      totalTokens: sessionWithout?.metrics?.totalTokens || rawTokensCalc + 1520,
       latencyMs: sessionWithout?.metrics?.latencyMs || Math.round(25000 + rawTokensCalc * 35),
       accuracyScore: sessionWithout?.metrics?.accuracyScore ?? 65,
-      modelAnswer: (sessionWithout?.output?.content || '').trim() || (sessionWithout?.output?.reasoning?.slice(-350) || '').trim(),
+      modelAnswer:
+        (sessionWithout?.output?.content || '').trim() || (sessionWithout?.output?.reasoning?.slice(-350) || '').trim(),
       modelReasoning: (sessionWithout?.output?.reasoning || '').trim()
     };
 
@@ -182,23 +187,28 @@ export async function exportWebData() {
       sessionId: sessionWith?.id || `simulated-${caseId}-with`,
       imageResolution: sessionWith?.inputImage?.resolution || { width: optResult.width, height: optResult.height },
       imagePayloadBytes: sessionWith?.inputImage?.bytes || optResult.buffer.length,
-      promptTokens: sessionWith?.metrics?.promptTokens || (optTokensCalc + 120),
+      promptTokens: sessionWith?.metrics?.promptTokens || optTokensCalc + 120,
       imageTokens: sessionWith?.metrics?.imageTokens > 0 ? sessionWith.metrics.imageTokens : optTokensCalc,
       completionTokens: sessionWith?.metrics?.completionTokens || 1100,
       reasoningTokens: sessionWith?.metrics?.reasoningTokens || 950,
-      totalTokens: sessionWith?.metrics?.totalTokens || (optTokensCalc + 1220),
+      totalTokens: sessionWith?.metrics?.totalTokens || optTokensCalc + 1220,
       latencyMs: sessionWith?.metrics?.latencyMs || Math.round(18000 + optTokensCalc * 35),
       accuracyScore: sessionWith?.metrics?.accuracyScore ?? (sessionWith ? 65 : 100),
-      modelAnswer: (sessionWith?.output?.content || '').trim() || (sessionWith?.output?.reasoning?.slice(-350) || '').trim(),
+      modelAnswer:
+        (sessionWith?.output?.content || '').trim() || (sessionWith?.output?.reasoning?.slice(-350) || '').trim(),
       modelReasoning: (sessionWith?.output?.reasoning || '').trim()
     };
 
     const tokenSaved = (((withoutObj.totalTokens - withObj.totalTokens) / withoutObj.totalTokens) * 100).toFixed(1);
     const imgTokenSaved = (((withoutObj.imageTokens - withObj.imageTokens) / withoutObj.imageTokens) * 100).toFixed(1);
-    const byteSaved = (((withoutObj.imagePayloadBytes - withObj.imagePayloadBytes) / withoutObj.imagePayloadBytes) * 100).toFixed(1);
-    const latencySaved = withoutObj.latencyMs > withObj.latencyMs 
-      ? `${Math.round(((withoutObj.latencyMs - withObj.latencyMs) / withoutObj.latencyMs) * 100)}% faster`
-      : 'comparable';
+    const byteSaved = (
+      ((withoutObj.imagePayloadBytes - withObj.imagePayloadBytes) / withoutObj.imagePayloadBytes) *
+      100
+    ).toFixed(1);
+    const latencySaved =
+      withoutObj.latencyMs > withObj.latencyMs
+        ? `${Math.round(((withoutObj.latencyMs - withObj.latencyMs) / withoutObj.latencyMs) * 100)}% faster`
+        : 'comparable';
 
     exports.push({
       id: meta.id,

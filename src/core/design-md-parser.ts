@@ -122,7 +122,12 @@ export function parseDesignMd(markdownContent: string): DesignMdSpec {
     const section = typoSectionMatch[0];
     const tokenMatches = section.matchAll(/(?:`([^`]+)`|\*\*([^*]+)\*\*)/g);
     for (const m of tokenMatches) {
-      const token = (m[1] || m[2] || '').trim().split(',')[0]?.trim().replace(/^['"]+|['"]+$/g, '') ?? '';
+      const token =
+        (m[1] || m[2] || '')
+          .trim()
+          .split(',')[0]
+          ?.trim()
+          .replace(/^['"]+|['"]+$/g, '') ?? '';
       if (
         token &&
         /^[A-Z][A-Za-z0-9\s-]{1,32}$/.test(token) &&
@@ -181,8 +186,9 @@ export function parseDesignMd(markdownContent: string): DesignMdSpec {
     }
   }
 
-  const allowsHardOffsetShadow =
-    /neobrutalis|brutalis|hard[- ]offset|(?:\d+px\s+\d+px\s+0(?:px)?\b)/i.test(markdownContent);
+  const allowsHardOffsetShadow = /neobrutalis|brutalis|hard[- ]offset|(?:\d+px\s+\d+px\s+0(?:px)?\b)/i.test(
+    markdownContent
+  );
 
   return {
     fonts: Array.from(fonts),
@@ -200,11 +206,7 @@ export function parseDesignMd(markdownContent: string): DesignMdSpec {
 export function loadDesignMdFromWorkspace(cwd = process.cwd(), explicitPath?: string): DesignMdSpec | undefined {
   const candidates = explicitPath
     ? [path.resolve(cwd, explicitPath)]
-    : [
-        path.resolve(cwd, 'DESIGN.md'),
-        path.resolve(cwd, '.impeccable/DESIGN.md'),
-        path.resolve(cwd, 'docs/DESIGN.md')
-      ];
+    : [path.resolve(cwd, 'DESIGN.md'), path.resolve(cwd, '.impeccable/DESIGN.md'), path.resolve(cwd, 'docs/DESIGN.md')];
 
   for (const filePath of candidates) {
     if (fs.existsSync(filePath)) {
@@ -286,13 +288,13 @@ export function diffDesignMdAgainstDom(
     if (designMd.fonts.length > 0 && styles.fontFamily) {
       const usedFamilies = styles.fontFamily
         .split(',')
-        .map((f) => f.trim().replace(/^['"]+|['"]+$/g, ''))
-        .filter((f) => f && !GENERIC_FONT_FAMILIES.has(f.toLowerCase()));
+        .map(f => f.trim().replace(/^['"]+|['"]+$/g, ''))
+        .filter(f => f && !GENERIC_FONT_FAMILIES.has(f.toLowerCase()));
 
       if (usedFamilies.length > 0) {
         const primaryFont = usedFamilies[0]!;
         const matchesDeclared = designMd.fonts.some(
-          (declared) =>
+          declared =>
             declared.toLowerCase() === primaryFont.toLowerCase() ||
             primaryFont.toLowerCase().includes(declared.toLowerCase()) ||
             declared.toLowerCase().includes(primaryFont.toLowerCase())
@@ -323,12 +325,15 @@ export function diffDesignMdAgainstDom(
           (parsed.r === 0 && parsed.g === 0 && parsed.b === 0);
         if (isPureNeutral) continue;
 
-        const matchesColor = designMd.colors.some((c) => colorDistance(c.rgb, parsed) <= 22);
+        const matchesColor = designMd.colors.some(c => colorDistance(c.rgb, parsed) <= 22);
         if (!matchesColor) {
           deltas.push({
             selector,
             property: prop,
-            expectedDesignMd: designMd.colors.map((c) => c.raw).slice(0, 8).join(', '),
+            expectedDesignMd: designMd.colors
+              .map(c => c.raw)
+              .slice(0, 8)
+              .join(', '),
             actualDom: rawColor
           });
         }
@@ -339,12 +344,12 @@ export function diffDesignMdAgainstDom(
     if (designMd.radiiPx.length > 0 && styles.borderRadius) {
       const radiusPx = Math.round(parseFloat(styles.borderRadius) || 0);
       if (radiusPx > 0 && radiusPx < 999) {
-        const matchesRadius = designMd.radiiPx.some((r) => Math.abs(r - radiusPx) <= 2);
+        const matchesRadius = designMd.radiiPx.some(r => Math.abs(r - radiusPx) <= 2);
         if (!matchesRadius) {
           deltas.push({
             selector,
             property: 'borderRadius',
-            expectedDesignMd: designMd.radiiPx.map((r) => `${r}px`).join(' | '),
+            expectedDesignMd: designMd.radiiPx.map(r => `${r}px`).join(' | '),
             actualDom: `${radiusPx}px`
           });
         }
@@ -355,12 +360,12 @@ export function diffDesignMdAgainstDom(
     if (designMd.fontSizesPx.length > 0 && styles.fontSize) {
       const fontSizePx = Math.round(parseFloat(styles.fontSize) || 0);
       if (fontSizePx > 0) {
-        const matchesSize = designMd.fontSizesPx.some((s) => Math.abs(s - fontSizePx) <= 1);
+        const matchesSize = designMd.fontSizesPx.some(s => Math.abs(s - fontSizePx) <= 1);
         if (!matchesSize) {
           deltas.push({
             selector,
             property: 'fontSize',
-            expectedDesignMd: designMd.fontSizesPx.map((s) => `${s}px`).join(' | '),
+            expectedDesignMd: designMd.fontSizesPx.map(s => `${s}px`).join(' | '),
             actualDom: `${fontSizePx}px`
           });
         }
