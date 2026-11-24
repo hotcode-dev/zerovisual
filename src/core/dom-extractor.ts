@@ -59,6 +59,31 @@ export interface CaptureDomOptions {
 }
 
 /**
+ * Browser-side background-fallback helpers, shared by `captureDomContext` and
+ * `auditPageHeuristics`. Playwright serializes only the evaluate callback's
+ * source, so shared helpers live here as plain-JS source and are instantiated
+ * inside each callback via `new Function` — one source of truth for the
+ * effective-background logic.
+ */
+const BROWSER_BG_HELPERS_JS = `function getEffectiveBg(element) {
+  let cur = element;
+  while (cur) {
+    const bg = window.getComputedStyle(cur).backgroundColor;
+    if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') return bg;
+    cur = cur.parentElement;
+  }
+  const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+  if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)') return bodyBg;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+}
+function applyEffectiveBgFallback(computed, element) {
+  const effectiveBg = getEffectiveBg(element);
+  const c = computed.backgroundColor;
+  if (c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || !c) computed.backgroundColor = effectiveBg;
+  return effectiveBg;
+}`;
+
+/**
  * Captures localized AOM ariaSnapshot and the allowed CSS computed styles,
  * plus deterministic UI heuristic violations for a target element or bounding box.
  */
@@ -82,8 +107,10 @@ export async function captureDomContext(
   }
 
   const evalResult = await page.evaluate(
-    ({ selector, point, allowedProps }) => {
+    ({ selector, point, allowedProps, bgHelpers }) => {
       let el: Element | null = null;
+
+      const { applyEffectiveBgFallback } = new Function(bgHelpers + '; return { applyEffectiveBgFallback }')();
 
       if (point) {
         el = document.elementFromPoint(point.x, point.y);
@@ -108,23 +135,6 @@ export async function captureDomContext(
         return tagName;
       }
 
-      function getEffectiveBg(element: Element | null): string {
-        let cur = element;
-        while (cur) {
-          const bg = window.getComputedStyle(cur).backgroundColor;
-          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
-            return bg;
-          }
-          cur = cur.parentElement;
-        }
-        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-        if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)') {
-          return bodyBg;
-        }
-        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        return isDark ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
-      }
-
       const resolvedSelector = el ? getCssSelector(el) : 'body';
       const tagName = el ? el.tagName.toLowerCase() : 'body';
       const styles = el ? window.getComputedStyle(el) : null;
@@ -136,14 +146,7 @@ export async function captureDomContext(
         }
       }
 
-      const effectiveBg = getEffectiveBg(el);
-      if (
-        computed.backgroundColor === 'transparent' ||
-        computed.backgroundColor === 'rgba(0, 0, 0, 0)' ||
-        !computed.backgroundColor
-      ) {
-        computed.backgroundColor = effectiveBg;
-      }
+      const effectiveBg = applyEffectiveBgFallback(computed, el);
 
       const rect = el ? el.getBoundingClientRect() : null;
       const boundingBox = rect
@@ -185,7 +188,7 @@ export async function captureDomContext(
         }
       };
     },
-    { selector: targetSelector, point, allowedProps: ALLOWED_STYLE_PROPS }
+    { selector: targetSelector, point, allowedProps: ALLOWED_STYLE_PROPS, bgHelpers: BROWSER_BG_HELPERS_JS }
   );
 
   let ariaSnapshot = '';
@@ -256,7 +259,10 @@ export async function auditPageHeuristics(
   const globalIgnores = opts.ignoreRules ?? [];
 
   const rawEvaluated = await page.evaluate(
-    ({ allowedProps }) => {
+    ({ allowedProps, bgHelpers }) => {
+      const { getEffectiveBg, applyEffectiveBgFallback } = new Function(
+        bgHelpers + '; return { getEffectiveBg, applyEffectiveBgFallback }'
+      )();
       const candidates = Array.from(
         document.querySelectorAll(
           'button, a, input, select, textarea, [role="button"], img, p, h1, h2, h3, h4, h5, h6, li, div, section, article, aside, header, footer, nav, span'
@@ -268,23 +274,6 @@ export async function auditPageHeuristics(
         const tag = el.tagName.toLowerCase();
         if (el.classList.length > 0) return `${tag}.${Array.from(el.classList).slice(0, 2).join('.')}`;
         return tag;
-      }
-
-      function getEffectiveBg(element: Element | null): string {
-        let cur = element;
-        while (cur) {
-          const bg = window.getComputedStyle(cur).backgroundColor;
-          if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
-            return bg;
-          }
-          cur = cur.parentElement;
-        }
-        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-        if (bodyBg && bodyBg !== 'transparent' && bodyBg !== 'rgba(0, 0, 0, 0)') {
-          return bodyBg;
-        }
-        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        return isDark ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
       }
 
       function isCardElement(el: Element): boolean {
@@ -350,14 +339,7 @@ export async function auditPageHeuristics(
           computed[prop] = styles[prop as any] || (styles as any).getPropertyValue?.(prop) || '';
         }
 
-        const effectiveBg = getEffectiveBg(el);
-        if (
-          computed.backgroundColor === 'transparent' ||
-          computed.backgroundColor === 'rgba(0, 0, 0, 0)' ||
-          !computed.backgroundColor
-        ) {
-          computed.backgroundColor = effectiveBg;
-        }
+        const effectiveBg = applyEffectiveBgFallback(computed, el);
 
         const rect = el.getBoundingClientRect();
         const tag = el.tagName.toLowerCase();
@@ -540,7 +522,7 @@ export async function auditPageHeuristics(
         };
       });
     },
-    { allowedProps: ALLOWED_STYLE_PROPS }
+    { allowedProps: ALLOWED_STYLE_PROPS, bgHelpers: BROWSER_BG_HELPERS_JS }
   );
 
   const elementsList = Array.isArray(rawEvaluated) ? rawEvaluated : [];
