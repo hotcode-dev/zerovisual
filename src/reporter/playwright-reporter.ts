@@ -9,7 +9,12 @@ import {
   type ViewportArtifact,
   type TriagePayload
 } from '../core/schema.js';
-import { detectDiffBoundingBox, optimizeImageForProvider, getProviderDimensions } from '../core/image-optimizer.js';
+import {
+  detectDiffBoundingBox,
+  optimizeImageForProvider,
+  optimizeAndWriteCompanionImage,
+  getProviderDimensions
+} from '../core/image-optimizer.js';
 
 export function normalizeTestId(titlePath: string[]): string {
   const full = titlePath.slice(1).join(' > ');
@@ -94,15 +99,17 @@ export class ZeroVisualReporter implements Reporter {
       const actualBuf =
         actualAttachment.body ?? (actualAttachment.path ? fs.readFileSync(actualAttachment.path) : null);
       if (actualBuf) {
-        const opt = await optimizeImageForProvider(actualBuf, {
+        const companion = await optimizeAndWriteCompanionImage(actualBuf, {
+          artifactsDir,
+          baseName: `${testId}-${safeProject}`,
+          suffix: 'actual',
           provider: this.config.targetProvider,
           lowTokenMode: this.config.lowTokenMode,
           customDimensions: this.config.customDimensions,
           cropBox: diffDetection.boundingBox
         });
-        actualBase64 = opt.dataUri;
-        actualImagePath = path.join(artifactsDir, `${testId}-${safeProject}-actual.webp`);
-        fs.writeFileSync(actualImagePath, opt.buffer);
+        actualBase64 = companion.dataUri;
+        actualImagePath = companion.imagePath;
       }
     }
 
@@ -115,15 +122,17 @@ export class ZeroVisualReporter implements Reporter {
       const expectedBuf =
         expectedAttachment.body ?? (expectedAttachment.path ? fs.readFileSync(expectedAttachment.path) : null);
       if (expectedBuf) {
-        const opt = await optimizeImageForProvider(expectedBuf, {
+        const companion = await optimizeAndWriteCompanionImage(expectedBuf, {
+          artifactsDir,
+          baseName: `${testId}-${safeProject}`,
+          suffix: 'expected',
           provider: this.config.targetProvider,
           lowTokenMode: this.config.lowTokenMode,
           customDimensions: this.config.customDimensions,
           cropBox: diffDetection.boundingBox
         });
-        expectedBase64 = opt.dataUri;
-        expectedImagePath = path.join(artifactsDir, `${testId}-${safeProject}-expected.webp`);
-        fs.writeFileSync(expectedImagePath, opt.buffer);
+        expectedBase64 = companion.dataUri;
+        expectedImagePath = companion.imagePath;
       }
     }
 
