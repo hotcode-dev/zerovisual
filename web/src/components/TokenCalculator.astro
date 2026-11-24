@@ -355,6 +355,8 @@
 </style>
 
 <script>
+  import { estimateVisionTokens, getProviderDimensions, type TargetProvider } from '../../../src/core/provider-math.ts';
+
   function setupCalculator() {
     const providerSelect = document.getElementById('provider-select') as HTMLSelectElement | null;
     const diffWidthInput = document.getElementById('diff-width') as HTMLInputElement | null;
@@ -378,39 +380,6 @@
     let rawH = 1080;
     let customFileBytes = 0;
 
-    function calculateTokens(width: number, height: number, provider: string): number {
-      if (provider === 'openai') {
-        const tilesW = Math.ceil(width / 512);
-        const tilesH = Math.ceil(height / 512);
-        return 85 + (tilesW * tilesH * 170);
-      } else if (provider === 'anthropic' || provider === 'qwen') {
-        const patchesW = Math.ceil(width / 28);
-        const patchesH = Math.ceil(height / 28);
-        return patchesW * patchesH;
-      } else if (provider === 'gemini' || provider === 'gemma' || provider === 'gemini-low' || provider === 'gemma-low') {
-        const tileDim = (provider === 'gemini-low' || provider === 'gemma-low') ? 384 : 768;
-        const tilesW = Math.ceil(width / tileDim);
-        const tilesH = Math.ceil(height / tileDim);
-        return tilesW * tilesH * 258;
-      } else if (provider === 'llama') {
-        const tilesW = Math.ceil(width / 560);
-        const tilesH = Math.ceil(height / 560);
-        return tilesW * tilesH * 324;
-      } else if (provider === 'mistral') {
-        const patchesW = Math.ceil(width / 16);
-        const patchesH = Math.ceil(height / 16);
-        return patchesW * patchesH;
-      } else if (provider === 'deepseek') {
-        const tilesW = Math.ceil(width / 384);
-        const tilesH = Math.ceil(height / 384);
-        return tilesW * tilesH * 576;
-      } else {
-        const patchesW = Math.ceil(width / 28);
-        const patchesH = Math.ceil(height / 28);
-        return patchesW * patchesH;
-      }
-    }
-
     function update() {
       if (!providerSelect || !diffWidthInput || !diffHeightInput) return;
       const provider = providerSelect.value;
@@ -423,12 +392,11 @@
       const paddedW = diffW + 64;
       const paddedH = diffH + 64;
 
-      let maxTile = 504;
-      if (provider === 'openai' || provider === 'mistral') maxTile = 512;
-      else if (provider === 'gemini' || provider === 'gemma') maxTile = 768;
-      else if (provider === 'gemini-low' || provider === 'gemma-low' || provider === 'deepseek') maxTile = 384;
-      else if (provider === 'llama') maxTile = 560;
-      else if (provider === 'local') maxTile = 448;
+      // 'gemma-low' is the only <select> value that maps onto a different library provider.
+      const lowTokenMode = provider === 'gemma-low';
+      const libProvider = (lowTokenMode ? 'gemma' : provider) as TargetProvider;
+
+      const maxTile = getProviderDimensions(libProvider, lowTokenMode).maxWidth;
 
       let optW = paddedW;
       let optH = paddedH;
@@ -438,8 +406,8 @@
         optH = Math.round(optH * ratio);
       }
 
-      const rawTokens = calculateTokens(rawW, rawH, provider);
-      const optTokens = calculateTokens(optW, optH, provider);
+      const rawTokens = estimateVisionTokens(rawW, rawH, libProvider, lowTokenMode);
+      const optTokens = estimateVisionTokens(optW, optH, libProvider, lowTokenMode);
       const tokenSaved = Math.max(0, Math.round(((rawTokens - optTokens) / rawTokens) * 1000) / 10);
 
       const rawKb = customFileBytes > 0

@@ -4,6 +4,10 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const site = process.env.SITE_URL || 'https://zerovisual.hotcode.dev/';
 const base = process.env.DOCS_BASE_PATH || (process.env.GITHUB_PAGES ? '/zerovisual' : '/');
@@ -20,6 +24,15 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		server: {
+			// Allow the dev server to resolve the cross-package import
+			// (../../../src/core/provider-math.ts) from the docs-site
+			// TokenCalculator. The build does not need this; it is the
+			// authoritative check.
+			fs: {
+				allow: [path.resolve(__dirname, '..')],
+			},
+		},
 	},
 	site,
 	base,

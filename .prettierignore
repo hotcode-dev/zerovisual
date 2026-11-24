@@ -2,6 +2,9 @@
 # `web/` is a separate private package (own package.json / lockfile / Astro
 # toolchain) with hand-authored docs content — keep it out of the gate.
 web/
+# GitHub issue templates have their own quote style; exclude to avoid
+# drive-by reformatting in task-scoped diffs.
+.github/
 # Lockfiles and build/coverage output.
 package-lock.json
 dist/
