@@ -1,7 +1,7 @@
-name: "🐛 Bug Report (Zero Factory)"
+name: '🐛 Bug Report (Zero Factory)'
 description: Report a bug for Zero Factory AI to investigate, triage, and fix.
-title: "[Bug]: "
-labels: ["bug", "zerofactory"]
+title: '[Bug]: '
+labels: ['bug', 'zerofactory']
 body:
   - type: markdown
     attributes:
@@ -45,5 +45,5 @@ body:
       label: Zero Factory AI Investigation
       description: Explicit human request for AI assistance.
       options:
-        - label: "Request Zero Factory AI to investigate, reproduce, and prepare triage task"
+        - label: 'Request Zero Factory AI to investigate, reproduce, and prepare triage task'
           required: false

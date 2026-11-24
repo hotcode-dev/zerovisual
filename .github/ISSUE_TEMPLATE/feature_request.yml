@@ -1,7 +1,7 @@
-name: "🚀 Feature Request (Zero Factory)"
+name: '🚀 Feature Request (Zero Factory)'
 description: Propose a new feature for Zero Factory AI to investigate and implement.
-title: "[Feature]: "
-labels: ["feature", "zerofactory"]
+title: '[Feature]: '
+labels: ['feature', 'zerofactory']
 body:
   - type: markdown
     attributes:
@@ -42,5 +42,5 @@ body:
       label: Zero Factory AI Investigation
       description: Explicit human request for AI assistance.
       options:
-        - label: "Request Zero Factory AI to investigate, plan architecture, and prepare triage task"
+        - label: 'Request Zero Factory AI to investigate, plan architecture, and prepare triage task'
           required: false
