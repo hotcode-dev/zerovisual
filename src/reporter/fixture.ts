@@ -1,10 +1,6 @@
 import { test as base, type Page, type TestInfo, type Locator } from '@playwright/test';
 import { captureDomContext, type DomContextResult } from '../core/dom-extractor.js';
 
-export interface ZeroVisualFixtureOptions {
-  autoCaptureAom?: boolean;
-}
-
 /**
  * Custom Playwright test runner pre-configured with the ZeroVisual Real-Context auto-fixture.
  * Automatically captures authentic AOM ariaSnapshots, computed styles, and heuristic violations
@@ -19,19 +15,7 @@ export const test = base.extend<{ zerovisual: void }>({
       // If test failed or timed out, capture authentic DOM context while page is still open
       const isFailed = testInfo.status !== 'passed' && testInfo.status !== 'skipped';
       if (isFailed && page && !page.isClosed()) {
-        try {
-          const context = await captureDomContext(page, 'body', {
-            isMobileViewport: (testInfo.project?.use as any)?.isMobile ?? false
-          });
-
-          testInfo.attachments.push({
-            name: 'zerovisual-context.json',
-            contentType: 'application/json',
-            body: Buffer.from(JSON.stringify(context, null, 2))
-          });
-        } catch {
-          // Graceful fallback if page was already destroyed
-        }
+        await attachZeroVisualContext(page, testInfo, 'body');
       }
     },
     { auto: true }
