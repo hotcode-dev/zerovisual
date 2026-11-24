@@ -9,7 +9,12 @@ import {
   type ViewportArtifact,
   type TriagePayload
 } from '../../core/schema.js';
-import { detectDiffBoundingBox, optimizeImageForProvider, getProviderDimensions } from '../../core/image-optimizer.js';
+import {
+  detectDiffBoundingBox,
+  optimizeImageForProvider,
+  optimizeAndWriteCompanionImage,
+  getProviderDimensions
+} from '../../core/image-optimizer.js';
 
 export interface RegressionOptions {
   inputDir?: string;
@@ -151,28 +156,32 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
     let actualImagePath: string | undefined;
     const actualPath = path.join(dir, `${baseName}-actual.png`);
     if (fs.existsSync(actualPath)) {
-      const opt = await optimizeImageForProvider(fs.readFileSync(actualPath), {
+      const companion = await optimizeAndWriteCompanionImage(fs.readFileSync(actualPath), {
+        artifactsDir,
+        baseName: `${testId}-${safeProject}`,
+        suffix: 'actual',
         provider,
         lowTokenMode,
         cropBox: diffDetection.boundingBox
       });
-      actualBase64 = opt.dataUri;
-      actualImagePath = path.join(artifactsDir, `${testId}-${safeProject}-actual.webp`);
-      fs.writeFileSync(actualImagePath, opt.buffer);
+      actualBase64 = companion.dataUri;
+      actualImagePath = companion.imagePath;
     }
 
     let expectedBase64: string | undefined;
     let expectedImagePath: string | undefined;
     const expectedPath = path.join(dir, `${baseName}-expected.png`);
     if (fs.existsSync(expectedPath)) {
-      const opt = await optimizeImageForProvider(fs.readFileSync(expectedPath), {
+      const companion = await optimizeAndWriteCompanionImage(fs.readFileSync(expectedPath), {
+        artifactsDir,
+        baseName: `${testId}-${safeProject}`,
+        suffix: 'expected',
         provider,
         lowTokenMode,
         cropBox: diffDetection.boundingBox
       });
-      expectedBase64 = opt.dataUri;
-      expectedImagePath = path.join(artifactsDir, `${testId}-${safeProject}-expected.webp`);
-      fs.writeFileSync(expectedImagePath, opt.buffer);
+      expectedBase64 = companion.dataUri;
+      expectedImagePath = companion.imagePath;
     }
 
     const viewportArtifact: ViewportArtifact = {

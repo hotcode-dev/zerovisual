@@ -1,9 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import sharp from 'sharp';
 import {
   getProviderDimensions,
   detectDiffBoundingBox,
-  optimizeImageForProvider
+  optimizeImageForProvider,
+  optimizeAndWriteCompanionImage
 } from '../../src/core/image-optimizer.js';
 
 describe('Model-Aware Image Optimizer', () => {
@@ -225,6 +229,97 @@ describe('Model-Aware Image Optimizer', () => {
 
       expect(result.width).toBe(200);
       expect(result.height).toBe(150);
+    });
+  });
+
+  describe('optimizeAndWriteCompanionImage', () => {
+    let artifactsDir: string;
+
+    beforeEach(() => {
+      artifactsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zv-companion-'));
+    });
+
+    afterEach(() => {
+      fs.rmSync(artifactsDir, { recursive: true, force: true });
+    });
+
+    it('should write `${baseName}-actual.webp` to artifactsDir and return its dataUri', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 800,
+          height: 600,
+          channels: 4,
+          background: { r: 20, g: 40, b: 60, alpha: 1 }
+        }
+      })
+        .png()
+        .toBuffer();
+
+      const result = await optimizeAndWriteCompanionImage(imageBuffer, {
+        artifactsDir,
+        baseName: 'test1-myproject',
+        suffix: 'actual',
+        provider: 'openai'
+      });
+
+      const expectedPath = path.join(artifactsDir, 'test1-myproject-actual.webp');
+      expect(result.imagePath).toBe(expectedPath);
+      expect(result.dataUri).toMatch(/^data:image\/webp;base64,/);
+      expect(fs.existsSync(expectedPath)).toBe(true);
+
+      const onDisk = fs.readFileSync(expectedPath);
+      expect(onDisk.length).toBeGreaterThan(0);
+      expect(result.dataUri).toBe(`data:image/webp;base64,${onDisk.toString('base64')}`);
+    });
+
+    it('should name the expected-suffix artifact `${baseName}-expected.webp`', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 300,
+          height: 300,
+          channels: 4,
+          background: { r: 1, g: 2, b: 3, alpha: 1 }
+        }
+      })
+        .png()
+        .toBuffer();
+
+      const result = await optimizeAndWriteCompanionImage(imageBuffer, {
+        artifactsDir,
+        baseName: 'test2-myproject',
+        suffix: 'expected',
+        provider: 'anthropic'
+      });
+
+      const expectedPath = path.join(artifactsDir, 'test2-myproject-expected.webp');
+      expect(result.imagePath).toBe(expectedPath);
+      expect(fs.existsSync(expectedPath)).toBe(true);
+      expect(result.dataUri).toMatch(/^data:image\/webp;base64,/);
+    });
+
+    it('should apply cropBox when passed through the helper', async () => {
+      const imageBuffer = await sharp({
+        create: {
+          width: 800,
+          height: 600,
+          channels: 4,
+          background: { r: 100, g: 100, b: 100, alpha: 1 }
+        }
+      })
+        .png()
+        .toBuffer();
+
+      await optimizeAndWriteCompanionImage(imageBuffer, {
+        artifactsDir,
+        baseName: 'test3-myproject',
+        suffix: 'actual',
+        provider: 'openai',
+        cropBox: { x: 10, y: 20, width: 200, height: 150 }
+      });
+
+      const meta = await sharp(path.join(artifactsDir, 'test3-myproject-actual.webp')).metadata();
+      expect(meta.width).toBe(200);
+      expect(meta.height).toBe(150);
     });
   });
 });

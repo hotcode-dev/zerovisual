@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import sharp from 'sharp';
 import type { TargetProvider, TileDimensions, BoundingBox } from './schema.js';
 
@@ -211,6 +213,28 @@ export async function optimizeImageForProvider(
     provider,
     tileDimensions: tileDims
   };
+}
+
+export interface CompanionImageOptions extends OptimizeImageOptions {
+  artifactsDir: string;
+  /** The `${testId}-${safeProject}` prefix used to name the artifact. */
+  baseName: string;
+  suffix: 'actual' | 'expected';
+}
+
+/**
+ * Shared companion-image (actual/expected) pipeline: optimizes the source
+ * buffer and writes the WebP artifact to `${baseName}-${suffix}.webp`
+ * under `artifactsDir`.
+ */
+export async function optimizeAndWriteCompanionImage(
+  source: Buffer,
+  opts: CompanionImageOptions
+): Promise<{ dataUri: string; imagePath: string }> {
+  const optimized = await optimizeImageForProvider(source, opts);
+  const imagePath = path.join(opts.artifactsDir, `${opts.baseName}-${opts.suffix}.webp`);
+  fs.writeFileSync(imagePath, optimized.buffer);
+  return { dataUri: optimized.dataUri, imagePath };
 }
 
 /**
