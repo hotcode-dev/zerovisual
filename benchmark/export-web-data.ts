@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
+import { classifyProvider } from './provider.js';
 
-function getBenchmarkProvider():
-  'qwen' | 'gemini' | 'openai' | 'anthropic' | 'llama' | 'mistral' | 'deepseek' | 'local' {
+function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
   const envPath = path.resolve(process.cwd(), 'benchmark/.env');
   let model = 'RadixArk/Qwen3.8-27B-NVFP4';
   if (fs.existsSync(envPath)) {
@@ -15,9 +15,7 @@ function getBenchmarkProvider():
       if (k?.trim() === 'AGENT_MODEL') model = v.join('=').trim();
     }
   }
-  if (model.toLowerCase().includes('qwen')) return 'qwen';
-  if (model.toLowerCase().includes('gemma') || model.toLowerCase().includes('gemini')) return 'gemini';
-  return 'local';
+  return classifyProvider(model);
 }
 
 function calculateVisionTokens(width: number, height: number): number {
