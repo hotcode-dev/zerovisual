@@ -2,11 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
 import { TargetProviderSchema, type TargetProvider } from '../../core/schema.js';
-import {
-  optimizeImageStandalone,
-  type ImageOptimizationStats,
-  type OptimizedImageResult
-} from '../../core/image-optimizer.js';
+import { optimizeImageStandalone, type ImageOptimizationStats } from '../../core/image-optimizer.js';
 
 export interface OptimizeOptions {
   input: string;

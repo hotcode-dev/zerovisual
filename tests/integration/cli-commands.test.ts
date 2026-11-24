@@ -123,7 +123,7 @@ describe('ZeroVisual CLI Commands Integration', () => {
       // Mock Page
       const mockPage = {
         goto: async () => {},
-        evaluate: async (fn: any, args: any) => {
+        evaluate: async (_fn: any, args: any) => {
           // If captureDomContext (has selector property)
           if (args?.selector !== undefined) {
             return {
