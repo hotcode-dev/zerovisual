@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../dist/index.js';
+import { classifyProvider } from './provider.js';
 
 interface GroundTruth {
   defect: string;
@@ -66,7 +67,7 @@ function loadEnv(): { baseUrl: string; model: string; apiKey?: string } {
   }
 
   // Gemma/Gemini models route through Google AI Studio's OpenAI-compatible endpoint.
-  if (/gemma|gemini/i.test(model) && aiStudioKey) {
+  if (classifyProvider(model) === 'gemini' && aiStudioKey) {
     baseUrl = 'https://generativelanguage.googleapis.com/v1beta/openai';
     apiKey = aiStudioKey;
   }
@@ -390,11 +391,7 @@ Identify:
     const diffResult = await detectDiffBoundingBox(diffPng, { padding: 32 });
 
     // Determine target provider based on model architecture
-    const targetProvider = model.toLowerCase().includes('gemma')
-      ? 'gemini'
-      : model.toLowerCase().includes('qwen')
-        ? 'qwen'
-        : 'local';
+    const targetProvider = classifyProvider(model);
 
     // Optimize image for target provider
     const optResult = await optimizeImageForProvider(actualPng, {
