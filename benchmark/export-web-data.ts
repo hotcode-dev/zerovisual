@@ -2,19 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
-import { classifyProvider } from './provider.js';
+import { classifyProvider, readBenchmarkEnv } from './provider.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
-  const envPath = path.resolve(process.cwd(), 'benchmark/.env');
-  let model = 'RadixArk/Qwen3.8-27B-NVFP4';
-  if (fs.existsSync(envPath)) {
-    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
-    for (const line of lines) {
-      const cleanLine = line.trim().split('#')[0]!.trim();
-      const [k, ...v] = cleanLine.split('=');
-      if (k?.trim() === 'AGENT_MODEL') model = v.join('=').trim();
-    }
-  }
+  const model = readBenchmarkEnv().AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
   return classifyProvider(model);
 }
 

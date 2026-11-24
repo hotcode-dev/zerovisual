@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../dist/index.js';
-import { classifyProvider } from './provider.js';
+import { classifyProvider, readBenchmarkEnv } from './provider.js';
 
 interface GroundTruth {
   defect: string;
@@ -45,26 +45,11 @@ interface BenchmarkRunResult {
 
 // Load .env
 function loadEnv(): { baseUrl: string; model: string; apiKey?: string } {
-  const envPath = path.resolve(process.cwd(), 'benchmark/.env');
-  let baseUrl = 'https://spark.ntsd.dev:8001/v1';
-  let model = 'RadixArk/Qwen3.8-27B-NVFP4';
-  let apiKey: string | undefined;
-  let aiStudioKey: string | undefined;
-
-  if (fs.existsSync(envPath)) {
-    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const cleanLine = trimmed.split('#')[0]!.trim();
-      const [k, ...v] = cleanLine.split('=');
-      const val = v.join('=').trim();
-      if (k?.trim() === 'OPENAI_BASE_URL') baseUrl = val;
-      if (k?.trim() === 'AGENT_MODEL') model = val;
-      if (k?.trim() === 'OPENAI_API_KEY') apiKey = val;
-      if (k?.trim() === 'AI_STUDIO_API_KEY') aiStudioKey = val;
-    }
-  }
+  const env = readBenchmarkEnv();
+  let baseUrl = env.OPENAI_BASE_URL ?? 'https://spark.ntsd.dev:8001/v1';
+  const model = env.AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
+  let apiKey: string | undefined = env.OPENAI_API_KEY;
+  const aiStudioKey: string | undefined = env.AI_STUDIO_API_KEY;
 
   // Gemma/Gemini models route through Google AI Studio's OpenAI-compatible endpoint.
   if (classifyProvider(model) === 'gemini' && aiStudioKey) {
