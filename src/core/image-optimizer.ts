@@ -32,6 +32,48 @@ export interface OptimizedImageResult {
 }
 
 /**
+ * Single source of truth for per-provider tile/patch sizes and token costs.
+ * tileWidth/tileHeight drive getProviderDimensions; patchSize/tokensPerPatch
+ * (plus baseTokens) drive estimateVisionTokens. Providers that shrink their
+ * tiles in lowTokenMode set lowTokenTileWidth/lowTokenTileHeight.
+ */
+interface ProviderSpec {
+  tileWidth: number;
+  tileHeight: number;
+  lowTokenTileWidth?: number;
+  lowTokenTileHeight?: number;
+  patchSize: number;
+  tokensPerPatch: number;
+  baseTokens?: number;
+}
+
+export const PROVIDER_SPECS: Record<TargetProvider, ProviderSpec> = {
+  openai: { tileWidth: 512, tileHeight: 512, patchSize: 512, tokensPerPatch: 170, baseTokens: 85 },
+  anthropic: { tileWidth: 504, tileHeight: 504, patchSize: 28, tokensPerPatch: 1 },
+  qwen: { tileWidth: 504, tileHeight: 504, patchSize: 28, tokensPerPatch: 1 },
+  gemini: {
+    tileWidth: 768,
+    tileHeight: 768,
+    lowTokenTileWidth: 384,
+    lowTokenTileHeight: 384,
+    patchSize: 768,
+    tokensPerPatch: 258
+  },
+  gemma: {
+    tileWidth: 768,
+    tileHeight: 768,
+    lowTokenTileWidth: 384,
+    lowTokenTileHeight: 384,
+    patchSize: 768,
+    tokensPerPatch: 258
+  },
+  llama: { tileWidth: 560, tileHeight: 560, patchSize: 560, tokensPerPatch: 324 },
+  mistral: { tileWidth: 512, tileHeight: 512, patchSize: 16, tokensPerPatch: 1 },
+  deepseek: { tileWidth: 384, tileHeight: 384, patchSize: 384, tokensPerPatch: 576 },
+  local: { tileWidth: 448, tileHeight: 448, patchSize: 28, tokensPerPatch: 1 }
+};
+
+/**
  * Returns model-aware maximum bounding-box tile dimensions.
  */
 export function getProviderDimensions(
@@ -39,26 +81,14 @@ export function getProviderDimensions(
   lowTokenMode = false,
   custom?: TileDimensions
 ): TileDimensions {
-  switch (provider) {
-    case 'openai':
-      return { maxWidth: 512, maxHeight: 512 };
-    case 'anthropic':
-    case 'qwen':
-      return { maxWidth: 504, maxHeight: 504 };
-    case 'gemini':
-    case 'gemma':
-      return lowTokenMode ? { maxWidth: 384, maxHeight: 384 } : { maxWidth: 768, maxHeight: 768 };
-    case 'llama':
-      return { maxWidth: 560, maxHeight: 560 };
-    case 'mistral':
-      return { maxWidth: 512, maxHeight: 512 };
-    case 'deepseek':
-      return { maxWidth: 384, maxHeight: 384 };
-    case 'local':
-      return custom ?? { maxWidth: 448, maxHeight: 448 };
-    default:
-      return { maxWidth: 512, maxHeight: 512 };
+  const spec = PROVIDER_SPECS[provider];
+  if (provider === 'local') {
+    return custom ?? { maxWidth: spec.tileWidth, maxHeight: spec.tileHeight };
   }
+  if (lowTokenMode && spec.lowTokenTileWidth != null) {
+    return { maxWidth: spec.lowTokenTileWidth, maxHeight: spec.lowTokenTileHeight! };
+  }
+  return { maxWidth: spec.tileWidth, maxHeight: spec.tileHeight };
 }
 
 /**
@@ -224,47 +254,11 @@ export function estimateVisionTokens(
 ): number {
   if (width <= 0 || height <= 0) return 0;
 
-  if (provider === 'openai') {
-    const tilesW = Math.ceil(width / 512);
-    const tilesH = Math.ceil(height / 512);
-    return 85 + tilesW * tilesH * 170;
-  }
-
-  if (provider === 'anthropic' || provider === 'qwen') {
-    const patchesW = Math.ceil(width / 28);
-    const patchesH = Math.ceil(height / 28);
-    return patchesW * patchesH;
-  }
-
-  if (provider === 'gemini' || provider === 'gemma') {
-    const tileDim = lowTokenMode ? 384 : 768;
-    const tilesW = Math.ceil(width / tileDim);
-    const tilesH = Math.ceil(height / tileDim);
-    return tilesW * tilesH * 258;
-  }
-
-  if (provider === 'llama') {
-    const tilesW = Math.ceil(width / 560);
-    const tilesH = Math.ceil(height / 560);
-    return tilesW * tilesH * 324;
-  }
-
-  if (provider === 'mistral') {
-    const patchesW = Math.ceil(width / 16);
-    const patchesH = Math.ceil(height / 16);
-    return patchesW * patchesH;
-  }
-
-  if (provider === 'deepseek') {
-    const tilesW = Math.ceil(width / 384);
-    const tilesH = Math.ceil(height / 384);
-    return tilesW * tilesH * 576;
-  }
-
-  // Local / default
-  const patchesW = Math.ceil(width / 28);
-  const patchesH = Math.ceil(height / 28);
-  return patchesW * patchesH;
+  const spec = PROVIDER_SPECS[provider];
+  const patchSize = lowTokenMode && spec.lowTokenTileWidth != null ? spec.lowTokenTileWidth : spec.patchSize;
+  const tilesW = Math.ceil(width / patchSize);
+  const tilesH = Math.ceil(height / patchSize);
+  return (spec.baseTokens ?? 0) + tilesW * tilesH * spec.tokensPerPatch;
 }
 
 export interface ImageOptimizationStats {
