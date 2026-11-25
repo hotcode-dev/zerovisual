@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture.md": {
+      "pageVersion": "sha256:8a2d340dd132cb6cf791f004baaee089df0a0c112d4dbeed177b6a7987b44b62",
+      "completedBy": "hermes",
+      "completedRunId": "23809355-0e36-4085-abe6-c9e7f5fa29fd",
+      "gitHead": "ed2e93f1c6096c0a572f34200b44efac5cef6260",
+      "sourceFingerprint": "sha256:15db8f1743d7abb0bf127dad139de58297dfa10890ab9c0c24ed44d88e6a7e5c"
+    },
+    "/openwiki/operations.md": {
+      "pageVersion": "sha256:1bd2286a733644606cc59597071f60a58298d7923ea02f9ad4d8fc537fd72bd7",
+      "completedBy": "hermes",
+      "completedRunId": "23809355-0e36-4085-abe6-c9e7f5fa29fd",
+      "gitHead": "ed2e93f1c6096c0a572f34200b44efac5cef6260",
+      "sourceFingerprint": "sha256:15db8f1743d7abb0bf127dad139de58297dfa10890ab9c0c24ed44d88e6a7e5c"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:3bd11319d468edd527c325d525368d6913183903e7d165469ae3514c09bf36f9",
+      "completedBy": "hermes",
+      "completedRunId": "23809355-0e36-4085-abe6-c9e7f5fa29fd",
+      "gitHead": "ed2e93f1c6096c0a572f34200b44efac5cef6260",
+      "sourceFingerprint": "sha256:15db8f1743d7abb0bf127dad139de58297dfa10890ab9c0c24ed44d88e6a7e5c"
+    }
+  }
+}

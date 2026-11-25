@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8a2d340dd132cb6cf791f004baaee089df0a0c112d4dbeed177b6a7987b44b62",
+  "claims": [
+    {
+      "id": "claim_20662bd1cc9d46b0a760bb49dca9451e",
+      "statement": "The CLI is a citty app whose root command registers four subcommands (regression, design-qa, optimize, estimate); both package.json bins point at dist/cli/index.js, and when the entry script is the zerovisual-optimize bin, runMain executes optimizeCommand directly without the subcommand layer.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L16-L19",
+          "version": "repo-lines-v1:sha256:955a6b7451705b30f39a2a92f646448d17c1a314644b7eccd633749e77a5220a:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjZjMTQ3NTdiOGUxZTlkNmE3ZGVlOTkwMmU5MDQwN2FkOGNmNjczYjNlOGQ3NjNlMjc5NTBkMTlkMDY3OGQ2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzE0NGM0MjNmNWQ0MDA5ODZiNjMxYzgxMDU5NDlkYjVjOWJlOTEyMmY5NmY1OGViYjE0ZTJhOTZjMmRlNWMxYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjEyMThmM2ZjZTQwYmVlOGYxYTI0MTZmOGJkY2U1ZmJjNzRiZWFiZmRkODg0Y2U3MTFiZWIzMTQ1OWZiNjgyNCJ9"
+        },
+        {
+          "resource": "repo://src/cli/index.ts#L1-L26",
+          "version": "repo-lines-v1:sha256:791413f179a5c9057d45b4bcd197de2e807818af79446273880c7a939134137a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2OGJmYjhmYmVmMDhlYmRhMmRjNzNlNTYzZDIyZDgyZDBiNTJjYTgyZWE3YTgwZWI3YmIzOGE0ZTgzMjM4ZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_88ea6dc9f95943cd80ad0814085a99e2",
+      "statement": "The regression command recursively discovers *-diff.png/diff.png files under the input dir, crops each to the detected diff bounding box with configurable padding (default 32px), resizes to the target provider's tile grid as WebP under <output>/artifacts/, and groups all viewports of one inferred testId into a single FailureEntry before writing a zod-validated triage-ready.json.",
+      "evidence": [
+        {
+          "resource": "repo://src/cli/commands/regression.ts#L89-L235",
+          "version": "repo-lines-v1:sha256:4cbbbc61e905486e3788093faf7815c4ad42c8e29f77c81d04270198234c09df:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzNTRjOGVjMzc0NWM4MDNjZDg3MzY2OWMxNjE5YTBjZGJmMTkyZGRhYzcxZTBhYjI1MmU1YTFmNmUyNDI3M2Q5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxYjU0ZWY5Nzg0ODg1ZWU5YTU4NDMyYzMyNDBmMmE3NDAwZTUxMWM4Y2M1ZjczYmE4N2VhNjAwY2Y4YjdiZGEyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlMzUzNjFiZDIxODJkZDk4NWRjYTBkMmZmODg3ODY1NDQxODM3YmQ1MTFmYWY2ZWRiNjFmMDU2ZDg2MTQ4NDFkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2YTFhMmIzYWYyMmY1Zjg4OWY0MDg4NThmOWE0OTA5MjRkYTA1OTk0OWQxNDVlYWUxOTc4MmQyZTM5NjY4ZjczIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d26b534720249398f9780f7cba5f12d",
+      "statement": "The standalone regression CLI has no live page, so its viewport artifacts use a synthesized placeholder ariaSnapshot and computedStyles { display: 'block' } instead of real DOM context.",
+      "evidence": [
+        {
+          "resource": "repo://src/cli/commands/regression.ts#L187-L207",
+          "version": "repo-lines-v1:sha256:e30b897859f3c2eac7458f57171733eef4c8f82dc71eb80ac782ea8d094bd607:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmMDNiMTIxZGE4Yzg5YzBjNzgwMGQxYWExYmRjYWUzNjUxZjI1YzU0OGJjYmZhMjlkMWU5ZWU4MjYzZmRkYmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlMGQzN2VkZTkxMzYyM2Q0ZjA5OGNjYTgyMjMxY2I4N2NlNGY2OTgxM2FmMzI1YTUzNmNiNzE4N2FmNmRlZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0ODE1ZDNkZjQ1ZmY4ZGJiN2IyODZkN2RmOTYxOWVlMjc1YTNmMTdjODUwYjllY2FhNDdiNTNhNWRkYzc3MzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_db843f799bc2486db0ec6c872f3ab5f1",
+      "statement": "The design-qa command audits a required --url at two fixed viewports (Desktop 1440x900, Mobile 390x844), optionally diffs against DESIGN.md and Penpot tokens, and writes a single-FailureEntry design-qa-ready.json with all heuristic violations aggregated in designContext.",
+      "evidence": [
+        {
+          "resource": "repo://src/cli/commands/design-qa.ts#L39-L244",
+          "version": "repo-lines-v1:sha256:599734d51b3ab635071b30a6611a3b735e2b636814c56897b44d8d3c1becba95:eyJzZWxlY3RlZExpbmVDb3VudCI6MjA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmYjc4OThjMDNmOGFlZjcyYWZiYjM0ODgxMGIwMDc5ZWJiNzlmOGY4MTU5MmQ3MTZhNTQzM2M4ZDY3YTU0MTVkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxYjU0ZWY5Nzg0ODg1ZWU5YTU4NDMyYzMyNDBmMmE3NDAwZTUxMWM4Y2M1ZjczYmE4N2VhNjAwY2Y4YjdiZGEyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3YmFlZDJjMDRmMzY3OGJjZjk0ZGVjNWI0ZGRmM2E5YmUwZjgxN2NhYjViNDcwZDc4MjllY2RmMjA4Zjc1YmI1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4Y2E1ODJhM2QzNTk4YjMxNGI2ODk3MjBhNmI4MjIyNjY1ZWYxZTkxZGE3ZGIwZGU0MWVhNjUwYzk2NWU5MDMwIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b1c0ac8e4c84c95b5b063eaef019db7",
+      "statement": "ZeroVisualReporter.onTestEnd enforces the Zero-Token Law: passing tests return immediately, and failing tests without a *-diff.png/diff.png attachment (inline body or on-disk path) are skipped entirely.",
+      "evidence": [
+        {
+          "resource": "repo://src/reporter/playwright-reporter.ts#L36-L60",
+          "version": "repo-lines-v1:sha256:fff88321921f613b049e129bad25ece31c30b604e8f06d619f5c594e395a95f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZTkxNGJmZTY1NzMyYTI2OGE3Mjc5YjJjYzM2NzY5NzBjN2M1YzFjMjE5MmRhNTE3Y2Y1ZTIwNDVjNzMyM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiOGMwMjJkZGU3OTQ1NDE2OGM0Zjk1MjRiMmYxMjY5Yzc0ZDhjMjZlOGU2OTRmNDBkNGYyYzAwM2RhNTY3MTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4Yjg0MGY1MDgyNjE1NDIyZTQwZDk5ODVkODEzNTIxN2VhMTgxOWRkZjE4Y2E5ZjU1OWNiY2M3NTVmYzM0MjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ced014ed7a8496ea8beb1c947b9c43f",
+      "statement": "The reporter parses an optional zerovisual-context.json attachment for real ariaSnapshot, computedStyles, selector, and heuristicViolations (silent placeholder fallback), groups failures across projects by normalizeTestId(titlePath) into one FailureEntry per test, and in onEnd validates the full payload against TriagePayloadSchema before writing triage-ready.json.",
+      "evidence": [
+        {
+          "resource": "repo://src/reporter/playwright-reporter.ts#L139-L240",
+          "version": "repo-lines-v1:sha256:3c7153c7aa6bc9bd68170f46b19028392dd406dbb13014b91d4c8a79b8c62343:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxZmNhNzYzNThlOWQ2ZWU0ODZjNmY5YjY0NzllODY3OTNhYjFmMzgzNDg1OTczZDRhMjc1ODM3YzAzZmNiZDU3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIwNGI5YTBiMTZiOTkxMGJhYTVkMGE0ZGNhZmY4YTYwYzQyOTYzM2JmMmFlM2NiYWNjODIwMjkwNzU4MGQxMGNhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkY2Q3ZDE1MGVkZDYxYzE2OWZiMDEyN2RiYWFiMDc4MTFjMGI5MGZkMDliZmYwZmU5MDRlODNjYjFjNjNjMTk4In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_80c1527536fa4af9946998789bbe636d",
+      "statement": "The zerovisual test fixture extends Playwright's test with an auto fixture that, after the test body, captures DOM context via captureDomContext and attaches zerovisual-context.json only when the test failed or timed out and the page is still open; attachZeroVisualContext accepts a selector string or Locator and returns null on any capture error instead of throwing.",
+      "evidence": [
+        {
+          "resource": "repo://src/reporter/fixture.ts#L9-L55",
+          "version": "repo-lines-v1:sha256:2bd3093e4346101addc8811cdc224e27df16db5f03334ff5bfdf323b69db4f5f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzYjQ3OGM3YzZjNjMzMmU2ODVmY2Y1YzhkOTMwYTk2N2ZjM2JiZWZiYTE1Y2Y4ZmZhOTIxMGVmZGMyZGM5MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzNmE2MzE3OWQ0MTA2MjEyZTcyMTllZDc0ZmFhMjA2NjFmYWM5ZWRiMDc4Y2RmY2RiMDk0YTVlMmRiNjIwMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwOTJkZjY5MDgzMGE3Y2Y0MzI4Y2U2ZjJjNTkzYjQ2M2ZlMWUyNzBlODRhZGE3ZWQyMzdiZmRjZDUxODQ5MmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_be1044e008de41059a2f7d2922723967",
+      "statement": "PROVIDER_SPECS in provider-math.ts is the single source of truth for per-provider tile dimensions, patch sizes, and token costs; the module is intentionally dependency-free (no sharp, no fs) so the docs-site TokenCalculator can import it in the browser.",
+      "evidence": [
+        {
+          "resource": "repo://src/core/provider-math.ts#L1-L54",
+          "version": "repo-lines-v1:sha256:80bc3c85c1fb16f4ee54ac2d81ff016eb57d8130d0c5047f28c917b6d19fe3ff:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlZDQyZjBlNzMyMzFjY2FlYmUyMTc3ZTRhMjY4ZWM5YWM1YTNiMTU0NTIyZGFkNDAxNmJiOTkxNzg2NzVjYjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3MjdiMDk2ZmZhMmQxMzk2NDhmNTE2NTVlNjVlZTA3YmFkN2ZkMDZhYTNkOTg1MGRmNWY3Njk0ZGYyYThiN2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba54e0354e794b708c84f2b161a70ea0",
+      "statement": "optimizeImageForProvider crops to the provided bounding box (clamped inside source boundaries), resizes with fit:'inside' and withoutEnlargement:true (never upscales), and encodes to WebP at the specified quality (default 80), returning a Base64 data URI and raw buffer.",
+      "evidence": [
+        {
+          "resource": "repo://src/core/image-optimizer.ts#L150-L195",
+          "version": "repo-lines-v1:sha256:86835c7cacad624f40892d17ea52e0c56570e11e5ce8b2b8bf4d986e6f7deef0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmE2MTlhYjU0OTQ3ZDdlM2Q2NDFlZGUzYzZhZGI5Yzc3MDFjMDgzOTU3OWI1ZmVjYmY5Y2Q4NzIyOGVkN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI1MGMwYjNjOTBhZmJmYzk2MDE4OWEzZTg0YTc1NzEzN2E3ZjZlZjVmN2E0OTZiOTg0NDc4NjkzYzAwZTg3Y2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3NGMyMmQ2NjMxNGRjN2I1NWU4ZTE2ZjlmZTZhMTRlZGUzYTgyNmU3NjhmOGZlNjcwODRhNmExY2Q4NDFjYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a5321eeba9184dcfb610c0a7cf99abf3",
+      "statement": "All TriagePayload objects are validated via TriagePayloadSchema.parse() before being written to disk, ensuring schema compliance at every exit point (CLI regression, reporter onEnd, design-qa command).",
+      "evidence": [
+        {
+          "resource": "repo://src/cli/commands/regression.ts#L232-L232",
+          "version": "repo-lines-v1:sha256:ba94c4ff083d4daa0b7d6c077a697676977a3fe3337e7660a29f4f08bcce0222:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE5NGM0ZmYwODNkNGRhYTBiN2Q2YzA3N2E2OTc2NzY5NzdhM2ZlMzMzN2U3NjYwYTI5ZjRmMDhiY2NlMDIyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE5NGM0ZmYwODNkNGRhYTBiN2Q2YzA3N2E2OTc2NzY5NzdhM2ZlMzMzN2U3NjYwYTI5ZjRmMDhiY2NlMDIyMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGU5Njg0YTYwNjM4MGIxZTcxZTQwYzZmYjM1YWNjYjY3Zjc3MGE0YmQyZGI1MjI4ZjZiNjg5NDc4NWNmYzlmZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGVhOGNhOGU1MmZjYjc1MGM3MmIzYjc4NjNhYzI3MDNjZWVkN2ZhMjg3YWIwODlhZjMyZmQ4MDJmMTY3NGUyYiJ9"
+        },
+        {
+          "resource": "repo://src/core/schema.ts#L182-L190",
+          "version": "repo-lines-v1:sha256:1b6e42a4ccb0f14bf3062d326caee58b47d9f5d721ad510966edca23f96139c6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjVmYjc1NjQ2YzY2OGZjNjRmMzliMzRmM2Q0ZGFjNjJlMmRmMDk0ZjE0YjkyNWMwZDRjZjkxOWI1YTE5YzdmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTEyNmE3ZTVkYWUzNDQ2NTk0MWI3ZGQ5ZmFhOGMxOTIxMjkwMTkwNmQzZDBjZDhjNzQ1YjliYmUwNzA0NmU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjM1MDQ1MzdmYzdhYmM3MmI1NDYxNjAyYmQ4ZjVhYThkYTcwNWMzNDdjM2EzMzUzNThlYTM2YjBiMzFmOWJiYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjNkODNlMzczNjg4ZDJmMGFmOTIzNmE0OGEzZWQ3MmUxNzRiOGUzNTE2ZjFmNzNhMmI5OWQ4N2IzMWM5ZGQ5MSJ9"
+        },
+        {
+          "resource": "repo://src/reporter/playwright-reporter.ts#L233-L233",
+          "version": "repo-lines-v1:sha256:bf5dccba2b853d9c5ee692a0b4c0126797aacf0b75d8e9aa181abcd9840a07a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmY1ZGNjYmEyYjg1M2Q5YzVlZTY5MmEwYjRjMDEyNjc5N2FhY2YwYjc1ZDhlOWFhMTgxYWJjZDk4NDBhMDdhMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmY1ZGNjYmEyYjg1M2Q5YzVlZTY5MmEwYjRjMDEyNjc5N2FhY2YwYjc1ZDhlOWFhMTgxYWJjZDk4NDBhMDdhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmViMDQxZDNlNTA5ODFkYzM1YmNkOTMyMGVmMzkzYzFlNzU0ZTU4YzI2M2JmMGQ3YTkyNWEyN2Y5ZmE5ZWRlYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2E5OTMwMWQzYzc3MTEzZjEyOTk1OGVhNjYyYmZjZDNmNGJiNDI2OWYxZTIzZmQwMWE5MmE1MjAxMTY4NWJiOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2a84acefb95b4707b358988263ce55cd",
+      "statement": "HeuristicRuleSchema defines exactly 26 rule identifiers grouped into six categories (accessibility, layout, typography, ai-slop, render-integrity, design-system), and RULE_METADATA assigns each rule a fixed category, severity, a suggested /impeccable command, and impeccableAliases used for waiver matching.",
+      "evidence": [
+        {
+          "resource": "repo://src/core/heuristic-linter.ts#L18-L175",
+          "version": "repo-lines-v1:sha256:8b8f45fcb6fd01c749dcce49f567584d55877445bf891fa6f142a2388bbc2da4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTU4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MDJkMTllNzAxMzZiNjYxZjhiMDUxMjg5NWVlYzM4ZDYzYTA2ZmZmODBhM2Y0M2JjMGFhOWNlZjVjZDcwNGU0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhYTFkMWE2MzM5MDIyOWM3OTgzNDdlODNhMDQwNTQ0MWM5NDAwMDM1Mjg0YWQxNjhjMWJmNmNkZjFkNzBhMzcwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3OTdlMGY2ZjBmNWY2NTk5NTJlNmY3YzI3ODdhODg3OWUwNTg0NTM0YTc2MTAyNzQ3MDdjNTQzMmUwMGJkM2FjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwNzRjYTRhN2I1ZjE4NzI3NzMwM2UxYTU0NGU2YTlmMGU3ZTFhYTNlYjM0ZmE2MTE5YzMwYzU2YzliMjkxZWVkIn0"
+        },
+        {
+          "resource": "repo://src/core/schema.ts#L89-L117",
+          "version": "repo-lines-v1:sha256:11c66a6a8f0abc5a22406edf494111798d460f9a0755029f1fe3201b60efef18:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlY2ViMTNlNDMwMjVjNjFkYzU1NzY3ZjgxMDUzOTlmM2E5YWIyNjlmZGMyOTg1OGRjNTMwN2Q4YWM0Yzk3MGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhYmYwNjgwNDgyOWNlMmE3ZGNmNzliMmI2ZWQ2ZmU2NzUzNjczNGIxYzA4ODBlNGQ2NDE5M2ViNjM1ODYyN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkZTc5NTljNDE2NjY1MTNlYjRiZmVkMGJmZGE2ZDM2NzUyMWJlMDFmODY3NTQxOTZmNDQxZjI4ZGU1M2E2NDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjMzE0OTE0MjgxNmM4YmY3ZGUyM2JhOGY1NTU0NDQzOWQ0MDkyOGE4MDkzYzAwYTgwOWZiMzU4ZDA4YWZhZDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a5677dfa8e644515a9ab8b28adf71d7c",
+      "statement": "auditPageHeuristics selects up to 250 candidate elements in the browser, computes per-element slop/integrity signals, respects data-impeccable-ignore and data-zerovisual-ignore attributes, then runs per-element and page-level lint (FLAT_TYPE_HIERARCHY, DESIGN_SYSTEM_DRIFT) in Node; clusterViolationBoundingBoxes merges violation boxes within 96px, skips boxes covering >=90% of the viewport, and returns up to maxCrops (default 4) with 32px context padding.",
+      "evidence": [
+        {
+          "resource": "repo://src/core/dom-extractor.ts#L246-L573",
+          "version": "repo-lines-v1:sha256:c8d0c879620ff784a94b41e71054061b3f3a3c10dc34b446fc741dfee82d3f95:eyJzZWxlY3RlZExpbmVDb3VudCI6MzI4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxMThkMzRmZmZmYmFlNGE5YzI3MTM2ZTczOGEyNDExNDMwMzU2NGNhODJjYjI2NDEzYmYxYmFhODRlMjZiZTNjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmNzFkODhhYmJmYjI5OWYwZjFhODdlNTY0ODIzMmY4YTk2NjMxZjI5MWQ4ZGJiY2U5NmIwOWRjN2E5Mzk3MTA4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://src/core/heuristic-linter.ts#L1508-L1636",
+          "version": "repo-lines-v1:sha256:4860cc5ddb742494be3a0be9287968b61d7f5a060d40c1cb8a767a26bfd40150:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjZjRhN2I5ZTk3Zjc5MDAyYTU2OTkzOTQ5NzlkZDhkYTA5ZWYxMTRkYWEwMWYxZjExODA5MWY3ZTkwMDg2N2RhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3NjVjNGQ1YmJmZDYxNDFlOTVjNjViMDRhMDljZmUxNTBiYjc4ZWFlMmE4ZGQxYmI4YjdhZjE3OTcwZThhMWFkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-11-25T04:42:05.705Z"
+  }
+}
