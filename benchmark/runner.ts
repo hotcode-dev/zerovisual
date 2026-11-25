@@ -5,15 +5,7 @@ import { detectDiffBoundingBox, optimizeImageForProvider } from '../src/core/ima
 import { percentSavings } from '../src/core/provider-math.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 import { buildBenchmarkReport, type BenchmarkRunResult } from './report.js';
-
-interface GroundTruth {
-  defect: string;
-  affectedElement: string;
-  defectType: string;
-  rootCause: string;
-  suggestedFix: string;
-  expectedBoundingBox: { x: number; y: number; width: number; height: number };
-}
+import type { GroundTruth } from './types.js';
 
 interface CaseMetadata {
   id: string;

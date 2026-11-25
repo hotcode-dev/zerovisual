@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox } from '../src/core/image-optimizer.js';
+import type { GroundTruth } from './types.js';
 
 interface BenchmarkCaseConfig {
   id: string;
@@ -14,14 +15,7 @@ interface BenchmarkCaseConfig {
   injectCss?: string;
   baselineHtml?: string;
   actualHtml?: string;
-  groundTruth: {
-    defect: string;
-    affectedElement: string;
-    defectType: string;
-    rootCause: string;
-    suggestedFix: string;
-    expectedBoundingBox?: { x: number; y: number; width: number; height: number };
-  };
+  groundTruth: GroundTruth;
 }
 
 async function createPixelDiff(baselinePng: Buffer, actualPng: Buffer, outputPath: string) {
