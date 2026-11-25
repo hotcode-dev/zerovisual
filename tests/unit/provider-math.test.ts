@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { PROVIDER_SPECS, getProviderDimensions, estimateVisionTokens } from '../../src/core/provider-math.js';
+import {
+  PROVIDER_SPECS,
+  estimateVisionTokens,
+  fitToTile,
+  getProviderDimensions,
+  percentSavings
+} from '../../src/core/provider-math.js';
 
 describe('provider-math', () => {
   describe('PROVIDER_SPECS', () => {
@@ -104,6 +110,67 @@ describe('provider-math', () => {
 
     it('calculates local tokens: 56x56 = 4', () => {
       expect(estimateVisionTokens(56, 56, 'local')).toBe(4);
+    });
+  });
+
+  describe('fitToTile', () => {
+    it('keeps dimensions unchanged when they already fit the tile', () => {
+      expect(fitToTile(300, 200, { maxWidth: 504, maxHeight: 504 })).toEqual({
+        width: 300,
+        height: 200
+      });
+    });
+
+    it('scales both axes down to the tile bounding box', () => {
+      // 1984x1144 into anthropic's 504x504 tile -> scale = 504/1984
+      expect(fitToTile(1984, 1144, { maxWidth: 504, maxHeight: 504 })).toEqual({
+        width: 504,
+        height: 291
+      });
+    });
+
+    it('drives scale by the overflow axis only', () => {
+      expect(fitToTile(2000, 100, { maxWidth: 504, maxHeight: 504 })).toEqual({
+        width: 504,
+        height: 25
+      });
+    });
+
+    it('never enlarges an image smaller than the tile', () => {
+      expect(fitToTile(50, 40, { maxWidth: 504, maxHeight: 504 })).toEqual({
+        width: 50,
+        height: 40
+      });
+    });
+
+    it('clamps each axis to at least 1 pixel', () => {
+      expect(fitToTile(1000000, 1, { maxWidth: 504, maxHeight: 504 })).toEqual({
+        width: 504,
+        height: 1
+      });
+    });
+
+    it('honours non-square tiles via the tightest axis', () => {
+      expect(fitToTile(800, 600, { maxWidth: 800, maxHeight: 400 })).toEqual({
+        width: 533,
+        height: 400
+      });
+    });
+  });
+
+  describe('percentSavings', () => {
+    it('computes a one-decimal percentage reduction', () => {
+      expect(percentSavings(1000, 400)).toBe(60);
+      expect(percentSavings(2691, 198)).toBe(92.6);
+    });
+
+    it('clamps negative savings to 0', () => {
+      expect(percentSavings(100, 120)).toBe(0);
+    });
+
+    it('returns 0 when before is not positive', () => {
+      expect(percentSavings(0, 50)).toBe(0);
+      expect(percentSavings(-10, 0)).toBe(0);
     });
   });
 });

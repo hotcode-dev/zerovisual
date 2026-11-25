@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty';
 import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
 import { TargetProviderSchema, type TargetProvider, type TileDimensions } from '../../core/schema.js';
-import { getProviderDimensions, estimateVisionTokens } from '../../core/image-optimizer.js';
+import { estimateVisionTokens, fitToTile, getProviderDimensions, percentSavings } from '../../core/image-optimizer.js';
 
 export interface EstimateOptions {
   width: number;
@@ -32,11 +32,9 @@ export function runEstimateCommand(options: EstimateOptions): EstimateSummary {
   const tileDims = getProviderDimensions(provider, lowTokenMode);
   const rawTokens = estimateVisionTokens(width, height, provider, lowTokenMode);
 
-  const scale = Math.min(1, Math.min(tileDims.maxWidth / width, tileDims.maxHeight / height));
-  const optWidth = Math.max(1, Math.round(width * scale));
-  const optHeight = Math.max(1, Math.round(height * scale));
+  const { width: optWidth, height: optHeight } = fitToTile(width, height, tileDims);
   const optTokens = estimateVisionTokens(optWidth, optHeight, provider, lowTokenMode);
-  const savingsPct = rawTokens > 0 ? Number((((rawTokens - optTokens) / rawTokens) * 100).toFixed(1)) : 0;
+  const savingsPct = percentSavings(rawTokens, optTokens);
 
   const summary: EstimateSummary = {
     provider,

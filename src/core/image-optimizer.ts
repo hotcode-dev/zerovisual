@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import type { TargetProvider, TileDimensions, BoundingBox } from './schema.js';
-import { getProviderDimensions, estimateVisionTokens } from './provider-math.js';
+import { estimateVisionTokens, getProviderDimensions, percentSavings } from './provider-math.js';
 
 export interface DiffDetectionResult {
   boundingBox: BoundingBox;
@@ -40,7 +40,13 @@ export interface OptimizedImageResult {
  * ./provider-math.ts so the docs-site calculator can reuse it directly in
  * the browser. Re-exported here so the package's public API is unchanged.
  */
-export { PROVIDER_SPECS, getProviderDimensions, estimateVisionTokens } from './provider-math.js';
+export {
+  PROVIDER_SPECS,
+  estimateVisionTokens,
+  fitToTile,
+  getProviderDimensions,
+  percentSavings
+} from './provider-math.js';
 
 /**
  * Default pixel matcher for Playwright / pixelmatch diff images.
@@ -259,11 +265,8 @@ export async function optimizeImageStandalone(
   const origTokens = estimateVisionTokens(origWidth, origHeight, provider, lowTokenMode);
   const optTokens = estimateVisionTokens(result.width, result.height, provider, lowTokenMode);
 
-  const tokenSavingsPercent =
-    origTokens > 0 ? Math.max(0, Number((((origTokens - optTokens) / origTokens) * 100).toFixed(1))) : 0;
-
-  const byteSavingsPercent =
-    origBytes > 0 ? Math.max(0, Number((((origBytes - result.buffer.length) / origBytes) * 100).toFixed(1))) : 0;
+  const tokenSavingsPercent = percentSavings(origTokens, optTokens);
+  const byteSavingsPercent = percentSavings(origBytes, result.buffer.length);
 
   return {
     result,
