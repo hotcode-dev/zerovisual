@@ -1,6 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
 import type { PenpotDelta } from './schema.js';
-import { parseColor } from './heuristic-linter.js';
+import { parseColor } from './color.js';
 
 export interface PenpotNodeToken {
   id?: string;
