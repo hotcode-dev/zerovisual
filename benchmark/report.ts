@@ -6,6 +6,8 @@
  * raw/optimized per-case pairing — can be unit-tested in isolation.
  */
 
+import { percentSavings } from '../src/core/provider-math.js';
+
 export interface BenchmarkRunResult {
   mode: 'without_zerovisual' | 'with_zerovisual';
   caseId: string;
@@ -27,6 +29,15 @@ export interface BenchmarkRunResult {
   traceSessionId: string;
 }
 
+/**
+ * Integer-rounded latency improvement for display — `NN% Faster` in the
+ * report, `NN% faster` in the web export. Shared by both so the rounding
+ * stays in one place.
+ */
+export function latencySavingsPct(before: number, after: number): number {
+  return Math.round(percentSavings(before, after));
+}
+
 export function buildBenchmarkReport(results: BenchmarkRunResult[], model: string, baseUrl: string): string {
   // Compute Aggregate Stats
   const rawRuns = results.filter(r => r.mode === 'without_zerovisual');
@@ -34,18 +45,16 @@ export function buildBenchmarkReport(results: BenchmarkRunResult[], model: strin
 
   const totalRawTokens = rawRuns.reduce((sum, r) => sum + r.totalTokens, 0);
   const totalOptTokens = optRuns.reduce((sum, r) => sum + r.totalTokens, 0);
-  const totalTokenSavings =
-    totalRawTokens > 0 ? (((totalRawTokens - totalOptTokens) / totalRawTokens) * 100).toFixed(1) : '0';
+  const totalTokenSavings = totalRawTokens > 0 ? percentSavings(totalRawTokens, totalOptTokens).toFixed(1) : '0';
 
   const totalRawImgTokens = rawRuns.reduce((sum, r) => sum + r.imageTokens, 0);
   const totalOptImgTokens = optRuns.reduce((sum, r) => sum + r.imageTokens, 0);
   const totalImgTokenSavings =
-    totalRawImgTokens > 0 ? (((totalRawImgTokens - totalOptImgTokens) / totalRawImgTokens) * 100).toFixed(1) : '0';
+    totalRawImgTokens > 0 ? percentSavings(totalRawImgTokens, totalOptImgTokens).toFixed(1) : '0';
 
   const totalRawBytes = rawRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
   const totalOptBytes = optRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
-  const totalByteSavings =
-    totalRawBytes > 0 ? (((totalRawBytes - totalOptBytes) / totalRawBytes) * 100).toFixed(1) : '0';
+  const totalByteSavings = totalRawBytes > 0 ? percentSavings(totalRawBytes, totalOptBytes).toFixed(1) : '0';
 
   const avgRawLatency =
     rawRuns.length > 0 ? Math.round(rawRuns.reduce((sum, r) => sum + r.latencyMs, 0) / rawRuns.length) : 0;
@@ -69,7 +78,7 @@ export function buildBenchmarkReport(results: BenchmarkRunResult[], model: strin
   md += `| **Total Tokens Consumed** | **${totalRawTokens.toLocaleString()} tokens** | **${totalOptTokens.toLocaleString()} tokens** | **-${totalTokenSavings}% Token Reduction** |\n`;
   md += `| **Vision Image Tokens (ViT)** | **${totalRawImgTokens.toLocaleString()} tokens** | **${totalOptImgTokens.toLocaleString()} tokens** | **-${totalImgTokenSavings}% Vision Token Savings** |\n`;
   md += `| **Network Payload Transfer** | **${(totalRawBytes / 1024).toFixed(1)} KB** | **${(totalOptBytes / 1024).toFixed(1)} KB** | **-${totalByteSavings}% Payload Bandwidth Reduction** |\n`;
-  md += `| **Average Roundtrip Latency** | **${avgRawLatency} ms** | **${avgOptLatency} ms** | **${avgRawLatency > avgOptLatency ? `${Math.round(((avgRawLatency - avgOptLatency) / avgRawLatency) * 100)}% Faster` : 'Comparable'}** |\n`;
+  md += `| **Average Roundtrip Latency** | **${avgRawLatency} ms** | **${avgOptLatency} ms** | **${avgRawLatency > avgOptLatency ? `${latencySavingsPct(avgRawLatency, avgOptLatency)}% Faster` : 'Comparable'}** |\n`;
   md += `| **Average Triage Accuracy** | **${avgRawAccuracy}%** | **${avgOptAccuracy}%** | **${Number(avgOptAccuracy) >= Number(avgRawAccuracy) ? `+${(Number(avgOptAccuracy) - Number(avgRawAccuracy)).toFixed(1)}% Accuracy` : `${(Number(avgOptAccuracy) - Number(avgRawAccuracy)).toFixed(1)}%`}** |\n\n`;
 
   md += `## 📋 Per-Case Benchmark Breakdown\n\n`;
@@ -101,11 +110,11 @@ export function buildBenchmarkReport(results: BenchmarkRunResult[], model: strin
     md += `- **Category:** ${raw.category}\n`;
     md += `- **Without ZeroVisual Tokens:** ${raw.totalTokens} (Image: ${raw.imageTokens}) | Latency: ${raw.latencyMs}ms | Accuracy: ${raw.accuracyScore}%\n`;
     if (opt) {
-      const savedPct = (((raw.totalTokens - opt.totalTokens) / raw.totalTokens) * 100).toFixed(1);
-      const imgSavedPct =
-        raw.imageTokens > 0 ? (((raw.imageTokens - opt.imageTokens) / raw.imageTokens) * 100).toFixed(1) : '0';
+      const savedPct = percentSavings(raw.totalTokens, opt.totalTokens).toFixed(1);
+      const imgSavedPct = raw.imageTokens > 0 ? percentSavings(raw.imageTokens, opt.imageTokens).toFixed(1) : '0';
+      const bandSavedPct = percentSavings(raw.imagePayloadBytes, opt.imagePayloadBytes).toFixed(1);
       md += `- **With ZeroVisual Tokens:** **${opt.totalTokens}** (Image: **${opt.imageTokens}**) | Latency: ${opt.latencyMs}ms | Accuracy: ${opt.accuracyScore}%\n`;
-      md += `- **Savings:** **${savedPct}% total tokens**, **${imgSavedPct}% vision image tokens**, **${(((raw.imagePayloadBytes - opt.imagePayloadBytes) / raw.imagePayloadBytes) * 100).toFixed(1)}% bandwidth**\n\n`;
+      md += `- **Savings:** **${savedPct}% total tokens**, **${imgSavedPct}% vision image tokens**, **${bandSavedPct}% bandwidth**\n\n`;
 
       md += `#### Model Diagnosis (ZeroVisual Optimized)\n`;
       const cleanAnswer = (opt.modelAnswer || opt.modelReasoning.slice(-400)).trim();

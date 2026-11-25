@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../src/core/image-optimizer.js';
+import { percentSavings } from '../src/core/provider-math.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
+import { latencySavingsPct } from './report.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
   const model = readBenchmarkEnv().AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
@@ -203,15 +205,12 @@ export async function exportWebData() {
       latencyMs: Math.round(18000 + optTokensCalc * 35)
     });
 
-    const tokenSaved = (((withoutObj.totalTokens - withObj.totalTokens) / withoutObj.totalTokens) * 100).toFixed(1);
-    const imgTokenSaved = (((withoutObj.imageTokens - withObj.imageTokens) / withoutObj.imageTokens) * 100).toFixed(1);
-    const byteSaved = (
-      ((withoutObj.imagePayloadBytes - withObj.imagePayloadBytes) / withoutObj.imagePayloadBytes) *
-      100
-    ).toFixed(1);
+    const tokenSaved = percentSavings(withoutObj.totalTokens, withObj.totalTokens).toFixed(1);
+    const imgTokenSaved = percentSavings(withoutObj.imageTokens, withObj.imageTokens).toFixed(1);
+    const byteSaved = percentSavings(withoutObj.imagePayloadBytes, withObj.imagePayloadBytes).toFixed(1);
     const latencySaved =
       withoutObj.latencyMs > withObj.latencyMs
-        ? `${Math.round(((withoutObj.latencyMs - withObj.latencyMs) / withoutObj.latencyMs) * 100)}% faster`
+        ? `${latencySavingsPct(withoutObj.latencyMs, withObj.latencyMs)}% faster`
         : 'comparable';
 
     exports.push({
