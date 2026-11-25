@@ -230,9 +230,8 @@ export async function exportWebData() {
     });
   }
 
-  // Write full dataset to web data and public
+  // Write full dataset to web data (imported at build time by BenchmarkExplorer.astro)
   fs.writeFileSync(path.join(webDataDir, 'benchmark-sessions.json'), JSON.stringify(exports, null, 2));
-  fs.writeFileSync(path.join(webPublicDir, 'benchmark-sessions.json'), JSON.stringify(exports, null, 2));
   console.log(`✅ Successfully exported web benchmark data with ${exports.length} cases.`);
 }
 
