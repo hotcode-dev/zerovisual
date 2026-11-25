@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1bd2286a733644606cc59597071f60a58298d7923ea02f9ad4d8fc537fd72bd7",
+  "claims": [
+    {
+      "id": "claim_d6760781840549b592b2a08903c2de6e",
+      "statement": "The Zero Factory precommit gate runs three phases (format via Prettier scoped to the main package with web/ excluded, build via tsc --noEmit, test via vitest) plus an install-hook subcommand that symlinks itself into .git/hooks/pre-commit; it skips npm ci when the package-lock.json hash matches .node_modules-lock-hash.",
+      "evidence": [
+        {
+          "resource": "repo://.zerofactory/precommit.sh#L1-L73",
+          "version": "repo-lines-v1:sha256:e94e2d4030e128525d174cd5a38b9a1e1d253c12b7ca4a7f828926960845fb27:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkOTVmYzA0YTgwYzk1MmY0OWNlNDE4ODYyN2M1M2IwZmJlOGM0NDA0MWI5NTJkNTkyYWNkMWRlOTk4NjE0NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViYzYyMjBkMDcwZTAyMGE4Njc0MzI1OWY3NTk5ODgwNzg3YTA4MDBjYmM1N2E3ZTkyY2Y4Njk0MTA1OTllMzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a48bd7f7a53048daa663e0eb255fff70",
+      "statement": "The Vitest suite runs tests/**/*.test.ts in the node environment with globals, importing modules directly from ../../src/ so unit tests exercise the source tree rather than the built dist; unit tests target one core module per file and integration tests drive runRegressionCommand, runDesignQaCommand, and runEstimateCommand plus ZeroVisualReporter aggregation against TriagePayloadSchema.",
+      "evidence": [
+        {
+          "resource": "repo://tests/integration/cli-commands.test.ts",
+          "version": "repo-file-v1:sha256:1d7f4bbf175a49769d624109129e153e3b505ba20d74ddf5b7a1956be4f91e39"
+        },
+        {
+          "resource": "repo://tests/integration/reporter-aggregation.test.ts",
+          "version": "repo-file-v1:sha256:e05d3ab715e8a5098340676c4d1d1c6cac74df21eebfee0a10e80d1f41e6f7e6"
+        },
+        {
+          "resource": "repo://tests/unit/provider-math.test.ts#L2-L2",
+          "version": "repo-lines-v1:sha256:ef1f2461e1176058ecdeb0dd182015b99850e239d74dadc022706b591d15ff29:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWYxZjI0NjFlMTE3NjA1OGVjZGViMGRkMTgyMDE1Yjk5ODUwZTIzOWQ3NGRhZGMwMjI3MDZiNTkxZDE1ZmYyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWYxZjI0NjFlMTE3NjA1OGVjZGViMGRkMTgyMDE1Yjk5ODUwZTIzOWQ3NGRhZGMwMjI3MDZiNTkxZDE1ZmYyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjEsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzA4ZTQ2OTFiYTY1MzE0ODhiZmUxMzM5NjNlMmNjMjU5OTMwYjQxZjBmNTVhYjVlNWNlYTJhZDYxMWQ4NDE4OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmU4ODAzODY2MmEyNWRlM2M1NGJkNTYwZmU3MWE1YjgyMGFiYmVmNWU0OThiODY3NmY1YzQxZWU3N2YxZGQ0YyJ9"
+        },
+        {
+          "resource": "repo://vitest.config.ts#L3-L8",
+          "version": "repo-lines-v1:sha256:4a9185809cbff0845777c54a84d0205551484fa46569a5b97a6efc9489161864:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJjZWNiMTQ0YTQ2ZjVkY2YxMmE2MTY5ZmNlZWQ3Njk1ZTgyOTRiMDkwZGU3NmYzNjYxY2RkMDI0OTMwMDE0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjQwMDBhMDFmOGY4MDhjMDY5OGMyOWEzM2MzNzNiZDcwYmZhZjM3ZWY3YjI2Mjc3MDEyNjZiMzY5ZDYwZTYyMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjZmNWI0MGIxNTg0NTdkMTc4NjRmMjE3OTA3ODZkZDVhMmVjZGI2NGI2NmE2NTFmNzg4ZDRlMjVjZDMzMDNkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_eee70c8b42b845c3af37b8b63ab4e280",
+      "statement": "benchmark/provider.ts centralizes classifyProvider(model) mapping a model name to qwen/gemini/local and readBenchmarkEnv() parsing benchmark/.env into a flat key/value map, both shared by runner.ts and export-web-data.ts; the runner executes each case in two modes (raw full-viewport PNG vs diff-crop + tile-downscale WebP via detectDiffBoundingBox and optimizeImageForProvider), scores answers against ground truth with defectFound at score >= 50, and writes benchmark-summary.json, benchmark-report.md, and per-run session JSON traces.",
+      "evidence": [
+        {
+          "resource": "repo://benchmark/provider.ts#L12-L39",
+          "version": "repo-lines-v1:sha256:3dce855141a73e4e1bcebed1673984763ffc85cd16dd31e18bae9b6cda19c7b1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMzZkYjdkMDc4YzEyZTNhZTlmODI4ZjdlYzNlNjBhNGE3NDhiMTE4Yjk1M2YwMzU0NGM1NWFiYjlmOTIxMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4YzhjNDU5OTA2MjVjNjk1ZjAxNzhlY2U0ZTYxMzNiNWY0YzU3Y2E4ZWY1NjI3NDg3MWQzODQ2NDRhOWI5ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://benchmark/runner.ts#L235-L575",
+          "version": "repo-lines-v1:sha256:c163966814ba49064e191ddb2b80ee8b7a327cc76fedb705311e6d7b3de0ee2e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4ZjQ1YjQxY2Y1MWM2NDJlZGQ1YWNhMWExNTc2ZTg1OTBlMzM0YTQ4M2U5YmQwNWRlY2MwYzA0NzA5MGVjOTZlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmYjU4MGU5NjRmODNhNDczZjQzZDQ0Mzg0NjI5NDlkNjhiNTYwMGZkYTc4N2YxNjM3NDVkMDBkZTg5Y2JmMzZhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MiwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlNzdmMmE2ZjJkNjlmY2E1NWQwZjE2ZmM1OGFlN2Q0ZmQyYjRmMGUyNjlkNTRmNGNmZmY0MzQ3NmFiNmYwMzE1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_34dd403614b9408794a274627f739b64",
+      "statement": "web/ is a private Astro sub-package with its own package.json and build scripts that the root package proxies via docs:dev/docs:build/docs:preview; its Astro build is not part of the root vitest/typecheck gate, and TokenCalculator.astro imports the repo's authoritative src/core/provider-math.ts directly (vite.fs.allow whitelists the repo root) so the calculator shows the same tile math as the CLI.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L34-L36",
+          "version": "repo-lines-v1:sha256:2ee3c0be4d7dd4f9cc51156e9fe42d03bddee50a22a0ce272c7ded1ea61fb6fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGZkNjM0NzkyY2QzNWVjOGM3N2E5N2JiOGM1YTg2M2RlYWIzYjQ5MGM1ZGRhYWU2YWJkZGQ5Yzk0M2NlNTMwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjg3N2MzOTZhYzMzZDhhNGJmYjVmYjBlZjI4ZDliOTJkN2Q2ZmM2ZGJkMWQyNDNjNzFkODEyYTgyZWRmOTc0OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNhZDcwMTg5YWVhNmM1YzYzNjYzYmM2ZmQ4MWEwZDI5NWZmODUwOGIxYWUxNTJkMWNiZGNkODhkMTVlNGZjMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWI5ZWE4ZDRkOTEzNmY4NmFhMzM4YWZlMTAxODA4NTNiMTM0OWE3MTM1OTRkMjcxZGJkYjZmMzNiNWU0NmU0ZiJ9"
+        },
+        {
+          "resource": "repo://web/astro.config.mjs#L22-L35",
+          "version": "repo-lines-v1:sha256:18a1b6f5d4fc0f1545a28a717332fd58e92506633262eef2b23d85c980acc799:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwZjFkMjI5MDYyNDZiMDA4MWRjMGNlYzA0MGZlODczMDE2MWZhMDBkY2RkOWQzMzdiOWFjNzhhM2ZhMjU3OWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViYWQ3Y2MyZGZhZmMyMTc1ZmEyZDk3MDRlMDIwMmY5NDA4M2E5ZGE2OWE1ODViMGIxOGM0OGJlYTIzNjI3NWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyODQ1OGMwMmI4NDI2Mjk0YTdlZDAwNTBkZTY4NThjMGQxYTNhYTI5ZmNiOWQxN2E2MzYyZWMwZjlhMTQxZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkMTQ0NjVjNDAxNjg5YWM1N2I0Mzc4N2M1MDE3MmZlMTVmYTUxYzQ5MjIyZDY1NzUyNDJlMzJhNzQyYjRhMTQifQ"
+        },
+        {
+          "resource": "repo://web/package.json#L1-L14",
+          "version": "repo-lines-v1:sha256:58b7b465f7cb1c599f3cd7a6ea8402c32fb8c14fe08ad3f082cd93af8fbf78cd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMjdhYTYyMGJhMDUzYmZlMDgwNTVjZWNlNmZiNTk4YThiMDM2YjVlMWUyZDliMzU0YWQ3ZmQyOWU3NjkzMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmMzA3YjM5M2JiNzBhZGMxYWYxNDIxODc3ZTRmYzdlY2M2YzFkZmM4MDUzYWJhZWVlODFhNjBiZDYzZDNlZjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79b102484cba43b49a94eed9c0802c50",
+      "statement": "Each bundled Agent Skill ships a SKILL.md rubric plus a thin .mjs wrapper that resolves the CLI binary from repo-local dist/cli/index.js, cwd dist, or node_modules/zerovisual, falling back to npx --yes zerovisual and forwarding all arguments; writeSkillSchemas() converts RegressionVerdictSchema and DesignQaVerdictSchema to JSON Schema 7 and writes the committed output.schema.json files for the regression and design-qa skills.",
+      "evidence": [
+        {
+          "resource": "repo://skills/zerovisual-design-qa/scripts/design-qa.mjs",
+          "version": "repo-file-v1:sha256:f5c2e5014f4284bf75cc74af7bb1ad407ec48305e87c7ce1723d9c323d3caece"
+        },
+        {
+          "resource": "repo://skills/zerovisual-optimize/scripts/optimize.mjs",
+          "version": "repo-file-v1:sha256:19001619f77281b14d4e411329251af987e8c6c594805c88852fc6d8aec36bb2"
+        },
+        {
+          "resource": "repo://skills/zerovisual-regression/scripts/regression.mjs",
+          "version": "repo-file-v1:sha256:6ba0e0b67ba56b2112824a6a256a2bc2aade971ff7d726db4679290dcdac58c3"
+        },
+        {
+          "resource": "repo://src/core/schema-generator.ts#L20-L38",
+          "version": "repo-lines-v1:sha256:e1359ee0ee7e97baf70fd088f792e5d3911c15fcc93eaa397045dd4e5a4bfa9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0NjA0NDU3NTk4N2VmMDI0NWE2YTI1NzhkNjU5MTI5YzIwNGQ1ZDk3OTI1ZjM3MTFiNjE3NjU5NmVmNzI5ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-11-25T04:42:05.705Z"
+  }
+}

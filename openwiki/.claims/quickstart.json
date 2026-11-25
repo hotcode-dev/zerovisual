@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3bd11319d468edd527c325d525368d6913183903e7d165469ae3514c09bf36f9",
+  "claims": [
+    {
+      "id": "claim_c9f88002e9444c26b910f96b2000757c",
+      "statement": "ZeroVisual is an ESM TypeScript npm package (zerovisual v0.2.0, node >= 20) whose published surface is dist/ plus the skills/ directory, with the public API being everything re-exported from src/index.ts (13 core/reporter/cli modules).",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L1-L25",
+          "version": "repo-lines-v1:sha256:73a76452afb83d08c03d2e8021c8c0e40997e92541a49ee7081cbbdae363e7af:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxZmQ0MjQ0YjkxYTEyYTgzNWU1MjE1YmMxM2NlZGQyNTc5OThmNDU5ZTBiMGFjZWVhMGE0NjJlMGUzYTFlMDIifQ"
+        },
+        {
+          "resource": "repo://src/index.ts",
+          "version": "repo-file-v1:sha256:c70bd50358c6370b394040079025b033f3dfa4355796b1cbb7f5165941230ba9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8264dcbde21e4ed2be9568046b7e2452",
+      "statement": "The CLI (dist/cli/index.js, backing both zerovisual and zerovisual-optimize bins) exposes four citty subcommands - regression, design-qa, optimize, estimate - and when launched as zerovisual-optimize it runs the optimize command directly without the subcommand layer.",
+      "evidence": [
+        {
+          "resource": "repo://src/cli/index.ts#L7-L25",
+          "version": "repo-lines-v1:sha256:99bfe9c39c267f00920e236f12c0b422d950fba1b0b041cb846d0207c2dd82aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkYmI0MmU5ZTU2ZDhjZTg3ZjE2NzE1MTMwMTkxZDQ1ZWY2ZGJlNzNiN2I1MzY2N2NmM2MwMmRlMzAyZjIxNDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiNTZkMjg2ZGE0MjY5ZjI5NTYyOGE5MGQyZGUwN2ZjZWFhODQ1ZDcwYmJiZWMzYzM0ODEyMDdkMjA1M2U5MjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmYTNiYmEwOGIxNDhjZGI0MmRkNTZlMDE1NTU5NjRhODhhM2Y3YjVkOTEyYWJiMmRlZmM3ZjVmZjc3NGQxNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1df27a8c667340598914daa45afd54a7",
+      "statement": "Root npm scripts build (tsup), test (vitest run), typecheck (tsc --noEmit), benchmark (tsx benchmark/runner.ts), and docs:dev/build/preview which proxy into the web/ sub-package.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L26-L37",
+          "version": "repo-lines-v1:sha256:5dd5017ca24385e7b372031ad451a9c5bef908001d14b375642db2ef0fc1345d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NTEzYmQxZGJjMjNmN2FiMzdlNTc1YmI5MjM0ODQ0NTYzM2RlMWYzNzAxOTU5ZmEyYzJjMWRiNmVjOTc1NzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMWJjMjBhNDI0YzIzNmMzNjdiY2JhNzVlYTZhOGJkYzRhOGZjYjc3MWVkNDU1MThmYTc5NDZlY2QzY2E4NDMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.6.0",
+    "at": "2026-11-25T04:42:05.705Z"
+  }
+}
