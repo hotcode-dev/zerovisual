@@ -32,22 +32,12 @@ export const ViewportDimensionsSchema = z.object({
   height: z.number().int().positive()
 });
 
-export const ViewportConfigSchema = z.object({
-  name: z.string(),
-  width: z.number().int().positive(),
-  height: z.number().int().positive()
-});
-
 export const ZeroVisualConfigSchema = z.object({
   targetProvider: TargetProviderSchema.default('openai'),
   lowTokenMode: z.boolean().default(false),
   customDimensions: TileDimensionsSchema.optional(),
   padding: z.number().int().nonnegative().default(32),
-  outputDir: z.string().default('./test-results'),
-  viewports: z.array(ViewportConfigSchema).default([
-    { name: 'Desktop', width: 1440, height: 900 },
-    { name: 'Mobile', width: 390, height: 844 }
-  ])
+  outputDir: z.string().default('./test-results')
 });
 export type ZeroVisualConfig = z.infer<typeof ZeroVisualConfigSchema>;
 

@@ -15,9 +15,20 @@ describe('ZeroVisual Canonical Schemas', () => {
       expect(parsed.lowTokenMode).toBe(false);
       expect(parsed.padding).toBe(32);
       expect(parsed.outputDir).toBe('./test-results');
-      expect(parsed.viewports).toHaveLength(2);
-      expect(parsed.viewports[0]?.name).toBe('Desktop');
-      expect(parsed.viewports[1]?.name).toBe('Mobile');
+    });
+
+    it('should strip unknown config keys like the removed viewports field', () => {
+      const parsed = ZeroVisualConfigSchema.parse({
+        viewports: [{ name: 'Desktop', width: 1440, height: 900 }]
+      });
+      expect(parsed).toEqual({
+        targetProvider: 'openai',
+        lowTokenMode: false,
+        customDimensions: undefined,
+        padding: 32,
+        outputDir: './test-results'
+      });
+      expect(parsed).not.toHaveProperty('viewports');
     });
 
     it('should accept custom provider and dimensions', () => {
