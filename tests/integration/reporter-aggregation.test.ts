@@ -136,6 +136,9 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
     expect(failure.viewports[0]?.project).toBe('Desktop Chrome');
     expect(failure.viewports[0]?.viewport).toEqual({ width: 1920, height: 1080 });
     expect(failure.viewports[0]?.images.diffBase64).toMatch(/^data:image\/webp;base64,/);
+    // No companion attachments provided: actual/expected fields stay undefined
+    expect(failure.viewports[0]?.images.actualBase64).toBeUndefined();
+    expect(failure.viewports[0]?.images.expectedBase64).toBeUndefined();
 
     expect(failure.viewports[1]?.project).toBe('Mobile Safari');
     expect(failure.viewports[1]?.viewport).toEqual({ width: 375, height: 667 });
@@ -201,5 +204,94 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
     expect(failure.viewports[0]?.computedStyles.backgroundColor).toBe('rgb(15, 23, 42)');
     expect(failure.designContext?.heuristicViolations).toHaveLength(1);
     expect(failure.designContext?.heuristicViolations[0]?.rule).toBe('SPACING_GRID');
+  });
+
+  async function createSolidPng(color: { r: number; g: number; b: number }): Promise<Buffer> {
+    return sharp({
+      create: {
+        width: 320,
+        height: 240,
+        channels: 4,
+        background: { r: color.r, g: color.g, b: color.b, alpha: 1 }
+      }
+    })
+      .png()
+      .toBuffer();
+  }
+
+  it('should discover, optimize, and persist actual/expected companion attachments', async () => {
+    const reporter = new ZeroVisualReporter({ outputDir: testOutputDir });
+    const diffBuffer = await createSyntheticDiffPng();
+    const actualBuffer = await createSolidPng({ r: 0, g: 200, b: 0 });
+    const expectedBuffer = await createSolidPng({ r: 0, g: 0, b: 200 });
+    const mockTest = createMockTestCase(
+      ['checkout.spec.ts', 'Checkout Flow', 'Header and CTA alignment'],
+      'Desktop Chrome'
+    );
+    const mockResult = {
+      status: 'failed',
+      attachments: [
+        { name: 'checkout-diff.png', contentType: 'image/png', body: diffBuffer },
+        { name: 'checkout-actual.png', contentType: 'image/png', body: actualBuffer },
+        { name: 'checkout-expected.png', contentType: 'image/png', body: expectedBuffer }
+      ]
+    } as unknown as TestResult;
+
+    await reporter.onTestEnd(mockTest, mockResult);
+    await reporter.onEnd({ status: 'failed' } as FullResult);
+
+    const content = JSON.parse(fs.readFileSync(path.join(testOutputDir, 'triage-ready.json'), 'utf-8'));
+    // Whole payload must still validate against the canonical schema
+    TriagePayloadSchema.parse(content);
+
+    const images = content.failures[0]!.viewports[0]!.images;
+    expect(images.actualBase64).toMatch(/^data:image\/webp;base64,/);
+    expect(images.expectedBase64).toMatch(/^data:image\/webp;base64,/);
+    // Distinct source images must produce distinct optimized payloads
+    expect(images.actualBase64).not.toBe(images.expectedBase64);
+    // Companion artifacts are named ${baseName}-${suffix}.webp and actually written to disk
+    expect(images.actualImagePath).toBe(
+      path.join(testOutputDir, 'artifacts', 'checkout-flow-header-and-cta-alignment-desktop-chrome-actual.webp')
+    );
+    expect(images.expectedImagePath).toBe(
+      path.join(testOutputDir, 'artifacts', 'checkout-flow-header-and-cta-alignment-desktop-chrome-expected.webp')
+    );
+    expect(images.actualImagePath).toMatch(/-actual\.webp$/);
+    expect(images.expectedImagePath).toMatch(/-expected\.webp$/);
+    expect(fs.existsSync(images.actualImagePath)).toBe(true);
+    expect(fs.existsSync(images.expectedImagePath)).toBe(true);
+  });
+
+  it('should discover bare actual.png names and skip companion attachments without body or path', async () => {
+    const reporter = new ZeroVisualReporter({ outputDir: testOutputDir });
+    const diffBuffer = await createSyntheticDiffPng();
+    const actualBuffer = await createSolidPng({ r: 0, g: 200, b: 0 });
+    const mockTest = createMockTestCase(['app.spec.ts', 'Pricing Page', 'Card Alignment'], 'Desktop Chrome');
+    const mockResult = {
+      status: 'failed',
+      attachments: [
+        { name: 'card-diff.png', contentType: 'image/png', body: diffBuffer },
+        // Bare 'actual.png' (no prefix) must still be discovered
+        { name: 'actual.png', contentType: 'image/png', body: actualBuffer },
+        // 'expected.png' with neither body nor path: nothing to read, must be skipped gracefully
+        { name: 'expected.png', contentType: 'image/png' }
+      ]
+    } as unknown as TestResult;
+
+    await reporter.onTestEnd(mockTest, mockResult);
+    await reporter.onEnd({ status: 'failed' } as FullResult);
+
+    const content = JSON.parse(fs.readFileSync(path.join(testOutputDir, 'triage-ready.json'), 'utf-8'));
+    TriagePayloadSchema.parse(content);
+
+    const images = content.failures[0]!.viewports[0]!.images;
+    expect(images.actualBase64).toMatch(/^data:image\/webp;base64,/);
+    expect(images.actualImagePath).toBe(
+      path.join(testOutputDir, 'artifacts', 'pricing-page-card-alignment-desktop-chrome-actual.webp')
+    );
+    expect(fs.existsSync(images.actualImagePath)).toBe(true);
+    // Unreadable expected attachment: fields stay undefined, payload still valid
+    expect(images.expectedBase64).toBeUndefined();
+    expect(images.expectedImagePath).toBeUndefined();
   });
 });

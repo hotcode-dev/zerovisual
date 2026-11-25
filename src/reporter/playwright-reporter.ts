@@ -89,51 +89,25 @@ export class ZeroVisualReporter implements Reporter {
     const diffImagePath = path.join(artifactsDir, `${testId}-${safeProject}-diff.webp`);
     fs.writeFileSync(diffImagePath, optimizedDiff.buffer);
 
-    // Check for optional actual and expected images
-    let actualBase64: string | undefined;
-    let actualImagePath: string | undefined;
-    const actualAttachment = result.attachments.find(
-      att => att.name.endsWith('-actual.png') || att.name.endsWith('actual.png')
-    );
-    if (actualAttachment) {
-      const actualBuf =
-        actualAttachment.body ?? (actualAttachment.path ? fs.readFileSync(actualAttachment.path) : null);
-      if (actualBuf) {
-        const companion = await optimizeAndWriteCompanionImage(actualBuf, {
-          artifactsDir,
-          baseName: `${testId}-${safeProject}`,
-          suffix: 'actual',
-          provider: this.config.targetProvider,
-          lowTokenMode: this.config.lowTokenMode,
-          customDimensions: this.config.customDimensions,
-          cropBox: diffDetection.boundingBox
-        });
-        actualBase64 = companion.dataUri;
-        actualImagePath = companion.imagePath;
-      }
-    }
-
-    let expectedBase64: string | undefined;
-    let expectedImagePath: string | undefined;
-    const expectedAttachment = result.attachments.find(
-      att => att.name.endsWith('-expected.png') || att.name.endsWith('expected.png')
-    );
-    if (expectedAttachment) {
-      const expectedBuf =
-        expectedAttachment.body ?? (expectedAttachment.path ? fs.readFileSync(expectedAttachment.path) : null);
-      if (expectedBuf) {
-        const companion = await optimizeAndWriteCompanionImage(expectedBuf, {
-          artifactsDir,
-          baseName: `${testId}-${safeProject}`,
-          suffix: 'expected',
-          provider: this.config.targetProvider,
-          lowTokenMode: this.config.lowTokenMode,
-          customDimensions: this.config.customDimensions,
-          cropBox: diffDetection.boundingBox
-        });
-        expectedBase64 = companion.dataUri;
-        expectedImagePath = companion.imagePath;
-      }
+    // Check for optional actual and expected companion images
+    const companionImages: Partial<Record<'actual' | 'expected', { base64: string; path: string }>> = {};
+    for (const suffix of ['actual', 'expected'] as const) {
+      const attachment = result.attachments.find(
+        att => att.name.endsWith(`-${suffix}.png`) || att.name.endsWith(`${suffix}.png`)
+      );
+      if (!attachment) continue;
+      const buf = attachment.body ?? (attachment.path ? fs.readFileSync(attachment.path) : null);
+      if (!buf) continue;
+      const companion = await optimizeAndWriteCompanionImage(buf, {
+        artifactsDir,
+        baseName: `${testId}-${safeProject}`,
+        suffix,
+        provider: this.config.targetProvider,
+        lowTokenMode: this.config.lowTokenMode,
+        customDimensions: this.config.customDimensions,
+        cropBox: diffDetection.boundingBox
+      });
+      companionImages[suffix] = { base64: companion.dataUri, path: companion.imagePath };
     }
 
     // Check for optional authentic DOM context captured by ZeroVisual fixture
@@ -176,11 +150,11 @@ export class ZeroVisualReporter implements Reporter {
       },
       images: {
         diffBase64: optimizedDiff.dataUri,
-        actualBase64,
-        expectedBase64,
+        actualBase64: companionImages.actual?.base64,
+        expectedBase64: companionImages.expected?.base64,
         diffImagePath,
-        actualImagePath,
-        expectedImagePath
+        actualImagePath: companionImages.actual?.path,
+        expectedImagePath: companionImages.expected?.path
       }
     };
 
