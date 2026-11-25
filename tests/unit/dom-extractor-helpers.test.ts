@@ -19,6 +19,7 @@ function makeEl(
   over: {
     tag?: string;
     id?: string;
+    classes?: string[];
     attrs?: Record<string, string>;
     innerText?: string;
     textContent?: string;
@@ -36,7 +37,7 @@ function makeEl(
     tagName: tag.toUpperCase(),
     id: over.id ?? '',
     getAttribute: (name: string) => (name in attrs ? attrs[name] : null),
-    classList: [],
+    classList: over.classes ?? [],
     innerText: over.innerText,
     textContent: over.textContent,
     type: over.type,
@@ -97,7 +98,7 @@ function instantiateHelpers(window: any, document: any): any {
   const factory = new Function(
     'window',
     'document',
-    BROWSER_BG_HELPERS_JS + '; return { rectToBBox, collectAccessibility }'
+    BROWSER_BG_HELPERS_JS + '; return { rectToBBox, collectAccessibility, getCssSelector }'
   );
   return factory(window, document);
 }
@@ -199,6 +200,59 @@ describe('BROWSER_BG_HELPERS_JS: collectAccessibility', () => {
   });
 });
 
+describe('BROWSER_BG_HELPERS_JS: getCssSelector', () => {
+  // Exact flag combos used at the call sites:
+  const captureOpts = { skipNgClasses: true, maxClasses: Infinity, specialCaseBodyHtml: true };
+  const auditOpts = { skipNgClasses: false, maxClasses: 2, specialCaseBodyHtml: false };
+
+  it('prefers the element id over any classes under both flag combos', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    const el = makeEl({ id: 'hero', classes: ['a', 'b'] });
+    expect(getCssSelector(el, captureOpts)).toBe('#hero');
+    expect(getCssSelector(el, auditOpts)).toBe('#hero');
+  });
+
+  it('captureDomContext combo: returns the bare tag for body/html even when they carry classes', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    expect(getCssSelector(makeEl({ tag: 'body', classes: ['dark', 'x'] }), captureOpts)).toBe('body');
+    expect(getCssSelector(makeEl({ tag: 'html', classes: ['lang-x'] }), captureOpts)).toBe('html');
+  });
+
+  it('captureDomContext combo: keeps every non-ng- class and drops ng- classes', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    // all classes retained (no 2-class slice at maxClasses: Infinity)
+    expect(getCssSelector(makeEl({ classes: ['a', 'b', 'c'] }), captureOpts)).toBe('div.a.b.c');
+    // ng- classes filtered out, remaining classes kept
+    expect(getCssSelector(makeEl({ classes: ['ng-xyz', 'card', 'ng-core'] }), captureOpts)).toBe('div.card');
+    // all classes are ng- -> bare tag
+    expect(getCssSelector(makeEl({ classes: ['ng-a', 'ng-b'] }), captureOpts)).toBe('div');
+    // no classes at all -> bare tag
+    expect(getCssSelector(makeEl({}), captureOpts)).toBe('div');
+  });
+
+  it('auditPageHeuristics combo: slices to the first two classes without any ng- filtering', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    expect(getCssSelector(makeEl({ classes: ['alpha', 'beta', 'gamma'] }), auditOpts)).toBe('div.alpha.beta');
+    // ng- classes are NOT filtered in audit mode
+    expect(getCssSelector(makeEl({ classes: ['ng-x', 'ng-y', 'ng-z'] }), auditOpts)).toBe('div.ng-x.ng-y');
+    expect(getCssSelector(makeEl({ classes: ['solo'] }), auditOpts)).toBe('div.solo');
+    expect(getCssSelector(makeEl({}), auditOpts)).toBe('div');
+  });
+
+  it('auditPageHeuristics combo: does NOT special-case body/html, classes are kept', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    expect(getCssSelector(makeEl({ tag: 'body', classes: ['dark', 'x'] }), auditOpts)).toBe('body.dark.x');
+    expect(getCssSelector(makeEl({ tag: 'html', classes: ['a'] }), auditOpts)).toBe('html.a');
+  });
+
+  it('omits the classes suffix when no class survives filtering/slicing', () => {
+    const { getCssSelector } = instantiateHelpers(makeFakeWindow(0, 0), {});
+    expect(getCssSelector(makeEl({ tag: 'span', classes: ['ng-only'] }), captureOpts)).toBe('span');
+    // maxClasses: 0 means "no slicing" (falsy guard) — full class list is kept
+    expect(getCssSelector(makeEl({ classes: ['a', 'b'] }), { skipNgClasses: false, maxClasses: 0 })).toBe('div.a.b');
+  });
+});
+
 describe('captureDomContext wires shared helpers through the evaluate callback', () => {
   let rawEvalResult: any;
 
@@ -274,6 +328,16 @@ describe('captureDomContext wires shared helpers through the evaluate callback',
       hasAssociatedLabel: false
     });
   });
+
+  it('builds the shared-helper CSS selector for classed elements (ng- filtered, all classes kept)', async () => {
+    const body = makeEl({ styles: { backgroundColor: 'rgb(10, 20, 30)' } });
+    const div = makeEl({ tag: 'div', classes: ['a', 'b', 'ng-c', 'd'], parentElement: body });
+    (globalThis as any).document = makeFakeDocument(body, [], [div]);
+
+    const result = await captureDomContext(fakePage() as any, 'div');
+
+    expect(result.selector).toBe('div.a.b.d');
+  });
 });
 
 describe('auditPageHeuristics wires shared helpers through the evaluate callback', () => {
@@ -345,5 +409,26 @@ describe('auditPageHeuristics wires shared helpers through the evaluate callback
     });
 
     expect(result.heuristicViolations).toEqual(expect.arrayContaining([]));
+  });
+
+  it('builds the shared-helper CSS selector for audited elements (first two classes, no ng- filter)', async () => {
+    const body = makeEl({ styles: { backgroundColor: 'rgb(10, 20, 30)' } });
+    const box = makeEl({
+      tag: 'div',
+      classes: ['alpha', 'beta', 'gamma', 'ng-h'],
+      styles: { overflow: 'hidden' }
+    });
+    (globalThis as any).document = makeFakeDocument(body, [], [box]);
+
+    const result = await auditPageHeuristics(
+      {
+        evaluate: async (fn: any, args: any) => fn(args),
+        locator: () => ({ first: () => ({ ariaSnapshot: async () => 'snap' }) })
+      } as any,
+      {}
+    );
+
+    expect(result.elementsData).toHaveLength(1);
+    expect(result.elementsData[0].selector).toBe('div.alpha.beta');
   });
 });
