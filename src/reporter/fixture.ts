@@ -1,4 +1,4 @@
-import { test as base, type Page, type TestInfo, type Locator } from '@playwright/test';
+import { test as base, type Page, type TestInfo } from '@playwright/test';
 import { captureDomContext, type DomContextResult } from '../core/dom-extractor.js';
 
 /**
@@ -23,20 +23,17 @@ export const test = base.extend<{ zerovisual: void }>({
 });
 
 /**
- * Explicit helper to capture and attach ZeroVisual DOM context for a specific locator or selector.
+ * Explicit helper to capture and attach ZeroVisual DOM context for a specific selector.
  */
 export async function attachZeroVisualContext(
   page: Page,
   testInfo: TestInfo,
-  targetLocatorOrSelector?: string | Locator
+  targetSelector?: string
 ): Promise<DomContextResult | null> {
   if (!page || page.isClosed()) return null;
 
   try {
-    let selector = 'body';
-    if (typeof targetLocatorOrSelector === 'string') {
-      selector = targetLocatorOrSelector;
-    }
+    const selector = targetSelector ?? 'body';
 
     const context = await captureDomContext(page, selector, {
       isMobileViewport: (testInfo.project?.use as any)?.isMobile ?? false

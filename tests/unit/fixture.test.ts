@@ -66,6 +66,44 @@ describe('Playwright Real Context Fixture & Helper', () => {
     expect(parsedJson.ariaSnapshot).toBe('- button "Submit Order"');
   });
 
+  it('should default to the "body" selector when no target selector is provided', async () => {
+    const mockTestInfo = {
+      attachments: []
+    } as unknown as TestInfo;
+
+    const mockPage = {
+      isClosed: () => false,
+      locator: vi.fn().mockReturnValue({
+        ariaSnapshot: vi.fn().mockResolvedValue('- body "Page"')
+      }),
+      evaluate: vi.fn().mockResolvedValue({
+        resolvedSelector: 'body',
+        tagName: 'body',
+        computedStyles: {
+          display: 'block',
+          color: 'rgb(0, 0, 0)',
+          backgroundColor: 'rgb(255, 255, 255)'
+        },
+        boundingBox: { x: 0, y: 0, width: 1280, height: 800 },
+        viewportWidth: 1280,
+        effectiveBg: 'rgb(255, 255, 255)',
+        accessibility: {
+          role: 'generic',
+          innerText: 'Page'
+        }
+      })
+    } as unknown as Page;
+
+    const result = await attachZeroVisualContext(mockPage, mockTestInfo);
+
+    expect(result).not.toBeNull();
+    expect(result?.selector).toBe('body');
+    // The omitted third argument must fall through to the 'body' default.
+    const evaluatePayload = (mockPage as any).evaluate.mock.calls[0]?.[1] as { selector: string };
+    expect(evaluatePayload.selector).toBe('body');
+    expect(mockTestInfo.attachments).toHaveLength(1);
+  });
+
   it('should catch errors gracefully and return null when page evaluation fails', async () => {
     const mockTestInfo = {
       attachments: []
