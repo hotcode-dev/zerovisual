@@ -72,6 +72,19 @@ export function getProviderDimensions(
 }
 
 /**
+ * Shrinks an image into the provider tile's bounding box (no enlargement),
+ * matching the `fit: 'inside', withoutEnlargement` behavior sharp applies in
+ * optimizeImageForProvider.
+ */
+export function fitToTile(width: number, height: number, tileDims: TileDimensions): { width: number; height: number } {
+  const scale = Math.min(1, tileDims.maxWidth / width, tileDims.maxHeight / height);
+  return {
+    width: Math.max(1, Math.round(width * scale)),
+    height: Math.max(1, Math.round(height * scale))
+  };
+}
+
+/**
  * Calculates estimated Vision LLM token consumption for a given pixel resolution.
  */
 export function estimateVisionTokens(
@@ -87,4 +100,13 @@ export function estimateVisionTokens(
   const tilesW = Math.ceil(width / patchSize);
   const tilesH = Math.ceil(height / patchSize);
   return (spec.baseTokens ?? 0) + tilesW * tilesH * spec.tokensPerPatch;
+}
+
+/**
+ * Percentage reduction from `before` to `after`, rounded to one decimal and
+ * clamped at 0 (e.g. before=100, after=42.5 -> 57.5). Returns 0 when `before`
+ * is not positive.
+ */
+export function percentSavings(before: number, after: number): number {
+  return before > 0 ? Math.max(0, Number((((before - after) / before) * 100).toFixed(1))) : 0;
 }

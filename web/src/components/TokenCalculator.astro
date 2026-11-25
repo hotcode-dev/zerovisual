@@ -355,7 +355,13 @@
 </style>
 
 <script>
-  import { estimateVisionTokens, getProviderDimensions, type TargetProvider } from '../../../src/core/provider-math.ts';
+  import {
+    estimateVisionTokens,
+    fitToTile,
+    getProviderDimensions,
+    percentSavings,
+    type TargetProvider
+  } from '../../../src/core/provider-math.ts';
 
   function setupCalculator() {
     const providerSelect = document.getElementById('provider-select') as HTMLSelectElement | null;
@@ -396,25 +402,18 @@
       const lowTokenMode = provider === 'gemma-low';
       const libProvider = (lowTokenMode ? 'gemma' : provider) as TargetProvider;
 
-      const maxTile = getProviderDimensions(libProvider, lowTokenMode).maxWidth;
-
-      let optW = paddedW;
-      let optH = paddedH;
-      if (optW > maxTile || optH > maxTile) {
-        const ratio = Math.min(maxTile / optW, maxTile / optH);
-        optW = Math.round(optW * ratio);
-        optH = Math.round(optH * ratio);
-      }
+      const tileDims = getProviderDimensions(libProvider, lowTokenMode);
+      const { width: optW, height: optH } = fitToTile(paddedW, paddedH, tileDims);
 
       const rawTokens = estimateVisionTokens(rawW, rawH, libProvider, lowTokenMode);
       const optTokens = estimateVisionTokens(optW, optH, libProvider, lowTokenMode);
-      const tokenSaved = Math.max(0, Math.round(((rawTokens - optTokens) / rawTokens) * 1000) / 10);
+      const tokenSaved = percentSavings(rawTokens, optTokens);
 
       const rawKb = customFileBytes > 0
         ? Math.round(customFileBytes / 1024)
         : Math.round((rawW * rawH * 4) / 2000);
       const optKb = Math.max(4, Math.round((optW * optH * 0.15) / 1024) + 3);
-      const byteSaved = Math.max(0, Math.round(((rawKb - optKb) / rawKb) * 1000) / 10);
+      const byteSaved = percentSavings(rawKb, optKb);
 
       if (tokenSavingsPct) tokenSavingsPct.textContent = `${tokenSaved}%`;
       if (tokenComparison) tokenComparison.textContent = `${rawTokens.toLocaleString()} tokens → ${optTokens.toLocaleString()} tokens`;
