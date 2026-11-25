@@ -57,13 +57,16 @@ export interface CaptureDomOptions {
 }
 
 /**
- * Browser-side background-fallback helpers, shared by `captureDomContext` and
- * `auditPageHeuristics`. Playwright serializes only the evaluate callback's
- * source, so shared helpers live here as plain-JS source and are instantiated
- * inside each callback via `new Function` — one source of truth for the
- * effective-background logic.
+ * Browser-side helpers shared by `captureDomContext` and `auditPageHeuristics`
+ * (effective-background resolution, bounding-box clamping, accessibility
+ * extraction). Playwright serializes only the evaluate callback's source, so
+ * shared helpers live here as plain-JS source and are instantiated inside each
+ * callback via `new Function` — one source of truth per behavior.
+ *
+ * Plain JS only: no TypeScript types and no `${}` template interpolation,
+ * since this string is evaluated inside the target page.
  */
-const BROWSER_BG_HELPERS_JS = `function getEffectiveBg(element) {
+export const BROWSER_BG_HELPERS_JS = `function getEffectiveBg(element) {
   let cur = element;
   while (cur) {
     const bg = window.getComputedStyle(cur).backgroundColor;
@@ -79,6 +82,28 @@ function applyEffectiveBgFallback(computed, element) {
   const c = computed.backgroundColor;
   if (c === 'transparent' || c === 'rgba(0, 0, 0, 0)' || !c) computed.backgroundColor = effectiveBg;
   return effectiveBg;
+}
+function rectToBBox(rect) {
+  return {
+    x: Math.max(0, Math.round(rect.x + window.scrollX)),
+    y: Math.max(0, Math.round(rect.y + window.scrollY)),
+    width: Math.max(1, Math.round(rect.width)),
+    height: Math.max(1, Math.round(rect.height))
+  };
+}
+function collectAccessibility(el, tagName) {
+  const ariaLabel = el.getAttribute('aria-label') || undefined;
+  const ariaLabelledBy = el.getAttribute('aria-labelledby') || undefined;
+  const alt = el.getAttribute('alt') || undefined;
+  const innerText = ((el.innerText || el.textContent) || '').trim() || undefined;
+  const inputType = el.type || undefined;
+  let hasAssociatedLabel = false;
+  if (['input', 'select', 'textarea'].includes(tagName)) {
+    if (el.id && document.querySelector('label[for="' + el.id + '"]')) hasAssociatedLabel = true;
+    if (el.closest('label')) hasAssociatedLabel = true;
+    if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
+  }
+  return { role: el.getAttribute('role') || undefined, ariaLabel, ariaLabelledBy, alt, innerText, inputType, hasAssociatedLabel };
 }`;
 
 /**
@@ -108,7 +133,9 @@ export async function captureDomContext(
     ({ selector, point, allowedProps, bgHelpers }) => {
       let el: Element | null = null;
 
-      const { applyEffectiveBgFallback } = new Function(bgHelpers + '; return { applyEffectiveBgFallback }')();
+      const { applyEffectiveBgFallback, rectToBBox, collectAccessibility } = new Function(
+        bgHelpers + '; return { applyEffectiveBgFallback, rectToBBox, collectAccessibility }'
+      )();
 
       if (point) {
         el = document.elementFromPoint(point.x, point.y);
@@ -147,26 +174,9 @@ export async function captureDomContext(
       const effectiveBg = applyEffectiveBgFallback(computed, el);
 
       const rect = el ? el.getBoundingClientRect() : null;
-      const boundingBox = rect
-        ? {
-            x: Math.max(0, Math.round(rect.x + window.scrollX)),
-            y: Math.max(0, Math.round(rect.y + window.scrollY)),
-            width: Math.max(1, Math.round(rect.width)),
-            height: Math.max(1, Math.round(rect.height))
-          }
-        : undefined;
+      const boundingBox = rect ? rectToBBox(rect) : undefined;
 
-      const ariaLabel = el?.getAttribute('aria-label') || undefined;
-      const ariaLabelledBy = el?.getAttribute('aria-labelledby') || undefined;
-      const alt = el?.getAttribute('alt') || undefined;
-      const innerText = el ? ((el as HTMLElement).innerText || el.textContent || '').trim() || undefined : undefined;
-      const inputType = el ? (el as HTMLInputElement).type || undefined : undefined;
-      let hasAssociatedLabel = false;
-      if (el && ['input', 'select', 'textarea'].includes(tagName)) {
-        if (el.id && document.querySelector(`label[for="${el.id}"]`)) hasAssociatedLabel = true;
-        if (el.closest('label')) hasAssociatedLabel = true;
-        if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
-      }
+      const accessibility = el ? collectAccessibility(el, tagName) : undefined;
 
       return {
         resolvedSelector,
@@ -175,15 +185,7 @@ export async function captureDomContext(
         boundingBox,
         viewportWidth: window.innerWidth,
         effectiveBg,
-        accessibility: {
-          role: el?.getAttribute('role') || undefined,
-          ariaLabel,
-          ariaLabelledBy,
-          alt,
-          innerText,
-          inputType,
-          hasAssociatedLabel
-        }
+        accessibility
       };
     },
     { selector: targetSelector, point, allowedProps: ALLOWED_STYLE_PROPS, bgHelpers: BROWSER_BG_HELPERS_JS }
@@ -258,8 +260,8 @@ export async function auditPageHeuristics(
 
   const rawEvaluated = await page.evaluate(
     ({ allowedProps, bgHelpers }) => {
-      const { getEffectiveBg, applyEffectiveBgFallback } = new Function(
-        bgHelpers + '; return { getEffectiveBg, applyEffectiveBgFallback }'
+      const { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility } = new Function(
+        bgHelpers + '; return { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility }'
       )();
       const candidates = Array.from(
         document.querySelectorAll(
@@ -341,17 +343,8 @@ export async function auditPageHeuristics(
 
         const rect = el.getBoundingClientRect();
         const tag = el.tagName.toLowerCase();
-        const ariaLabel = el.getAttribute('aria-label') || undefined;
-        const ariaLabelledBy = el.getAttribute('aria-labelledby') || undefined;
-        const alt = el.getAttribute('alt') || undefined;
-        const innerText = ((el as HTMLElement).innerText || el.textContent || '').trim() || undefined;
-        const inputType = (el as HTMLInputElement).type || undefined;
-        let hasAssociatedLabel = false;
-        if (['input', 'select', 'textarea'].includes(tag)) {
-          if (el.id && document.querySelector(`label[for="${el.id}"]`)) hasAssociatedLabel = true;
-          if (el.closest('label')) hasAssociatedLabel = true;
-          if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
-        }
+        const accessibility = collectAccessibility(el, tag);
+        const innerText = accessibility.innerText;
 
         // Card & Nested Card detection
         const isCard = isCardElement(el);
@@ -489,21 +482,8 @@ export async function auditPageHeuristics(
           computedStyles: computed,
           effectiveBg,
           viewportWidth,
-          boundingBox: {
-            x: Math.max(0, Math.round(rect.x + window.scrollX)),
-            y: Math.max(0, Math.round(rect.y + window.scrollY)),
-            width: Math.max(1, Math.round(rect.width)),
-            height: Math.max(1, Math.round(rect.height))
-          },
-          accessibility: {
-            role: el.getAttribute('role') || undefined,
-            ariaLabel,
-            ariaLabelledBy,
-            alt,
-            innerText,
-            inputType,
-            hasAssociatedLabel
-          },
+          boundingBox: rectToBBox(rect),
+          accessibility,
           signals: {
             isCard,
             isInsideCard,
