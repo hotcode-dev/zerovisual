@@ -52,4 +52,3 @@ export async function attachZeroVisualContext(
 }
 
 export { expect } from '@playwright/test';
-export default test;
