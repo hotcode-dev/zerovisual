@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { parseColor, calculateContrastRatio } from '../../src/core/color.js';
 import {
-  parseColor,
-  calculateContrastRatio,
   checkContrast,
   checkSpacingGrid,
   checkTapTarget,

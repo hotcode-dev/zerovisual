@@ -8,18 +8,6 @@ import {
   calculateContrastRatio
 } from './color.js';
 
-export {
-  parseColor,
-  hslToRgb,
-  oklabToRgb,
-  oklchToRgb,
-  extractColorsFromCssValue,
-  compositeColors,
-  calculateRelativeLuminance,
-  calculateContrastRatio,
-  type RgbColor
-} from './color.js';
-
 export interface RuleMetadata {
   category: ViolationCategory;
   severity: ViolationSeverity;
