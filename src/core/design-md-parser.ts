@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { DesignMdDelta } from './schema.js';
-import { parseColor, type RgbColor } from './heuristic-linter.js';
+import { parseColor, type RgbColor } from './color.js';
 
 export interface DesignMdSpec {
   fonts: string[];

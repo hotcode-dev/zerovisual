@@ -1,4 +1,15 @@
 export * from './core/schema.js';
+export {
+  parseColor,
+  hslToRgb,
+  oklabToRgb,
+  oklchToRgb,
+  extractColorsFromCssValue,
+  compositeColors,
+  calculateRelativeLuminance,
+  calculateContrastRatio,
+  type RgbColor
+} from './core/color.js';
 export * from './core/schema-generator.js';
 export * from './core/image-optimizer.js';
 export * from './core/heuristic-linter.js';
