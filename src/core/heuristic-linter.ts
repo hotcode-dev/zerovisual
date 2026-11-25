@@ -661,7 +661,6 @@ export interface SlopAndRenderSignals {
   spaceBelowPx?: number;
   imageBroken?: boolean;
   hasUnintendedTextOverflow?: boolean;
-  hasClippedPositionedChild?: boolean;
   isHiddenAtRest?: boolean;
   occludedBySelector?: string;
   hasColumnOverflowImbalance?: boolean;
@@ -1112,15 +1111,13 @@ export function checkRenderedVisualIntegrity(input: LintElementInput): Heuristic
     );
   }
 
-  if (signals?.hasUnintendedTextOverflow || signals?.hasClippedPositionedChild) {
+  if (signals?.hasUnintendedTextOverflow) {
     violations.push(
       createViolation(
         'CLIPPED_OVERFLOW',
         selector,
         'content fits container or wraps cleanly without unintended clipping',
-        signals.hasClippedPositionedChild
-          ? 'positioned child clipped by overflow:hidden/clip container'
-          : 'content scrollWidth exceeds clientWidth inside clipping container',
+        'content scrollWidth exceeds clientWidth inside clipping container',
         boundingBox,
         viewportName
       )
