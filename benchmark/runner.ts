@@ -313,6 +313,38 @@ Identify:
       fs.writeFileSync(path.join(sessionsDir, `${id}.json`), JSON.stringify(trace, null, 2));
     };
 
+    // Shared constructor for both per-case result objects; only the per-mode
+    // inputs differ, the 12 shared fields are assembled in one place.
+    const buildRunResult = (
+      mode: BenchmarkRunResult['mode'],
+      imageResolution: BenchmarkRunResult['imageResolution'],
+      imagePayloadBytes: number,
+      imageFormat: string,
+      res: VlmResult,
+      modelAnswer: string,
+      evalRes: { score: number; found: boolean },
+      traceSessionId: string
+    ): BenchmarkRunResult => ({
+      mode,
+      caseId: metadata.id,
+      caseName: metadata.name,
+      category: metadata.category,
+      imageResolution,
+      imagePayloadBytes,
+      imageFormat,
+      promptTokens: res.usage.prompt_tokens,
+      imageTokens: res.usage.image_tokens,
+      completionTokens: res.usage.completion_tokens,
+      reasoningTokens: res.usage.reasoning_tokens,
+      totalTokens: res.usage.total_tokens,
+      latencyMs: res.latencyMs,
+      accuracyScore: evalRes.score,
+      defectFound: evalRes.found,
+      modelAnswer,
+      modelReasoning: res.reasoning,
+      traceSessionId
+    });
+
     // =========================================================================
     // RUN 1: WITHOUT ZeroVisual (Raw full-viewport screenshot)
     // =========================================================================
@@ -333,27 +365,16 @@ Identify:
     const traceSessionIdA = `session-${metadata.id}-without-${Date.now()}`;
 
     const effectiveAnswerA = pickEffectiveAnswer(resA);
-
-    const resultA: BenchmarkRunResult = {
-      mode: 'without_zerovisual',
-      caseId: metadata.id,
-      caseName: metadata.name,
-      category: metadata.category,
-      imageResolution: { width: rawMeta.width ?? 0, height: rawMeta.height ?? 0 },
-      imagePayloadBytes: rawPayloadBytes,
-      imageFormat: 'png',
-      promptTokens: resA.usage.prompt_tokens,
-      imageTokens: resA.usage.image_tokens,
-      completionTokens: resA.usage.completion_tokens,
-      reasoningTokens: resA.usage.reasoning_tokens,
-      totalTokens: resA.usage.total_tokens,
-      latencyMs: resA.latencyMs,
-      accuracyScore: evalA.score,
-      defectFound: evalA.found,
-      modelAnswer: effectiveAnswerA,
-      modelReasoning: resA.reasoning,
-      traceSessionId: traceSessionIdA
-    };
+    const resultA = buildRunResult(
+      'without_zerovisual',
+      { width: rawMeta.width ?? 0, height: rawMeta.height ?? 0 },
+      rawPayloadBytes,
+      'png',
+      resA,
+      effectiveAnswerA,
+      evalA,
+      traceSessionIdA
+    );
     allResults.push(resultA);
 
     console.log(
@@ -400,27 +421,16 @@ Identify:
     const traceSessionIdB = `session-${metadata.id}-with-${Date.now()}`;
 
     const effectiveAnswerB = pickEffectiveAnswer(resB);
-
-    const resultB: BenchmarkRunResult = {
-      mode: 'with_zerovisual',
-      caseId: metadata.id,
-      caseName: metadata.name,
-      category: metadata.category,
-      imageResolution: { width: optResult.width, height: optResult.height },
-      imagePayloadBytes: optPayloadBytes,
-      imageFormat: 'webp',
-      promptTokens: resB.usage.prompt_tokens,
-      imageTokens: resB.usage.image_tokens,
-      completionTokens: resB.usage.completion_tokens,
-      reasoningTokens: resB.usage.reasoning_tokens,
-      totalTokens: resB.usage.total_tokens,
-      latencyMs: resB.latencyMs,
-      accuracyScore: evalB.score,
-      defectFound: evalB.found,
-      modelAnswer: effectiveAnswerB,
-      modelReasoning: resB.reasoning,
-      traceSessionId: traceSessionIdB
-    };
+    const resultB = buildRunResult(
+      'with_zerovisual',
+      { width: optResult.width, height: optResult.height },
+      optPayloadBytes,
+      'webp',
+      resB,
+      effectiveAnswerB,
+      evalB,
+      traceSessionIdB
+    );
     allResults.push(resultB);
 
     const tokenSavedPct = percentSavings(resultA.totalTokens, resultB.totalTokens).toFixed(1);
