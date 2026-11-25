@@ -125,13 +125,8 @@ function pickEffectiveAnswer(res: { content: string; reasoning: string }): strin
     : res.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || res.reasoning.trim();
 }
 
-async function callVlm(
-  baseUrl: string,
-  model: string,
-  imageDataUri: string,
-  promptText: string,
-  apiKey?: string
-): Promise<{
+// Shape of a single VLM call result, shared by callVlm and the trace-session writer.
+type VlmResult = {
   content: string;
   reasoning: string;
   usage: {
@@ -142,7 +137,15 @@ async function callVlm(
     reasoning_tokens: number;
   };
   latencyMs: number;
-}> {
+};
+
+async function callVlm(
+  baseUrl: string,
+  model: string,
+  imageDataUri: string,
+  promptText: string,
+  apiKey?: string
+): Promise<VlmResult> {
   const startTime = performance.now();
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
@@ -268,6 +271,48 @@ Identify:
 3. Probable Root Cause in CSS or layout
 4. Suggested Fix or code snippet`;
 
+    const writeTraceSession = (
+      id: string,
+      mode: string,
+      inputImage: {
+        resolution: CaseMetadata['viewport'];
+        format: string;
+        bytes: number;
+        isZeroVisualOptimized: boolean;
+        cropBox?: GroundTruth['expectedBoundingBox'];
+      },
+      res: VlmResult,
+      accuracyScore: number
+    ): void => {
+      const trace = {
+        id,
+        timestamp: new Date().toISOString(),
+        benchmarkRunTimestamp: runTimestamp,
+        caseId: metadata.id,
+        caseName: metadata.name,
+        mode,
+        model,
+        systemPrompt: 'You are an automated visual regression QA engineer.',
+        userPrompt: promptText,
+        inputImage,
+        output: {
+          content: res.content,
+          reasoning: res.reasoning
+        },
+        metrics: {
+          promptTokens: res.usage.prompt_tokens,
+          imageTokens: res.usage.image_tokens,
+          completionTokens: res.usage.completion_tokens,
+          reasoningTokens: res.usage.reasoning_tokens,
+          totalTokens: res.usage.total_tokens,
+          latencyMs: res.latencyMs,
+          accuracyScore
+        },
+        groundTruth: metadata.groundTruth
+      };
+      fs.writeFileSync(path.join(sessionsDir, `${id}.json`), JSON.stringify(trace, null, 2));
+    };
+
     // =========================================================================
     // RUN 1: WITHOUT ZeroVisual (Raw full-viewport screenshot)
     // =========================================================================
@@ -316,38 +361,13 @@ Identify:
     );
 
     // Save Langfuse / Pi agent session trace for Mode A
-    const traceA = {
-      id: traceSessionIdA,
-      timestamp: new Date().toISOString(),
-      benchmarkRunTimestamp: runTimestamp,
-      caseId: metadata.id,
-      caseName: metadata.name,
-      mode: 'without_zerovisual',
-      model,
-      systemPrompt: 'You are an automated visual regression QA engineer.',
-      userPrompt: promptText,
-      inputImage: {
-        resolution: resultA.imageResolution,
-        format: 'png',
-        bytes: rawPayloadBytes,
-        isZeroVisualOptimized: false
-      },
-      output: {
-        content: resA.content,
-        reasoning: resA.reasoning
-      },
-      metrics: {
-        promptTokens: resA.usage.prompt_tokens,
-        imageTokens: resA.usage.image_tokens,
-        completionTokens: resA.usage.completion_tokens,
-        reasoningTokens: resA.usage.reasoning_tokens,
-        totalTokens: resA.usage.total_tokens,
-        latencyMs: resA.latencyMs,
-        accuracyScore: evalA.score
-      },
-      groundTruth: metadata.groundTruth
+    const imageA = {
+      resolution: resultA.imageResolution,
+      format: 'png',
+      bytes: rawPayloadBytes,
+      isZeroVisualOptimized: false
     };
-    fs.writeFileSync(path.join(sessionsDir, `${traceSessionIdA}.json`), JSON.stringify(traceA, null, 2));
+    writeTraceSession(traceSessionIdA, 'without_zerovisual', imageA, resA, evalA.score);
 
     // =========================================================================
     // RUN 2: WITH ZeroVisual (Cropped diff box + model-aligned WebP)
@@ -416,39 +436,14 @@ Identify:
     );
 
     // Save Langfuse / Pi agent session trace for Mode B
-    const traceB = {
-      id: traceSessionIdB,
-      timestamp: new Date().toISOString(),
-      benchmarkRunTimestamp: runTimestamp,
-      caseId: metadata.id,
-      caseName: metadata.name,
-      mode: 'with_zerovisual',
-      model,
-      systemPrompt: 'You are an automated visual regression QA engineer.',
-      userPrompt: promptText,
-      inputImage: {
-        resolution: resultB.imageResolution,
-        format: 'webp',
-        bytes: optPayloadBytes,
-        isZeroVisualOptimized: true,
-        cropBox: diffResult.boundingBox
-      },
-      output: {
-        content: resB.content,
-        reasoning: resB.reasoning
-      },
-      metrics: {
-        promptTokens: resB.usage.prompt_tokens,
-        imageTokens: resB.usage.image_tokens,
-        completionTokens: resB.usage.completion_tokens,
-        reasoningTokens: resB.usage.reasoning_tokens,
-        totalTokens: resB.usage.total_tokens,
-        latencyMs: resB.latencyMs,
-        accuracyScore: evalB.score
-      },
-      groundTruth: metadata.groundTruth
+    const imageB = {
+      resolution: resultB.imageResolution,
+      format: 'webp',
+      bytes: optPayloadBytes,
+      isZeroVisualOptimized: true,
+      cropBox: diffResult.boundingBox
     };
-    fs.writeFileSync(path.join(sessionsDir, `${traceSessionIdB}.json`), JSON.stringify(traceB, null, 2));
+    writeTraceSession(traceSessionIdB, 'with_zerovisual', imageB, resB, evalB.score);
   }
 
   // Generate Reports
