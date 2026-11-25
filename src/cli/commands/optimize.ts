@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
+import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
 import { TargetProviderSchema, type TargetProvider } from '../../core/schema.js';
 import { optimizeImageStandalone, type ImageOptimizationStats } from '../../core/image-optimizer.js';
 
@@ -138,29 +139,15 @@ export const optimizeCommand = defineCommand({
       alias: 'o',
       description: 'Output file or directory path for optimized WebP image(s)'
     },
-    provider: {
-      type: 'string',
-      alias: 'p',
-      default: 'anthropic',
-      description:
-        'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
-    },
-    lowTokenMode: {
-      type: 'boolean',
-      default: false,
-      description: 'Enable aggressive token reduction (e.g. 384x384 for Gemini)'
-    },
+    provider: providerArg('anthropic'),
+    lowTokenMode: lowTokenModeArg,
     quality: {
       type: 'string',
       alias: 'q',
       default: '80',
       description: 'WebP compression quality (default: 80)'
     },
-    json: {
-      type: 'boolean',
-      default: false,
-      description: 'Output JSON statistics to stdout'
-    }
+    json: jsonArg('Output JSON statistics to stdout')
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);

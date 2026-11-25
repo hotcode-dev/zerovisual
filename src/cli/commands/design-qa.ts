@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { defineCommand } from 'citty';
+import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
 import type { Browser } from '@playwright/test';
 import {
   TriagePayloadSchema,
@@ -324,23 +325,9 @@ export const designQaCommand = defineCommand({
       default: './test-results',
       description: 'Directory where design-qa-ready.json will be saved'
     },
-    provider: {
-      type: 'string',
-      alias: 'p',
-      default: 'openai',
-      description:
-        'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
-    },
-    lowTokenMode: {
-      type: 'boolean',
-      default: false,
-      description: 'Enable aggressive token reduction (e.g. 384x384 for Gemini)'
-    },
-    json: {
-      type: 'boolean',
-      default: false,
-      description: 'Output concise JSON audit summary (with WebP file paths) to stdout'
-    }
+    provider: providerArg('openai'),
+    lowTokenMode: lowTokenModeArg,
+    json: jsonArg('Output concise JSON audit summary (with WebP file paths) to stdout')
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
+import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
 import {
   TriagePayloadSchema,
   TargetProviderSchema,
@@ -292,28 +293,14 @@ export const regressionCommand = defineCommand({
       default: './test-results',
       description: 'Directory where triage-ready.json will be saved'
     },
-    provider: {
-      type: 'string',
-      alias: 'p',
-      default: 'openai',
-      description:
-        'Target Vision LLM provider: openai | anthropic | gemini | local | qwen | gemma | llama | mistral | deepseek'
-    },
-    lowTokenMode: {
-      type: 'boolean',
-      default: false,
-      description: 'Enable aggressive token reduction (e.g. 384x384 for Gemini)'
-    },
+    provider: providerArg('openai'),
+    lowTokenMode: lowTokenModeArg,
     padding: {
       type: 'string',
       default: '32',
       description: 'Bounding box padding in pixels around detected diff region'
     },
-    json: {
-      type: 'boolean',
-      default: false,
-      description: 'Output concise JSON triage summary (with WebP file paths) to stdout'
-    }
+    json: jsonArg('Output concise JSON triage summary (with WebP file paths) to stdout')
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);

@@ -1,4 +1,5 @@
 import { defineCommand } from 'citty';
+import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
 import { TargetProviderSchema, type TargetProvider, type TileDimensions } from '../../core/schema.js';
 import { getProviderDimensions, estimateVisionTokens } from '../../core/image-optimizer.js';
 
@@ -77,23 +78,9 @@ export const estimateCommand = defineCommand({
       required: true,
       description: 'Image pixel height (e.g. 1080)'
     },
-    provider: {
-      type: 'string',
-      alias: 'p',
-      default: 'anthropic',
-      description:
-        'Target Vision LLM provider: anthropic | openai | gemini | local | qwen | gemma | llama | mistral | deepseek'
-    },
-    lowTokenMode: {
-      type: 'boolean',
-      default: false,
-      description: 'Enable aggressive token reduction (e.g. 384x384 for Gemini)'
-    },
-    json: {
-      type: 'boolean',
-      default: false,
-      description: 'Output JSON estimate summary to stdout'
-    }
+    provider: providerArg('anthropic'),
+    lowTokenMode: lowTokenModeArg,
+    json: jsonArg('Output JSON estimate summary to stdout')
   },
   run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);
