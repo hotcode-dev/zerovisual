@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../dist/index.js';
-import { classifyProvider, readBenchmarkEnv } from './provider.js';
+import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 
 interface GroundTruth {
   defect: string;
@@ -244,10 +244,7 @@ async function runBenchmark() {
   const sessionsDir = path.join(resultsDir, 'sessions');
   fs.mkdirSync(sessionsDir, { recursive: true });
 
-  const cases = fs
-    .readdirSync(testdataDir)
-    .filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory())
-    .sort();
+  const cases = listCaseDirs(testdataDir);
 
   console.log(`Discovered ${cases.length} benchmark test cases:`);
   cases.forEach(c => console.log(` - ${c}`));
