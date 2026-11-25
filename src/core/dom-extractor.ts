@@ -41,8 +41,6 @@ export const ALLOWED_STYLE_PROPS = [
   'outlineWidth'
 ] as const;
 
-export type AllowedStyleProp = (typeof ALLOWED_STYLE_PROPS)[number];
-
 export interface DomContextResult {
   selector: string;
   ariaSnapshot: string;

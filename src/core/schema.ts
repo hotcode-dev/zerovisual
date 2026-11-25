@@ -31,14 +31,12 @@ export const ViewportDimensionsSchema = z.object({
   width: z.number().int().positive(),
   height: z.number().int().positive()
 });
-export type ViewportDimensions = z.infer<typeof ViewportDimensionsSchema>;
 
 export const ViewportConfigSchema = z.object({
   name: z.string(),
   width: z.number().int().positive(),
   height: z.number().int().positive()
 });
-export type ViewportConfig = z.infer<typeof ViewportConfigSchema>;
 
 export const ZeroVisualConfigSchema = z.object({
   targetProvider: TargetProviderSchema.default('openai'),
@@ -61,7 +59,6 @@ export const ViewportImagesSchema = z.object({
   actualImagePath: z.string().optional(),
   expectedImagePath: z.string().optional()
 });
-export type ViewportImages = z.infer<typeof ViewportImagesSchema>;
 
 export const ViolationCropArtifactSchema = z.object({
   id: z.string(),
@@ -164,7 +161,6 @@ export const DesignContextSchema = z.object({
   penpotDeltas: z.array(PenpotDeltaSchema).default([]),
   designMdDeltas: z.array(DesignMdDeltaSchema).optional()
 });
-export type DesignContext = z.infer<typeof DesignContextSchema>;
 
 export const FailureEntrySchema = z.object({
   testId: z.string(),
@@ -177,7 +173,6 @@ export const FailureEntrySchema = z.object({
 export type FailureEntry = z.infer<typeof FailureEntrySchema>;
 
 export const PipelineModeSchema = z.enum(['regression', 'design-qa']);
-export type PipelineMode = z.infer<typeof PipelineModeSchema>;
 
 export const TriagePayloadSchema = z.object({
   version: z.literal('1.0.0'),
@@ -209,7 +204,6 @@ export const DesignQaViolationVerdictSchema = z.object({
   suggestedCommand: z.string().optional(),
   cropImagePath: z.string().optional()
 });
-export type DesignQaViolationVerdict = z.infer<typeof DesignQaViolationVerdictSchema>;
 
 export const DesignQaVerdictSchema = z.object({
   url: z.string(),
