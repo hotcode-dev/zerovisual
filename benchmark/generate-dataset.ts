@@ -2,7 +2,7 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { detectDiffBoundingBox } from '../dist/index.js';
+import { detectDiffBoundingBox } from '../src/core/image-optimizer.js';
 
 interface BenchmarkCaseConfig {
   id: string;

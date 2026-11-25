@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { detectDiffBoundingBox, optimizeImageForProvider } from '../dist/index.js';
+import { detectDiffBoundingBox, optimizeImageForProvider } from '../src/core/image-optimizer.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 import { buildBenchmarkReport, type BenchmarkRunResult } from './report.js';
 
