@@ -59,7 +59,7 @@ export interface CaptureDomOptions {
 /**
  * Browser-side helpers shared by `captureDomContext` and `auditPageHeuristics`
  * (effective-background resolution, bounding-box clamping, accessibility
- * extraction). Playwright serializes only the evaluate callback's source, so
+ * extraction, CSS selector construction). Playwright serializes only the evaluate callback's source, so
  * shared helpers live here as plain-JS source and are instantiated inside each
  * callback via `new Function` — one source of truth per behavior.
  *
@@ -104,6 +104,19 @@ function collectAccessibility(el, tagName) {
     if (ariaLabel || ariaLabelledBy) hasAssociatedLabel = true;
   }
   return { role: el.getAttribute('role') || undefined, ariaLabel, ariaLabelledBy, alt, innerText, inputType, hasAssociatedLabel };
+}
+function getCssSelector(el, opts) {
+  const skipNgClasses = !!(opts && opts.skipNgClasses);
+  const maxClasses = opts ? opts.maxClasses : 0;
+  const specialCaseBodyHtml = !!(opts && opts.specialCaseBodyHtml);
+  if (el.id) return '#' + el.id;
+  const tag = el.tagName.toLowerCase();
+  if (specialCaseBodyHtml && (tag === 'body' || tag === 'html')) return tag;
+  let classes = Array.from(el.classList);
+  if (skipNgClasses) classes = classes.filter(c => !c.startsWith('ng-'));
+  if (maxClasses > 0) classes = classes.slice(0, maxClasses);
+  if (classes.length > 0) return tag + '.' + classes.join('.');
+  return tag;
 }`;
 
 /**
@@ -133,8 +146,8 @@ export async function captureDomContext(
     ({ selector, point, allowedProps, bgHelpers }) => {
       let el: Element | null = null;
 
-      const { applyEffectiveBgFallback, rectToBBox, collectAccessibility } = new Function(
-        bgHelpers + '; return { applyEffectiveBgFallback, rectToBBox, collectAccessibility }'
+      const { applyEffectiveBgFallback, rectToBBox, collectAccessibility, getCssSelector } = new Function(
+        bgHelpers + '; return { applyEffectiveBgFallback, rectToBBox, collectAccessibility, getCssSelector }'
       )();
 
       if (point) {
@@ -151,16 +164,9 @@ export async function captureDomContext(
         el = document.body;
       }
 
-      function getCssSelector(element: Element): string {
-        if (element.id) return `#${element.id}`;
-        const tagName = element.tagName.toLowerCase();
-        if (tagName === 'body' || tagName === 'html') return tagName;
-        const classes = Array.from(element.classList).filter(c => !c.startsWith('ng-'));
-        if (classes.length > 0) return `${tagName}.${classes.join('.')}`;
-        return tagName;
-      }
-
-      const resolvedSelector = el ? getCssSelector(el) : 'body';
+      const resolvedSelector = el
+        ? getCssSelector(el, { skipNgClasses: true, maxClasses: Infinity, specialCaseBodyHtml: true })
+        : 'body';
       const tagName = el ? el.tagName.toLowerCase() : 'body';
       const styles = el ? window.getComputedStyle(el) : null;
 
@@ -260,21 +266,16 @@ export async function auditPageHeuristics(
 
   const rawEvaluated = await page.evaluate(
     ({ allowedProps, bgHelpers }) => {
-      const { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility } = new Function(
-        bgHelpers + '; return { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility }'
-      )();
+      const { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility, getCssSelector } =
+        new Function(
+          bgHelpers +
+            '; return { getEffectiveBg, applyEffectiveBgFallback, rectToBBox, collectAccessibility, getCssSelector }'
+        )();
       const candidates = Array.from(
         document.querySelectorAll(
           'button, a, input, select, textarea, [role="button"], img, p, h1, h2, h3, h4, h5, h6, li, div, section, article, aside, header, footer, nav, span'
         )
       );
-
-      function getCssSelector(el: Element): string {
-        if (el.id) return `#${el.id}`;
-        const tag = el.tagName.toLowerCase();
-        if (el.classList.length > 0) return `${tag}.${Array.from(el.classList).slice(0, 2).join('.')}`;
-        return tag;
-      }
 
       function isCardElement(el: Element): boolean {
         const tag = el.tagName.toLowerCase();
@@ -475,7 +476,7 @@ export async function auditPageHeuristics(
         }
 
         return {
-          selector: getCssSelector(el),
+          selector: getCssSelector(el, { skipNgClasses: false, maxClasses: 2, specialCaseBodyHtml: false }),
           tagName: tag,
           isInteractive:
             ['button', 'a', 'input', 'select', 'textarea'].includes(tag) || el.getAttribute('role') === 'button',
