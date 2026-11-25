@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
+import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../src/core/image-optimizer.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
