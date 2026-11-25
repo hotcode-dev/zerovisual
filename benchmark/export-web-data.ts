@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../dist/index.js';
-import { classifyProvider, readBenchmarkEnv } from './provider.js';
+import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
   const model = readBenchmarkEnv().AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
@@ -11,6 +11,60 @@ function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
 
 function calculateVisionTokens(width: number, height: number): number {
   return estimateVisionTokens(width, height, getBenchmarkProvider());
+}
+
+interface SessionMetrics {
+  sessionId: string;
+  imageResolution: { width: number; height: number };
+  imagePayloadBytes: number;
+  promptTokens: number;
+  imageTokens: number;
+  completionTokens: number;
+  reasoningTokens: number;
+  totalTokens: number;
+  latencyMs: number;
+  accuracyScore: number;
+  modelAnswer: string;
+  modelReasoning: string;
+}
+
+/** Per-mode fallbacks used when a benchmark session trace is absent or incomplete. */
+interface SessionMetricsFallbacks {
+  resolution: { width: number; height: number };
+  payloadBytes: number;
+  promptTokens: number;
+  imageTokens: number;
+  completionTokens: number;
+  reasoningTokens: number;
+  totalTokens: number;
+  latencyMs: number;
+}
+
+// Builds the "without"/"with" export block from a session trace (or null),
+// filling gaps from per-mode fallbacks. The `with` mode accuracy fallback is
+// 65 when a session exists and 100 when it does not (simulated pass).
+function buildSessionMetrics(
+  session: any,
+  caseId: string,
+  mode: 'without' | 'with',
+  fallbacks: SessionMetricsFallbacks
+): SessionMetrics {
+  const m = session?.metrics;
+  const accuracyFallback = mode === 'without' ? 65 : session ? 65 : 100;
+  return {
+    sessionId: session?.id || `simulated-${caseId}-${mode}`,
+    imageResolution: session?.inputImage?.resolution || fallbacks.resolution,
+    imagePayloadBytes: session?.inputImage?.bytes || fallbacks.payloadBytes,
+    promptTokens: m?.promptTokens || fallbacks.promptTokens,
+    imageTokens: m?.imageTokens > 0 ? m.imageTokens : fallbacks.imageTokens,
+    completionTokens: m?.completionTokens || fallbacks.completionTokens,
+    reasoningTokens: m?.reasoningTokens || fallbacks.reasoningTokens,
+    totalTokens: m?.totalTokens || fallbacks.totalTokens,
+    latencyMs: m?.latencyMs || fallbacks.latencyMs,
+    accuracyScore: m?.accuracyScore ?? accuracyFallback,
+    modelAnswer: (session?.output?.content || '').trim() || (session?.output?.reasoning?.slice(-350) || '').trim(),
+    modelReasoning: (session?.output?.reasoning || '').trim()
+  };
 }
 
 interface CaseSessionExport {
@@ -38,34 +92,8 @@ interface CaseSessionExport {
     bytes: string;
     latency: string;
   };
-  without: {
-    sessionId: string;
-    imageResolution: { width: number; height: number };
-    imagePayloadBytes: number;
-    promptTokens: number;
-    imageTokens: number;
-    completionTokens: number;
-    reasoningTokens: number;
-    totalTokens: number;
-    latencyMs: number;
-    accuracyScore: number;
-    modelAnswer: string;
-    modelReasoning: string;
-  };
-  with: {
-    sessionId: string;
-    imageResolution: { width: number; height: number };
-    imagePayloadBytes: number;
-    promptTokens: number;
-    imageTokens: number;
-    completionTokens: number;
-    reasoningTokens: number;
-    totalTokens: number;
-    latencyMs: number;
-    accuracyScore: number;
-    modelAnswer: string;
-    modelReasoning: string;
-  };
+  without: SessionMetrics;
+  with: SessionMetrics;
 }
 
 export async function exportWebData() {
@@ -78,10 +106,7 @@ export async function exportWebData() {
   fs.mkdirSync(webDataDir, { recursive: true });
   fs.mkdirSync(webPublicDir, { recursive: true });
 
-  const cases = fs
-    .readdirSync(testdataDir)
-    .filter(f => fs.statSync(path.join(testdataDir, f)).isDirectory())
-    .sort();
+  const cases = listCaseDirs(testdataDir);
 
   // Load all session files
   const sessionFiles = fs.existsSync(sessionsDir) ? fs.readdirSync(sessionsDir).filter(f => f.endsWith('.json')) : [];
@@ -155,38 +180,28 @@ export async function exportWebData() {
     const device = isMobile ? 'Mobile (iPhone 13)' : 'Desktop';
 
     // Build "without" object
-    const withoutObj = {
-      sessionId: sessionWithout?.id || `simulated-${caseId}-without`,
-      imageResolution: sessionWithout?.inputImage?.resolution || { width: rawWidth, height: rawHeight },
-      imagePayloadBytes: sessionWithout?.inputImage?.bytes || actualBuffer.length,
-      promptTokens: sessionWithout?.metrics?.promptTokens || rawTokensCalc + 120,
-      imageTokens: sessionWithout?.metrics?.imageTokens > 0 ? sessionWithout.metrics.imageTokens : rawTokensCalc,
-      completionTokens: sessionWithout?.metrics?.completionTokens || 1400,
-      reasoningTokens: sessionWithout?.metrics?.reasoningTokens || 1200,
-      totalTokens: sessionWithout?.metrics?.totalTokens || rawTokensCalc + 1520,
-      latencyMs: sessionWithout?.metrics?.latencyMs || Math.round(25000 + rawTokensCalc * 35),
-      accuracyScore: sessionWithout?.metrics?.accuracyScore ?? 65,
-      modelAnswer:
-        (sessionWithout?.output?.content || '').trim() || (sessionWithout?.output?.reasoning?.slice(-350) || '').trim(),
-      modelReasoning: (sessionWithout?.output?.reasoning || '').trim()
-    };
+    const withoutObj = buildSessionMetrics(sessionWithout, caseId, 'without', {
+      resolution: { width: rawWidth, height: rawHeight },
+      payloadBytes: actualBuffer.length,
+      promptTokens: rawTokensCalc + 120,
+      imageTokens: rawTokensCalc,
+      completionTokens: 1400,
+      reasoningTokens: 1200,
+      totalTokens: rawTokensCalc + 1520,
+      latencyMs: Math.round(25000 + rawTokensCalc * 35)
+    });
 
     // Build "with" object
-    const withObj = {
-      sessionId: sessionWith?.id || `simulated-${caseId}-with`,
-      imageResolution: sessionWith?.inputImage?.resolution || { width: optResult.width, height: optResult.height },
-      imagePayloadBytes: sessionWith?.inputImage?.bytes || optResult.buffer.length,
-      promptTokens: sessionWith?.metrics?.promptTokens || optTokensCalc + 120,
-      imageTokens: sessionWith?.metrics?.imageTokens > 0 ? sessionWith.metrics.imageTokens : optTokensCalc,
-      completionTokens: sessionWith?.metrics?.completionTokens || 1100,
-      reasoningTokens: sessionWith?.metrics?.reasoningTokens || 950,
-      totalTokens: sessionWith?.metrics?.totalTokens || optTokensCalc + 1220,
-      latencyMs: sessionWith?.metrics?.latencyMs || Math.round(18000 + optTokensCalc * 35),
-      accuracyScore: sessionWith?.metrics?.accuracyScore ?? (sessionWith ? 65 : 100),
-      modelAnswer:
-        (sessionWith?.output?.content || '').trim() || (sessionWith?.output?.reasoning?.slice(-350) || '').trim(),
-      modelReasoning: (sessionWith?.output?.reasoning || '').trim()
-    };
+    const withObj = buildSessionMetrics(sessionWith, caseId, 'with', {
+      resolution: { width: optResult.width, height: optResult.height },
+      payloadBytes: optResult.buffer.length,
+      promptTokens: optTokensCalc + 120,
+      imageTokens: optTokensCalc,
+      completionTokens: 1100,
+      reasoningTokens: 950,
+      totalTokens: optTokensCalc + 1220,
+      latencyMs: Math.round(18000 + optTokensCalc * 35)
+    });
 
     const tokenSaved = (((withoutObj.totalTokens - withObj.totalTokens) / withoutObj.totalTokens) * 100).toFixed(1);
     const imgTokenSaved = (((withoutObj.imageTokens - withObj.imageTokens) / withoutObj.imageTokens) * 100).toFixed(1);

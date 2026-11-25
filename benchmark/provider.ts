@@ -17,6 +17,17 @@ export function classifyProvider(model: string): 'qwen' | 'gemini' | 'local' {
 }
 
 /**
+ * List benchmark case directories (subdirectories of `dir`), sorted by name.
+ * Shared by runner.ts and export-web-data.ts so case discovery stays consistent.
+ */
+export function listCaseDirs(dir: string): string[] {
+  return fs
+    .readdirSync(dir)
+    .filter(f => fs.statSync(path.join(dir, f)).isDirectory())
+    .sort();
+}
+
+/**
  * Parse `benchmark/.env` into a flat key/value map.
  * Skips blank lines and `#` comments, strips inline comments,
  * preserves embedded `=` in values. Returns `{}` when the file is absent.
