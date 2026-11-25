@@ -91,6 +91,33 @@ describe('Image Optimization & Token Estimation', () => {
       expect(result.height).toBe(100);
       expect(stats.optimizedTokens).toBe(estimateVisionTokens(200, 100, 'anthropic'));
     });
+
+    it('keeps token stats consistent with the resolved provider when no provider is supplied', async () => {
+      const buffer = await sharp({
+        create: {
+          width: 1920,
+          height: 1080,
+          channels: 4,
+          background: { r: 100, g: 150, b: 200, alpha: 1 }
+        }
+      })
+        .png()
+        .toBuffer();
+
+      // No provider supplied — the resize pipeline defaults to 'openai',
+      // so the token stats must be computed with the same provider.
+      const { result, stats } = await optimizeImageStandalone(buffer);
+
+      expect(result.provider).toBe('openai');
+      expect(stats.optimizedTokens).toBe(estimateVisionTokens(result.width, result.height, result.provider, false));
+      expect(stats.originalTokens).toBe(estimateVisionTokens(1920, 1080, result.provider, false));
+
+      // Guard: the providers genuinely disagree for this source, so a stats/
+      // provider mismatch (the original bug) would have been caught here.
+      expect(estimateVisionTokens(1920, 1080, 'openai', false)).not.toBe(
+        estimateVisionTokens(1920, 1080, 'anthropic', false)
+      );
+    });
   });
 
   describe('runOptimizeCommand CLI', () => {

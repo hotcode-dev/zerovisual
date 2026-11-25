@@ -232,6 +232,12 @@ export interface ImageOptimizationStats {
 /**
  * Standalone optimizer for arbitrary screenshots or UI images,
  * returning the optimized WebP buffer alongside token and byte efficiency stats.
+ *
+ * When `options.provider` is omitted it defaults to `'openai'`, matching
+ * `optimizeImageForProvider` / `getProviderDimensions`. The resolved provider and
+ * `lowTokenMode` are passed through to the resize pipeline and reused for the token
+ * stats, so `stats.originalTokens` / `stats.optimizedTokens` always agree with
+ * `result.provider` and `result.tileDimensions`.
  */
 export async function optimizeImageStandalone(
   imageInput: Buffer | string,
@@ -240,7 +246,7 @@ export async function optimizeImageStandalone(
   result: OptimizedImageResult;
   stats: ImageOptimizationStats;
 }> {
-  const provider = options.provider ?? 'anthropic';
+  const provider = options.provider ?? 'openai';
   const lowTokenMode = options.lowTokenMode ?? false;
 
   const metadata = await sharp(imageInput).metadata();
@@ -248,7 +254,7 @@ export async function optimizeImageStandalone(
   const origHeight = metadata.height ?? 1;
   const origBytes = metadata.size ?? (Buffer.isBuffer(imageInput) ? imageInput.length : 0);
 
-  const result = await optimizeImageForProvider(imageInput, options);
+  const result = await optimizeImageForProvider(imageInput, { ...options, provider, lowTokenMode });
 
   const origTokens = estimateVisionTokens(origWidth, origHeight, provider, lowTokenMode);
   const optTokens = estimateVisionTokens(result.width, result.height, provider, lowTokenMode);
