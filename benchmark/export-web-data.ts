@@ -5,6 +5,7 @@ import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens }
 import { percentSavings } from '../src/core/provider-math.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 import { latencySavingsPct } from './report.js';
+import type { GroundTruth } from './types.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
   const model = readBenchmarkEnv().AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
@@ -79,14 +80,7 @@ interface CaseSessionExport {
   actualPath: string;
   diffPath: string;
   cropPath: string;
-  groundTruth: {
-    defect: string;
-    affectedElement: string;
-    defectType: string;
-    rootCause: string;
-    suggestedFix: string;
-    expectedBoundingBox: { x: number; y: number; width: number; height: number };
-  };
+  groundTruth: GroundTruth;
   cropBox: { x: number; y: number; width: number; height: number };
   savings: {
     totalTokens: string;
