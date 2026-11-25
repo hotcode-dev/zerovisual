@@ -153,37 +153,24 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
       .replace(/-diff\.png$/, '')
       .replace(/diff\.png$/, '');
 
-    let actualBase64: string | undefined;
-    let actualImagePath: string | undefined;
-    const actualPath = path.join(dir, `${baseName}-actual.png`);
-    if (fs.existsSync(actualPath)) {
-      const companion = await optimizeAndWriteCompanionImage(fs.readFileSync(actualPath), {
+    const companionImages: Partial<Record<'actual' | 'expected', { base64: string; path: string }>> = {};
+    for (const suffix of ['actual', 'expected'] as const) {
+      const companionPath = path.join(dir, `${baseName}-${suffix}.png`);
+      if (!fs.existsSync(companionPath)) continue;
+      const companion = await optimizeAndWriteCompanionImage(fs.readFileSync(companionPath), {
         artifactsDir,
         baseName: `${testId}-${safeProject}`,
-        suffix: 'actual',
+        suffix,
         provider,
         lowTokenMode,
         cropBox: diffDetection.boundingBox
       });
-      actualBase64 = companion.dataUri;
-      actualImagePath = companion.imagePath;
+      companionImages[suffix] = { base64: companion.dataUri, path: companion.imagePath };
     }
-
-    let expectedBase64: string | undefined;
-    let expectedImagePath: string | undefined;
-    const expectedPath = path.join(dir, `${baseName}-expected.png`);
-    if (fs.existsSync(expectedPath)) {
-      const companion = await optimizeAndWriteCompanionImage(fs.readFileSync(expectedPath), {
-        artifactsDir,
-        baseName: `${testId}-${safeProject}`,
-        suffix: 'expected',
-        provider,
-        lowTokenMode,
-        cropBox: diffDetection.boundingBox
-      });
-      expectedBase64 = companion.dataUri;
-      expectedImagePath = companion.imagePath;
-    }
+    const actualBase64 = companionImages.actual?.base64;
+    const actualImagePath = companionImages.actual?.path;
+    const expectedBase64 = companionImages.expected?.base64;
+    const expectedImagePath = companionImages.expected?.path;
 
     const viewportArtifact: ViewportArtifact = {
       project: projectName,
