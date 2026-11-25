@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../src/core/image-optimizer.js';
+import { percentSavings } from '../src/core/provider-math.js';
 import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
 import { buildBenchmarkReport, type BenchmarkRunResult } from './report.js';
 
@@ -402,12 +403,10 @@ Identify:
     };
     allResults.push(resultB);
 
-    const tokenSavedPct = (((resultA.totalTokens - resultB.totalTokens) / resultA.totalTokens) * 100).toFixed(1);
+    const tokenSavedPct = percentSavings(resultA.totalTokens, resultB.totalTokens).toFixed(1);
     const imgTokenSavedPct =
-      resultA.imageTokens > 0
-        ? (((resultA.imageTokens - resultB.imageTokens) / resultA.imageTokens) * 100).toFixed(1)
-        : '0.0';
-    const bytesSavedPct = (((rawPayloadBytes - optPayloadBytes) / rawPayloadBytes) * 100).toFixed(1);
+      resultA.imageTokens > 0 ? percentSavings(resultA.imageTokens, resultB.imageTokens).toFixed(1) : '0.0';
+    const bytesSavedPct = percentSavings(rawPayloadBytes, optPayloadBytes).toFixed(1);
 
     console.log(
       `      ✓ Mode B Complete: ${resB.usage.total_tokens} tokens (Img: ${resB.usage.image_tokens}), Latency: ${resB.latencyMs}ms, Accuracy: ${evalB.score}%`
