@@ -117,6 +117,13 @@ function splitThoughtTags(text: string): { content: string; reasoning: string } 
   };
 }
 
+function pickEffectiveAnswer(res: { content: string; reasoning: string }): string {
+  const content = res.content.trim();
+  return content.length > 10
+    ? content
+    : res.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || res.reasoning.trim();
+}
+
 async function callVlm(
   baseUrl: string,
   model: string,
@@ -279,10 +286,7 @@ Identify:
     const evalA = evaluateAccuracy(resA.content, resA.reasoning, metadata.groundTruth);
     const traceSessionIdA = `session-${metadata.id}-without-${Date.now()}`;
 
-    const effectiveAnswerA =
-      resA.content.trim().length > 10
-        ? resA.content.trim()
-        : resA.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resA.reasoning.trim();
+    const effectiveAnswerA = pickEffectiveAnswer(resA);
 
     const resultA: BenchmarkRunResult = {
       mode: 'without_zerovisual',
@@ -374,10 +378,7 @@ Identify:
     const evalB = evaluateAccuracy(resB.content, resB.reasoning, metadata.groundTruth);
     const traceSessionIdB = `session-${metadata.id}-with-${Date.now()}`;
 
-    const effectiveAnswerB =
-      resB.content.trim().length > 10
-        ? resB.content.trim()
-        : resB.reasoning.split('\n\n').slice(-3).join('\n\n').trim() || resB.reasoning.trim();
+    const effectiveAnswerB = pickEffectiveAnswer(resB);
 
     const resultB: BenchmarkRunResult = {
       mode: 'with_zerovisual',
