@@ -101,22 +101,20 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         }
       }
 
-      // Collect DOM heuristics, rendered AI-slop rules, and computed styles
-      const { heuristicViolations, computedStylesMap } = await auditPageHeuristics(page, {
+      // Shared options for both the full-page audit and the scoped DOM capture
+      const pageOpts = {
         isMobileViewport: vp.isMobile,
         viewportName: vp.name,
         designMd,
         ignoreRules: impeccableConfig.ignoreRules
-      });
+      };
+
+      // Collect DOM heuristics, rendered AI-slop rules, and computed styles
+      const { heuristicViolations, computedStylesMap } = await auditPageHeuristics(page, pageOpts);
       Object.assign(combinedDomStyles, computedStylesMap);
 
       // Scoped DOM context
-      const domContext = await captureDomContext(page, 'body', {
-        isMobileViewport: vp.isMobile,
-        viewportName: vp.name,
-        designMd,
-        ignoreRules: impeccableConfig.ignoreRules
-      });
+      const domContext = await captureDomContext(page, 'body', pageOpts);
 
       // Capture above-the-fold viewport screenshot and downscale to 1-tile WebP
       const rawScreenshot = await page.screenshot({ fullPage: false });
