@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import { cssRuleBody } from '../helpers/css-rule-body.js';
 
 // Regression guard for zf-hdz-3962e993 (Ponytail Rung 1): six legacy
 // `.action` / `.action.primary` / `.action.secondary` selectors in
@@ -16,15 +17,6 @@ const css = readFileSync(fileURLToPath(new URL('../../web/src/styles/custom.css'
 // so the live `.hero .actions` rule does not trip it.
 const DEAD_SELECTOR = /\.action(?![\w-])/;
 
-// Extract one CSS rule body: from the given selector to its closing brace.
-const ruleBody = (selector: string): string => {
-  const idx = css.indexOf(selector);
-  expect(idx, `selector ${selector} not found`).toBeGreaterThanOrEqual(0);
-  const open = css.indexOf('{', idx);
-  const close = css.indexOf('}', open);
-  return css.slice(open + 1, close);
-};
-
 describe('custom.css hero button selectors', () => {
   it('contains no .action / .action.primary / .action.secondary selectors', () => {
     expect(css, 'dead .action selector present').not.toMatch(DEAD_SELECTOR);
@@ -38,6 +30,6 @@ describe('custom.css hero button selectors', () => {
     ['.sl-link-button.secondary:hover {', 'background-color: var(--zv-surface-elevated) !important;'],
     ['.sl-link-button.secondary:active {', 'transform: scale(0.98);']
   ])('keeps the live %s override with its key declaration', (selector, prop) => {
-    expect(ruleBody(selector), `missing ${prop} in ${selector}`).toContain(prop);
+    expect(cssRuleBody(css, selector), `missing ${prop} in ${selector}`).toContain(prop);
   });
 });
