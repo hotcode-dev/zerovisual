@@ -9,6 +9,7 @@ import {
   optimizeImageForProvider,
   optimizeAndWriteCompanionImage
 } from '../../src/core/image-optimizer.js';
+import { makePng } from '../helpers/make-png.js';
 
 describe('Model-Aware Image Optimizer', () => {
   describe('getProviderDimensions', () => {
@@ -48,28 +49,10 @@ describe('Model-Aware Image Optimizer', () => {
   describe('detectDiffBoundingBox', () => {
     it('should detect minimal bounding box with 32px padding on synthetic 1920x1080 diff', async () => {
       // Create white 1920x1080 canvas
-      const base = await sharp({
-        create: {
-          width: 1920,
-          height: 1080,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const base = await makePng(1920, 1080, { r: 255, g: 255, b: 255 });
 
       // Create a red diff patch at (200, 300) with size 100x50
-      const redPatch = await sharp({
-        create: {
-          width: 100,
-          height: 50,
-          channels: 4,
-          background: { r: 255, g: 0, b: 0, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const redPatch = await makePng(100, 50, { r: 255, g: 0, b: 0 });
 
       const diffImage = await sharp(base)
         .composite([{ input: redPatch, left: 200, top: 300 }])
@@ -89,27 +72,9 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should clamp bounding box to boundaries when diff is near edges', async () => {
-      const base = await sharp({
-        create: {
-          width: 500,
-          height: 500,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const base = await makePng(500, 500, { r: 255, g: 255, b: 255 });
 
-      const redPatch = await sharp({
-        create: {
-          width: 20,
-          height: 20,
-          channels: 4,
-          background: { r: 255, g: 0, b: 0, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const redPatch = await makePng(20, 20, { r: 255, g: 0, b: 0 });
 
       // Put diff at (5, 5)
       const diffImage = await sharp(base)
@@ -126,16 +91,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should fallback to full image if no diff pixels found', async () => {
-      const base = await sharp({
-        create: {
-          width: 400,
-          height: 300,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const base = await makePng(400, 300, { r: 255, g: 255, b: 255 });
 
       const result = await detectDiffBoundingBox(base, 32);
 
@@ -147,16 +103,7 @@ describe('Model-Aware Image Optimizer', () => {
 
   describe('optimizeImageForProvider', () => {
     it('should downscale 1920x1080 desktop screenshot to fit openai 512x512 grid without exceeding bounds', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 1920,
-          height: 1080,
-          channels: 4,
-          background: { r: 100, g: 150, b: 200, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(1920, 1080, { r: 100, g: 150, b: 200 });
 
       const result = await optimizeImageForProvider(imageBuffer, { provider: 'openai' });
 
@@ -169,16 +116,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should fit anthropic 504x504 grid on 375x812 mobile viewport', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 375,
-          height: 812,
-          channels: 4,
-          background: { r: 50, g: 50, b: 50, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(375, 812, { r: 50, g: 50, b: 50 });
 
       const result = await optimizeImageForProvider(imageBuffer, { provider: 'anthropic' });
 
@@ -189,16 +127,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should honor gemini lowTokenMode 384x384', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 1200,
-          height: 1200,
-          channels: 4,
-          background: { r: 10, g: 20, b: 30, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(1200, 1200, { r: 10, g: 20, b: 30 });
 
       const result = await optimizeImageForProvider(imageBuffer, {
         provider: 'gemini',
@@ -210,16 +139,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should honor withoutEnlargement: true when crop region is smaller than grid', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 800,
-          height: 600,
-          channels: 4,
-          background: { r: 200, g: 200, b: 200, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(800, 600, { r: 200, g: 200, b: 200 });
 
       // Crop box is 200x150, smaller than 512x512
       const result = await optimizeImageForProvider(imageBuffer, {
@@ -244,16 +164,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should write `${baseName}-actual.webp` to artifactsDir and return its dataUri', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 800,
-          height: 600,
-          channels: 4,
-          background: { r: 20, g: 40, b: 60, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(800, 600, { r: 20, g: 40, b: 60 });
 
       const result = await optimizeAndWriteCompanionImage(imageBuffer, {
         artifactsDir,
@@ -273,16 +184,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should name the expected-suffix artifact `${baseName}-expected.webp`', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 300,
-          height: 300,
-          channels: 4,
-          background: { r: 1, g: 2, b: 3, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(300, 300, { r: 1, g: 2, b: 3 });
 
       const result = await optimizeAndWriteCompanionImage(imageBuffer, {
         artifactsDir,
@@ -298,16 +200,7 @@ describe('Model-Aware Image Optimizer', () => {
     });
 
     it('should apply cropBox when passed through the helper', async () => {
-      const imageBuffer = await sharp({
-        create: {
-          width: 800,
-          height: 600,
-          channels: 4,
-          background: { r: 100, g: 100, b: 100, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const imageBuffer = await makePng(800, 600, { r: 100, g: 100, b: 100 });
 
       await optimizeAndWriteCompanionImage(imageBuffer, {
         artifactsDir,
