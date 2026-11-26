@@ -66,12 +66,6 @@ html[data-theme='light'] {
 	color-scheme: dark !important;
 }
 
-/* Hide theme selection controls */
-starlight-theme-select,
-.theme-select {
-	@apply hidden;
-}
-
 /* Base ground with subtle architectural grid + faint emerald zenith light */
 body {
 	background-color: var(--zv-bg) !important;
