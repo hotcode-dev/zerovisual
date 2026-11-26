@@ -640,6 +640,17 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const groundTruthDesc = document.getElementById('ground-truth-desc');
     const groundTruthFix = document.getElementById('ground-truth-fix');
 
+    // Deactivate every element in a toggle group, then activate `clicked`,
+    // keeping the 'active' class and the group's aria state in sync.
+    function setGroupActive(group, clicked, ariaAttr) {
+      group.forEach((b) => {
+        b.classList.remove('active');
+        b.setAttribute(ariaAttr, 'false');
+      });
+      clicked.classList.add('active');
+      clicked.setAttribute(ariaAttr, 'true');
+    }
+
     function getDomainForCase(item) {
       if (item.id.includes('wikipedia')) return 'https://www.wikipedia.org/';
       if (item.id.includes('hackernews')) return 'https://news.ycombinator.com/';
@@ -788,12 +799,7 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     filterBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        filterBtns.forEach((b) => {
-          b.classList.remove('active');
-          b.setAttribute('aria-pressed', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-pressed', 'true');
+        setGroupActive(filterBtns, btn, 'aria-pressed');
 
         const filter = btn.getAttribute('data-filter');
         caseCards.forEach((card) => {
@@ -811,12 +817,7 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     imgViewTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
-        imgViewTabs.forEach((t) => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
+        setGroupActive(imgViewTabs, tab, 'aria-selected');
 
         currentViewMode = tab.getAttribute('data-view') || 'crop';
         renderActiveCase();
@@ -825,12 +826,7 @@ import benchmarkData from '../data/benchmark-sessions.json';
 
     sessionModeBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        sessionModeBtns.forEach((b) => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
+        setGroupActive(sessionModeBtns, btn, 'aria-selected');
 
         currentSessionMode = btn.getAttribute('data-mode') || 'with';
         const item = benchmarkData[currentCaseIndex];
