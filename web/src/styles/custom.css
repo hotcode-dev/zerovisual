@@ -43,7 +43,6 @@
 	--zv-text: #f1f5f9;
 	--zv-text-secondary: #cbd5e1;
 	--zv-text-muted: #94a3b8;
-	--zv-radius-sm: 6px;
 	--zv-radius-md: 10px;
 	--zv-radius-lg: 14px;
 	--zv-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -82,11 +81,6 @@ a.site-title {
 	min-height: 44px;
 	display: inline-flex;
 	align-items: center;
-}
-
-/* Tabular numbers utility for metrics and tables */
-.tabular-nums {
-	font-variant-numeric: tabular-nums;
 }
 
 /* Hero Section */
