@@ -4,10 +4,10 @@ import type { Reporter, TestCase, TestResult, FullResult } from '@playwright/tes
 import {
   ZeroVisualConfigSchema,
   TriagePayloadSchema,
+  createTriagePayload,
   type ZeroVisualConfig,
   type FailureEntry,
-  type ViewportArtifact,
-  type TriagePayload
+  type ViewportArtifact
 } from '../core/schema.js';
 import {
   detectDiffBoundingBox,
@@ -191,14 +191,12 @@ export class ZeroVisualReporter implements Reporter {
       this.config.customDimensions
     );
 
-    const payload: TriagePayload = {
-      version: '1.0.0',
-      mode: 'regression',
-      targetProvider: this.config.targetProvider,
-      tileDimensions: tileDims,
-      timestamp: new Date().toISOString(),
-      failures: Array.from(this.failureMap.values())
-    };
+    const payload = createTriagePayload(
+      'regression',
+      this.config.targetProvider,
+      tileDims,
+      Array.from(this.failureMap.values())
+    );
 
     // Validate payload against canonical schema
     const validated = TriagePayloadSchema.parse(payload);

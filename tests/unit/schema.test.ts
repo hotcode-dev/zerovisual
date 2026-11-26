@@ -4,6 +4,8 @@ import {
   TriagePayloadSchema,
   RegressionVerdictSchema,
   DesignQaVerdictSchema,
+  createTriagePayload,
+  TRIAGE_PAYLOAD_VERSION,
   type TriagePayload
 } from '../../src/core/schema.js';
 
@@ -180,6 +182,41 @@ describe('ZeroVisual Canonical Schemas', () => {
       const invalid = JSON.parse(JSON.stringify(validPayload));
       invalid.failures[0].viewports = [];
       expect(() => TriagePayloadSchema.parse(invalid)).toThrow();
+    });
+
+    describe('createTriagePayload', () => {
+      it('should produce a payload that TriagePayloadSchema accepts for regression mode', () => {
+        const payload = createTriagePayload('regression', 'openai', { maxWidth: 1024, maxHeight: 1024 }, [
+          validPayload.failures[0]!
+        ]);
+        const parsed = TriagePayloadSchema.parse(payload);
+        expect(parsed.mode).toBe('regression');
+        expect(parsed.targetProvider).toBe('openai');
+        expect(parsed.tileDimensions).toEqual({ maxWidth: 1024, maxHeight: 1024 });
+        expect(parsed.failures).toHaveLength(1);
+      });
+
+      it('should support an empty failures array (no-diff case)', () => {
+        const payload = createTriagePayload('regression', 'local', { maxWidth: 512, maxHeight: 512 }, []);
+        const parsed = TriagePayloadSchema.parse(payload);
+        expect(parsed.failures).toEqual([]);
+      });
+
+      it('should pin version to TRIAGE_PAYLOAD_VERSION and reject any other version', () => {
+        expect(TRIAGE_PAYLOAD_VERSION).toBe('1.0.0');
+        const payload = createTriagePayload('design-qa', 'anthropic', { maxWidth: 504, maxHeight: 504 }, []);
+        expect(payload.version).toBe('1.0.0');
+        expect(() => TriagePayloadSchema.parse({ ...payload, version: '2.0.0' })).toThrow();
+      });
+
+      it('should stamp a fresh valid ISO-8601 timestamp within the call window', () => {
+        const before = new Date().toISOString();
+        const payload = createTriagePayload('design-qa', 'gemini', { maxWidth: 768, maxHeight: 768 }, []);
+        const after = new Date().toISOString();
+        expect(before <= payload.timestamp && payload.timestamp <= after).toBe(true);
+        expect(Number.isNaN(Date.parse(payload.timestamp))).toBe(false);
+        expect(() => TriagePayloadSchema.parse({ ...payload, timestamp: 'not-a-timestamp' })).toThrow();
+      });
     });
   });
 

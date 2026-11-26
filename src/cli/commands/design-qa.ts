@@ -8,6 +8,7 @@ import type { Browser } from '@playwright/test';
 import {
   TriagePayloadSchema,
   TargetProviderSchema,
+  createTriagePayload,
   type TargetProvider,
   type TriagePayload,
   type ViewportArtifact,
@@ -216,27 +217,20 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   // Handle optional DESIGN.md comparison deltas
   const designMdDeltas: DesignMdDelta[] = designMd ? diffDesignMdAgainstDom(designMd, combinedDomStyles) : [];
 
-  const payload: TriagePayload = {
-    version: '1.0.0',
-    mode: 'design-qa',
-    targetProvider: provider,
-    tileDimensions: getProviderDimensions(provider, lowTokenMode),
-    timestamp: new Date().toISOString(),
-    failures: [
-      {
-        testId,
-        testTitle: `UI Design QA Audit for ${url}`,
-        filePath: url,
-        selector: 'body',
-        viewports: viewportsArtifacts,
-        designContext: {
-          heuristicViolations: aggregatedViolations,
-          penpotDeltas,
-          ...(designMdDeltas.length > 0 ? { designMdDeltas } : {})
-        }
+  const payload = createTriagePayload('design-qa', provider, getProviderDimensions(provider, lowTokenMode), [
+    {
+      testId,
+      testTitle: `UI Design QA Audit for ${url}`,
+      filePath: url,
+      selector: 'body',
+      viewports: viewportsArtifacts,
+      designContext: {
+        heuristicViolations: aggregatedViolations,
+        penpotDeltas,
+        ...(designMdDeltas.length > 0 ? { designMdDeltas } : {})
       }
-    ]
-  };
+    }
+  ]);
 
   const validated = TriagePayloadSchema.parse(payload);
   fs.mkdirSync(outputDir, { recursive: true });
