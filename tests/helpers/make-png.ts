@@ -1,8 +1,8 @@
 import sharp from 'sharp';
 
 /**
- * Create a solid-color PNG buffer via sharp's `create` pipeline.
- * All fixtures in the test suite use 4-channel RGBA with alpha = 1.
+ * Build a solid-color RGBA PNG buffer via sharp's create option.
+ * Shared test fixture — replaces per-test 8-line `sharp({ create: {...} })` blocks.
  */
 export async function makePng(
   width: number,

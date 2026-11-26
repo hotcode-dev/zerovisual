@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
+import { makePng } from '../helpers/make-png.js';
 import { estimateVisionTokens, optimizeImageStandalone } from '../../src/core/image-optimizer.js';
 import { runOptimizeCommand } from '../../src/cli/commands/optimize.js';
-import { makePng } from '../helpers/make-png.js';
 
 describe('Image Optimization & Token Estimation', () => {
   const testDir = path.resolve(process.cwd(), './test-optimize-temp');

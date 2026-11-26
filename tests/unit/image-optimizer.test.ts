@@ -3,13 +3,13 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
+import { makePng } from '../helpers/make-png.js';
 import {
   getProviderDimensions,
   detectDiffBoundingBox,
   optimizeImageForProvider,
   optimizeAndWriteCompanionImage
 } from '../../src/core/image-optimizer.js';
-import { makePng } from '../helpers/make-png.js';
 
 describe('Model-Aware Image Optimizer', () => {
   describe('getProviderDimensions', () => {
