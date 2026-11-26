@@ -14,8 +14,6 @@ export interface DesignMdSpec {
 
 export interface ImpeccableProjectConfig {
   ignoreRules: string[];
-  ignoreFiles: string[];
-  ignoreValues: string[];
   designSystemEnabled: boolean;
 }
 
@@ -231,8 +229,6 @@ export function loadImpeccableConfig(cwd = process.cwd()): ImpeccableProjectConf
   ];
 
   const ignoreRules = new Set<string>();
-  const ignoreFiles = new Set<string>();
-  const ignoreValues = new Set<string>();
   let designSystemEnabled = true;
 
   for (const file of configFiles) {
@@ -242,12 +238,6 @@ export function loadImpeccableConfig(cwd = process.cwd()): ImpeccableProjectConf
       const detector = parsed?.detector ?? parsed ?? {};
       if (Array.isArray(detector.ignoreRules)) {
         for (const r of detector.ignoreRules) ignoreRules.add(String(r));
-      }
-      if (Array.isArray(detector.ignoreFiles)) {
-        for (const f of detector.ignoreFiles) ignoreFiles.add(String(f));
-      }
-      if (Array.isArray(detector.ignoreValues)) {
-        for (const v of detector.ignoreValues) ignoreValues.add(String(v));
       }
       if (typeof detector?.designSystem?.enabled === 'boolean') {
         designSystemEnabled = detector.designSystem.enabled;
@@ -259,8 +249,6 @@ export function loadImpeccableConfig(cwd = process.cwd()): ImpeccableProjectConf
 
   return {
     ignoreRules: Array.from(ignoreRules),
-    ignoreFiles: Array.from(ignoreFiles),
-    ignoreValues: Array.from(ignoreValues),
     designSystemEnabled
   };
 }
