@@ -457,8 +457,8 @@ import benchmarkData from '../data/benchmark-sessions.json';
     box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
   }
 
-  /* Scenario Filter Buttons — 44px touch targets */
-  .filter-btn {
+  /* Shared button base — 44px touch targets */
+  .filter-btn, .img-view-tab, .session-mode-btn {
     min-height: 44px;
     padding: 0 0.875rem;
     border-radius: 6px;
@@ -471,11 +471,12 @@ import benchmarkData from '../data/benchmark-sessions.json';
     transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
-  .filter-btn:hover:not(.active) {
+  .filter-btn:hover:not(.active), .session-mode-btn:hover:not(.active) {
     color: #ffffff;
     background: #161d2b;
   }
 
+  /* Scenario Filter Buttons — 44px touch targets */
   .filter-btn.active {
     background: #161d2b;
     color: #a7f3d0;
@@ -487,16 +488,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
   .img-view-tab {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
-    padding: 0 0.875rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #cbd5e1;
-    background: transparent;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
   }
 
   .img-view-tab:hover:not(.active) {
@@ -562,24 +553,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
   }
 
   /* Session Mode Buttons — 44px touch targets */
-  .session-mode-btn {
-    min-height: 44px;
-    padding: 0 0.875rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #cbd5e1;
-    background: transparent;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: background-color 150ms var(--zv-ease-out), color 150ms var(--zv-ease-out), border-color 150ms var(--zv-ease-out);
-  }
-
-  .session-mode-btn:hover:not(.active) {
-    color: #ffffff;
-    background: #161d2b;
-  }
-
   .session-mode-btn[data-mode="with"].active {
     background: rgba(16, 185, 129, 0.16);
     color: #a7f3d0;
