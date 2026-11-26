@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
+import { makePng } from '../helpers/make-png.js';
 import { estimateVisionTokens, optimizeImageStandalone } from '../../src/core/image-optimizer.js';
 import { runOptimizeCommand } from '../../src/cli/commands/optimize.js';
 
@@ -47,16 +48,7 @@ describe('Image Optimization & Token Estimation', () => {
 
   describe('optimizeImageStandalone', () => {
     it('should downscale large 1920x1080 image to target provider dimensions and report savings', async () => {
-      const buffer = await sharp({
-        create: {
-          width: 1920,
-          height: 1080,
-          channels: 4,
-          background: { r: 100, g: 150, b: 200, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const buffer = await makePng(1920, 1080, { r: 100, g: 150, b: 200 });
 
       const { result, stats } = await optimizeImageStandalone(buffer, {
         provider: 'anthropic'
@@ -72,16 +64,7 @@ describe('Image Optimization & Token Estimation', () => {
     });
 
     it('should not enlarge small images when withoutEnlargement is active', async () => {
-      const buffer = await sharp({
-        create: {
-          width: 200,
-          height: 100,
-          channels: 4,
-          background: { r: 255, g: 0, b: 0, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const buffer = await makePng(200, 100, { r: 255, g: 0, b: 0 });
 
       const { result, stats } = await optimizeImageStandalone(buffer, {
         provider: 'anthropic'
@@ -93,16 +76,7 @@ describe('Image Optimization & Token Estimation', () => {
     });
 
     it('keeps token stats consistent with the resolved provider when no provider is supplied', async () => {
-      const buffer = await sharp({
-        create: {
-          width: 1920,
-          height: 1080,
-          channels: 4,
-          background: { r: 100, g: 150, b: 200, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const buffer = await makePng(1920, 1080, { r: 100, g: 150, b: 200 });
 
       // No provider supplied — the resize pipeline defaults to 'openai',
       // so the token stats must be computed with the same provider.
@@ -123,16 +97,7 @@ describe('Image Optimization & Token Estimation', () => {
   describe('runOptimizeCommand CLI', () => {
     it('should optimize image files in directory and write .optimized.webp files', async () => {
       const testImage = path.join(testDir, 'screenshot.png');
-      const pngBuffer = await sharp({
-        create: {
-          width: 1200,
-          height: 800,
-          channels: 4,
-          background: { r: 50, g: 100, b: 150, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const pngBuffer = await makePng(1200, 800, { r: 50, g: 100, b: 150 });
       fs.writeFileSync(testImage, pngBuffer);
 
       const summaries = await runOptimizeCommand({
