@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
 import type { TestCase, TestResult, FullResult } from '@playwright/test/reporter';
+import { makePng } from '../helpers/make-png.js';
 import { ZeroVisualReporter } from '../../src/reporter/playwright-reporter.js';
 import { TriagePayloadSchema } from '../../src/core/schema.js';
 
@@ -22,27 +23,8 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
   });
 
   async function createSyntheticDiffPng(): Promise<Buffer> {
-    const base = await sharp({
-      create: {
-        width: 800,
-        height: 600,
-        channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 }
-      }
-    })
-      .png()
-      .toBuffer();
-
-    const redDiff = await sharp({
-      create: {
-        width: 100,
-        height: 50,
-        channels: 4,
-        background: { r: 255, g: 0, b: 0, alpha: 1 }
-      }
-    })
-      .png()
-      .toBuffer();
+    const base = await makePng(800, 600, { r: 255, g: 255, b: 255 });
+    const redDiff = await makePng(100, 50, { r: 255, g: 0, b: 0 });
 
     return sharp(base)
       .composite([{ input: redDiff, left: 100, top: 150 }])
@@ -207,16 +189,7 @@ describe('ZeroVisual Playwright Reporter Aggregation', () => {
   });
 
   async function createSolidPng(color: { r: number; g: number; b: number }): Promise<Buffer> {
-    return sharp({
-      create: {
-        width: 320,
-        height: 240,
-        channels: 4,
-        background: { r: color.r, g: color.g, b: color.b, alpha: 1 }
-      }
-    })
-      .png()
-      .toBuffer();
+    return makePng(320, 240, color);
   }
 
   it('should discover, optimize, and persist actual/expected companion attachments', async () => {

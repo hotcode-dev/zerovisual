@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
+import { makePng } from '../helpers/make-png.js';
 
 // Spy on the core image pipeline functions with pass-through implementations:
 // the citty command `run` handlers call these locally, so spying here captures
@@ -26,16 +27,8 @@ const optimizeStandalone = vi.mocked(optimizeImageStandalone);
 async function createDiffFixture(baseDir: string, name: string): Promise<string> {
   const dir = path.join(baseDir, name, 'my-test-Desktop-Chrome');
   fs.mkdirSync(dir, { recursive: true });
-  const base = await sharp({
-    create: { width: 300, height: 200, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } }
-  })
-    .png()
-    .toBuffer();
-  const red = await sharp({
-    create: { width: 40, height: 20, channels: 4, background: { r: 255, g: 0, b: 0, alpha: 1 } }
-  })
-    .png()
-    .toBuffer();
+  const base = await makePng(300, 200, { r: 255, g: 255, b: 255 });
+  const red = await makePng(40, 20, { r: 255, g: 0, b: 0 });
   const diff = await sharp(base)
     .composite([{ input: red, left: 50, top: 50 }])
     .png()
@@ -48,11 +41,7 @@ async function createDiffFixture(baseDir: string, name: string): Promise<string>
 async function createImageFixture(baseDir: string, name: string): Promise<string> {
   const dir = path.join(baseDir, name);
   fs.mkdirSync(dir, { recursive: true });
-  const png = await sharp({
-    create: { width: 640, height: 400, channels: 4, background: { r: 50, g: 100, b: 150, alpha: 1 } }
-  })
-    .png()
-    .toBuffer();
+  const png = await makePng(640, 400, { r: 50, g: 100, b: 150 });
   fs.writeFileSync(path.join(dir, 'shot.png'), png);
   return dir;
 }

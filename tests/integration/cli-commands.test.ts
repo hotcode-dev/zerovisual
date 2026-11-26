@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import sharp from 'sharp';
+import { makePng } from '../helpers/make-png.js';
 import { runRegressionCommand } from '../../src/cli/commands/regression.js';
 import { runDesignQaCommand } from '../../src/cli/commands/design-qa.js';
 import { runEstimateCommand } from '../../src/cli/commands/estimate.js';
@@ -43,27 +44,8 @@ describe('ZeroVisual CLI Commands Integration', () => {
       const fixtureDir = path.join(cliOutputDir, 'my-test-Desktop-Chrome');
       fs.mkdirSync(fixtureDir, { recursive: true });
 
-      const base = await sharp({
-        create: {
-          width: 600,
-          height: 400,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
-
-      const red = await sharp({
-        create: {
-          width: 80,
-          height: 40,
-          channels: 4,
-          background: { r: 255, g: 0, b: 0, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const base = await makePng(600, 400, { r: 255, g: 255, b: 255 });
+      const red = await makePng(80, 40, { r: 255, g: 0, b: 0 });
 
       const diffImg = await sharp(base)
         .composite([{ input: red, left: 100, top: 100 }])
@@ -109,16 +91,7 @@ describe('ZeroVisual CLI Commands Integration', () => {
 
   describe('runDesignQaCommand with mock browser', () => {
     it('should execute design-qa audit and write design-qa-ready.json', async () => {
-      const mockScreenshotBuffer = await sharp({
-        create: {
-          width: 800,
-          height: 600,
-          channels: 4,
-          background: { r: 240, g: 240, b: 240, alpha: 1 }
-        }
-      })
-        .png()
-        .toBuffer();
+      const mockScreenshotBuffer = await makePng(800, 600, { r: 240, g: 240, b: 240 });
 
       // Mock Page
       const mockPage = {
