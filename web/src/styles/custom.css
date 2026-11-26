@@ -129,8 +129,7 @@ a.site-title {
 }
 
 /* Hero Action Buttons — override Starlight .sl-link-button with 8pt grid, 44px+ tap targets, WCAG AAA contrast */
-.sl-link-button.primary,
-.action.primary {
+.sl-link-button.primary {
 	display: inline-flex !important;
 	align-items: center !important;
 	justify-content: center !important;
@@ -150,21 +149,18 @@ a.site-title {
 	transition: background-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out), box-shadow 160ms var(--zv-ease-out);
 }
 
-.sl-link-button.primary:hover,
-.action.primary:hover {
+.sl-link-button.primary:hover {
 	background-color: #34d399 !important;
 	color: #03150e !important;
 	transform: translateY(-1px);
 	box-shadow: 0 8px 24px -6px rgba(16, 185, 129, 0.45) !important;
 }
 
-.sl-link-button.primary:active,
-.action.primary:active {
+.sl-link-button.primary:active {
 	transform: scale(0.98);
 }
 
-.sl-link-button.secondary,
-.action.secondary {
+.sl-link-button.secondary {
 	display: inline-flex !important;
 	align-items: center !important;
 	justify-content: center !important;
@@ -183,16 +179,14 @@ a.site-title {
 	transition: background-color 160ms var(--zv-ease-out), border-color 160ms var(--zv-ease-out), transform 160ms var(--zv-ease-out);
 }
 
-.sl-link-button.secondary:hover,
-.action.secondary:hover {
+.sl-link-button.secondary:hover {
 	background-color: var(--zv-surface-elevated) !important;
 	border-color: var(--zv-accent) !important;
 	color: #ffffff !important;
 	transform: translateY(-1px);
 }
 
-.sl-link-button.secondary:active,
-.action.secondary:active {
+.sl-link-button.secondary:active {
 	transform: scale(0.98);
 }
 
