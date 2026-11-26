@@ -18,3 +18,13 @@ export interface GroundTruth {
   suggestedFix: string;
   expectedBoundingBox?: { x: number; y: number; width: number; height: number };
 }
+
+/** Per-run vision-token + latency metrics shared by report.ts and export-web-data.ts. */
+export interface TokenMetrics {
+  imageTokens: number;
+  completionTokens: number;
+  reasoningTokens: number;
+  totalTokens: number;
+  latencyMs: number;
+  accuracyScore: number;
+}
