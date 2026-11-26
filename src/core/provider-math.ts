@@ -54,10 +54,17 @@ export const PROVIDER_SPECS: Record<TargetProvider, ProviderSpec> = {
 };
 
 /**
+ * Shared default provider for the public tile/token APIs
+ * (`getProviderDimensions` and `estimateVisionTokens`).
+ */
+export const DEFAULT_TARGET_PROVIDER: TargetProvider = 'anthropic';
+
+/**
  * Returns model-aware maximum bounding-box tile dimensions.
+ * Defaults to `DEFAULT_TARGET_PROVIDER` ('anthropic') when no provider is given.
  */
 export function getProviderDimensions(
-  provider: TargetProvider = 'openai',
+  provider: TargetProvider = DEFAULT_TARGET_PROVIDER,
   lowTokenMode = false,
   custom?: TileDimensions
 ): TileDimensions {
@@ -86,11 +93,12 @@ export function fitToTile(width: number, height: number, tileDims: TileDimension
 
 /**
  * Calculates estimated Vision LLM token consumption for a given pixel resolution.
+ * Defaults to `DEFAULT_TARGET_PROVIDER` ('anthropic') when no provider is given.
  */
 export function estimateVisionTokens(
   width: number,
   height: number,
-  provider: TargetProvider = 'anthropic',
+  provider: TargetProvider = DEFAULT_TARGET_PROVIDER,
   lowTokenMode = false
 ): number {
   if (width <= 0 || height <= 0) return 0;
