@@ -20,7 +20,6 @@ interface SessionMetrics {
   sessionId: string;
   imageResolution: { width: number; height: number };
   imagePayloadBytes: number;
-  promptTokens: number;
   imageTokens: number;
   completionTokens: number;
   reasoningTokens: number;
@@ -35,7 +34,6 @@ interface SessionMetrics {
 interface SessionMetricsFallbacks {
   resolution: { width: number; height: number };
   payloadBytes: number;
-  promptTokens: number;
   imageTokens: number;
   completionTokens: number;
   reasoningTokens: number;
@@ -58,7 +56,6 @@ function buildSessionMetrics(
     sessionId: session?.id || `simulated-${caseId}-${mode}`,
     imageResolution: session?.inputImage?.resolution || fallbacks.resolution,
     imagePayloadBytes: session?.inputImage?.bytes || fallbacks.payloadBytes,
-    promptTokens: m?.promptTokens || fallbacks.promptTokens,
     imageTokens: m?.imageTokens > 0 ? m.imageTokens : fallbacks.imageTokens,
     completionTokens: m?.completionTokens || fallbacks.completionTokens,
     reasoningTokens: m?.reasoningTokens || fallbacks.reasoningTokens,
@@ -179,7 +176,6 @@ export async function exportWebData() {
     const withoutObj = buildSessionMetrics(sessionWithout, caseId, 'without', {
       resolution: { width: rawWidth, height: rawHeight },
       payloadBytes: actualBuffer.length,
-      promptTokens: rawTokensCalc + 120,
       imageTokens: rawTokensCalc,
       completionTokens: 1400,
       reasoningTokens: 1200,
@@ -191,7 +187,6 @@ export async function exportWebData() {
     const withObj = buildSessionMetrics(sessionWith, caseId, 'with', {
       resolution: { width: optResult.width, height: optResult.height },
       payloadBytes: optResult.buffer.length,
-      promptTokens: optTokensCalc + 120,
       imageTokens: optTokensCalc,
       completionTokens: 1100,
       reasoningTokens: 950,

@@ -17,7 +17,6 @@ function mkResult(
     imageResolution: { width: 1920, height: 1080 },
     imagePayloadBytes: 20480,
     imageFormat: 'png',
-    promptTokens: 10,
     imageTokens: 800,
     completionTokens: 40,
     reasoningTokens: 0,

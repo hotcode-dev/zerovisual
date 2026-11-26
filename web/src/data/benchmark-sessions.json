@@ -44,7 +44,6 @@
         "height": 800
       },
       "imagePayloadBytes": 25172,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 2048,
       "reasoningTokens": 2049,
@@ -61,7 +60,6 @@
         "height": 389
       },
       "imagePayloadBytes": 6134,
-      "promptTokens": 330,
       "imageTokens": 192,
       "completionTokens": 2048,
       "reasoningTokens": 2048,
@@ -117,7 +115,6 @@
         "height": 800
       },
       "imagePayloadBytes": 27720,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 425,
       "reasoningTokens": 228,
@@ -134,7 +131,6 @@
         "height": 92
       },
       "imagePayloadBytes": 3420,
-      "promptTokens": 214,
       "imageTokens": 76,
       "completionTokens": 1291,
       "reasoningTokens": 956,
@@ -190,7 +186,6 @@
         "height": 800
       },
       "imagePayloadBytes": 35106,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 2026,
       "reasoningTokens": 1548,
@@ -207,7 +202,6 @@
         "height": 103
       },
       "imagePayloadBytes": 572,
-      "promptTokens": 208,
       "imageTokens": 70,
       "completionTokens": 910,
       "reasoningTokens": 528,
@@ -263,7 +257,6 @@
         "height": 800
       },
       "imagePayloadBytes": 22948,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 978,
       "reasoningTokens": 497,
@@ -280,7 +273,6 @@
         "height": 328
       },
       "imagePayloadBytes": 7156,
-      "promptTokens": 298,
       "imageTokens": 160,
       "completionTokens": 387,
       "reasoningTokens": 159,
@@ -336,7 +328,6 @@
         "height": 800
       },
       "imagePayloadBytes": 33568,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 1462,
       "reasoningTokens": 891,
@@ -353,7 +344,6 @@
         "height": 66
       },
       "imagePayloadBytes": 3452,
-      "promptTokens": 207,
       "imageTokens": 69,
       "completionTokens": 2048,
       "reasoningTokens": 1561,
@@ -409,7 +399,6 @@
         "height": 664
       },
       "imagePayloadBytes": 5612,
-      "promptTokens": 390,
       "imageTokens": 252,
       "completionTokens": 2048,
       "reasoningTokens": 2048,
@@ -426,7 +415,6 @@
         "height": 121
       },
       "imagePayloadBytes": 1482,
-      "promptTokens": 215,
       "imageTokens": 77,
       "completionTokens": 1875,
       "reasoningTokens": 1491,
@@ -482,7 +470,6 @@
         "height": 800
       },
       "imagePayloadBytes": 125273,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 1044,
       "reasoningTokens": 720,
@@ -499,7 +486,6 @@
         "height": 145
       },
       "imagePayloadBytes": 6070,
-      "promptTokens": 218,
       "imageTokens": 80,
       "completionTokens": 1768,
       "reasoningTokens": 1378,
@@ -555,7 +541,6 @@
         "height": 664
       },
       "imagePayloadBytes": 50042,
-      "promptTokens": 390,
       "imageTokens": 252,
       "completionTokens": 2048,
       "reasoningTokens": 2049,
@@ -572,7 +557,6 @@
         "height": 133
       },
       "imagePayloadBytes": 1574,
-      "promptTokens": 208,
       "imageTokens": 70,
       "completionTokens": 2048,
       "reasoningTokens": 2049,
@@ -628,7 +612,6 @@
         "height": 800
       },
       "imagePayloadBytes": 157851,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 2048,
       "reasoningTokens": 2050,
@@ -645,7 +628,6 @@
         "height": 354
       },
       "imagePayloadBytes": 18386,
-      "promptTokens": 314,
       "imageTokens": 176,
       "completionTokens": 424,
       "reasoningTokens": 225,
@@ -701,7 +683,6 @@
         "height": 800
       },
       "imagePayloadBytes": 114551,
-      "promptTokens": 1138,
       "imageTokens": 1000,
       "completionTokens": 690,
       "reasoningTokens": 349,
@@ -718,7 +699,6 @@
         "height": 504
       },
       "imagePayloadBytes": 20538,
-      "promptTokens": 394,
       "imageTokens": 256,
       "completionTokens": 814,
       "reasoningTokens": 461,
@@ -774,7 +754,6 @@
         "height": 664
       },
       "imagePayloadBytes": 56411,
-      "promptTokens": 390,
       "imageTokens": 252,
       "completionTokens": 2048,
       "reasoningTokens": 2048,
@@ -791,7 +770,6 @@
         "height": 168
       },
       "imagePayloadBytes": 4774,
-      "promptTokens": 216,
       "imageTokens": 78,
       "completionTokens": 1670,
       "reasoningTokens": 1172,
