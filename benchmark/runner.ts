@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../src/core/image-optimizer.js';
-import { percentSavings } from '../src/core/provider-math.js';
+import { savingsPct } from '../src/core/provider-math.js';
 import {
   BENCHMARK_CROP_PADDING_PX,
   BENCHMARK_WEBP_QUALITY,
@@ -431,10 +431,9 @@ Identify:
     );
     allResults.push(resultB);
 
-    const tokenSavedPct = percentSavings(resultA.totalTokens, resultB.totalTokens).toFixed(1);
-    const imgTokenSavedPct =
-      resultA.imageTokens > 0 ? percentSavings(resultA.imageTokens, resultB.imageTokens).toFixed(1) : '0.0';
-    const bytesSavedPct = percentSavings(rawPayloadBytes, optPayloadBytes).toFixed(1);
+    const tokenSavedPct = savingsPct(resultA.totalTokens, resultB.totalTokens);
+    const imgTokenSavedPct = savingsPct(resultA.imageTokens, resultB.imageTokens);
+    const bytesSavedPct = savingsPct(rawPayloadBytes, optPayloadBytes);
 
     console.log(
       `      ✓ Mode B Complete: ${resB.usage.total_tokens} tokens (Img: ${resB.usage.image_tokens}), Latency: ${resB.latencyMs}ms, Accuracy: ${evalB.score}%`

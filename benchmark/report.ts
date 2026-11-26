@@ -6,7 +6,7 @@
  * raw/optimized per-case pairing — can be unit-tested in isolation.
  */
 
-import { percentSavings } from '../src/core/provider-math.js';
+import { percentSavings, savingsPct } from '../src/core/provider-math.js';
 
 export interface BenchmarkRunResult {
   mode: 'without_zerovisual' | 'with_zerovisual';
@@ -44,16 +44,15 @@ export function buildBenchmarkReport(results: BenchmarkRunResult[], model: strin
 
   const totalRawTokens = rawRuns.reduce((sum, r) => sum + r.totalTokens, 0);
   const totalOptTokens = optRuns.reduce((sum, r) => sum + r.totalTokens, 0);
-  const totalTokenSavings = totalRawTokens > 0 ? percentSavings(totalRawTokens, totalOptTokens).toFixed(1) : '0';
+  const totalTokenSavings = savingsPct(totalRawTokens, totalOptTokens, '0');
 
   const totalRawImgTokens = rawRuns.reduce((sum, r) => sum + r.imageTokens, 0);
   const totalOptImgTokens = optRuns.reduce((sum, r) => sum + r.imageTokens, 0);
-  const totalImgTokenSavings =
-    totalRawImgTokens > 0 ? percentSavings(totalRawImgTokens, totalOptImgTokens).toFixed(1) : '0';
+  const totalImgTokenSavings = savingsPct(totalRawImgTokens, totalOptImgTokens, '0');
 
   const totalRawBytes = rawRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
   const totalOptBytes = optRuns.reduce((sum, r) => sum + r.imagePayloadBytes, 0);
-  const totalByteSavings = totalRawBytes > 0 ? percentSavings(totalRawBytes, totalOptBytes).toFixed(1) : '0';
+  const totalByteSavings = savingsPct(totalRawBytes, totalOptBytes, '0');
 
   const avgRawLatency =
     rawRuns.length > 0 ? Math.round(rawRuns.reduce((sum, r) => sum + r.latencyMs, 0) / rawRuns.length) : 0;
@@ -109,9 +108,9 @@ export function buildBenchmarkReport(results: BenchmarkRunResult[], model: strin
     md += `- **Category:** ${raw.category}\n`;
     md += `- **Without ZeroVisual Tokens:** ${raw.totalTokens} (Image: ${raw.imageTokens}) | Latency: ${raw.latencyMs}ms | Accuracy: ${raw.accuracyScore}%\n`;
     if (opt) {
-      const savedPct = percentSavings(raw.totalTokens, opt.totalTokens).toFixed(1);
-      const imgSavedPct = raw.imageTokens > 0 ? percentSavings(raw.imageTokens, opt.imageTokens).toFixed(1) : '0';
-      const bandSavedPct = percentSavings(raw.imagePayloadBytes, opt.imagePayloadBytes).toFixed(1);
+      const savedPct = savingsPct(raw.totalTokens, opt.totalTokens);
+      const imgSavedPct = savingsPct(raw.imageTokens, opt.imageTokens, '0');
+      const bandSavedPct = savingsPct(raw.imagePayloadBytes, opt.imagePayloadBytes);
       md += `- **With ZeroVisual Tokens:** **${opt.totalTokens}** (Image: **${opt.imageTokens}**) | Latency: ${opt.latencyMs}ms | Accuracy: ${opt.accuracyScore}%\n`;
       md += `- **Savings:** **${savedPct}% total tokens**, **${imgSavedPct}% vision image tokens**, **${bandSavedPct}% bandwidth**\n\n`;
 
