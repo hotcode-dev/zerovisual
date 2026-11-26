@@ -1,44 +1,33 @@
 import { describe, it, expect, afterAll } from 'vitest';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { loadImpeccableConfig } from '../../src/core/design-md-parser.js';
+import { makeTmpDir, cleanupTmpDirs } from '../helpers/tmp-dir.js';
 
 describe('loadImpeccableConfig', () => {
-  const tmpDirs: string[] = [];
-  const makeTmpDir = () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'zv-impeccable-config-'));
-    tmpDirs.push(dir);
-    return dir;
-  };
-
   const writeConfig = (dir: string, filename: string, obj: unknown) => {
     fs.mkdirSync(path.join(dir, '.impeccable'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.impeccable', filename), JSON.stringify(obj), 'utf-8');
   };
 
-  afterAll(() => {
-    for (const dir of tmpDirs) {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
-  });
+  afterAll(cleanupTmpDirs);
 
   it('returns defaults when no config files exist', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     const config = loadImpeccableConfig(dir);
     expect(config.ignoreRules).toEqual([]);
     expect(config.designSystemEnabled).toBe(true);
   });
 
   it('parses detector.ignoreRules from config.json', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     writeConfig(dir, 'config.json', { detector: { ignoreRules: ['contrast', 'spacing'] } });
     const config = loadImpeccableConfig(dir);
     expect(config.ignoreRules).toEqual(['contrast', 'spacing']);
   });
 
   it('strips legacy ignoreFiles and ignoreValues keys without error', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     writeConfig(dir, 'config.json', {
       detector: {
         ignoreRules: ['contrast'],
@@ -56,14 +45,14 @@ describe('loadImpeccableConfig', () => {
   });
 
   it('honors designSystem.enabled override', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     writeConfig(dir, 'config.json', { detector: { designSystem: { enabled: false } } });
     const config = loadImpeccableConfig(dir);
     expect(config.designSystemEnabled).toBe(false);
   });
 
   it('merges ignoreRules across config.json and config.local.json', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     writeConfig(dir, 'config.json', { detector: { ignoreRules: ['contrast'] } });
     writeConfig(dir, 'config.local.json', { detector: { ignoreRules: ['spacing'] } });
     const config = loadImpeccableConfig(dir);
@@ -72,7 +61,7 @@ describe('loadImpeccableConfig', () => {
   });
 
   it('ignores malformed JSON without throwing', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     fs.mkdirSync(path.join(dir, '.impeccable'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.impeccable', 'config.json'), '{ not valid json', 'utf-8');
     const config = loadImpeccableConfig(dir);
@@ -81,7 +70,7 @@ describe('loadImpeccableConfig', () => {
   });
 
   it('handles top-level (non-detector) config shape', () => {
-    const dir = makeTmpDir();
+    const dir = makeTmpDir('zv-impeccable-config-');
     writeConfig(dir, 'config.json', { ignoreRules: ['tap-target'] });
     const config = loadImpeccableConfig(dir);
     expect(config.ignoreRules).toEqual(['tap-target']);

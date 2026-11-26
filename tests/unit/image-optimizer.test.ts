@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
 import { makePng } from '../helpers/make-png.js';
+import { makeTmpDir, cleanupTmpDirs } from '../helpers/tmp-dir.js';
 import {
   getProviderDimensions,
   detectDiffBoundingBox,
@@ -156,12 +156,10 @@ describe('Model-Aware Image Optimizer', () => {
     let artifactsDir: string;
 
     beforeEach(() => {
-      artifactsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zv-companion-'));
+      artifactsDir = makeTmpDir('zv-companion-');
     });
 
-    afterEach(() => {
-      fs.rmSync(artifactsDir, { recursive: true, force: true });
-    });
+    afterEach(cleanupTmpDirs);
 
     it('should write `${baseName}-actual.webp` to artifactsDir and return its dataUri', async () => {
       const imageBuffer = await makePng(800, 600, { r: 20, g: 40, b: 60 });
