@@ -179,12 +179,19 @@ export function parseColor(colorStr: string): RgbColor {
 }
 
 /**
+ * Matches 3-8 digit hex color tokens (#abc, #aabbcc, #aabbccdd, …).
+ * Shared by every CSS/markdown color-token extractor (String.match with /g
+ * always restarts at index 0, so one shared regex object is safe).
+ */
+export const HEX_COLOR_RE = /#[0-9a-fA-F]{3,8}\b/g;
+
+/**
  * Extracts all color tokens from a CSS value string (e.g. gradients or box-shadows).
  */
 export function extractColorsFromCssValue(cssVal: string): RgbColor[] {
   if (!cssVal || cssVal === 'none') return [];
   const matches = [
-    ...(cssVal.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []),
+    ...(cssVal.match(HEX_COLOR_RE) ?? []),
     ...(cssVal.match(/rgba?\([^)]+\)/gi) ?? []),
     ...(cssVal.match(/hsla?\([^)]+\)/gi) ?? []),
     ...(cssVal.match(/oklch\([^)]+\)/gi) ?? []),

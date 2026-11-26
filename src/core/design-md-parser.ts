@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { DesignMdDelta } from './schema.js';
-import { parseColor, type RgbColor } from './color.js';
+import { parseColor, type RgbColor, HEX_COLOR_RE } from './color.js';
 
 export interface DesignMdSpec {
   fonts: string[];
@@ -75,7 +75,7 @@ export function parseDesignMd(markdownContent: string): DesignMdSpec {
 
   // 1. Extract hex, rgb/rgba, hsl/hsla, oklch/oklab colors
   const colorMatches = [
-    ...(markdownContent.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []),
+    ...(markdownContent.match(HEX_COLOR_RE) ?? []),
     ...(markdownContent.match(/rgba?\(\s*\d+[\s,]+\d+[\s,]+\d+(?:[\s,/]+[\d.]+%?)?\s*\)/gi) ?? []),
     ...(markdownContent.match(/hsla?\(\s*[\d.]+(?:deg)?[\s,]+[\d.]+%[\s,]+[\d.]+%(?:[\s,/]+[\d.]+%?)?\s*\)/gi) ?? []),
     ...(markdownContent.match(/oklch\(\s*[\d.]+%?[\s,]+[\d.]+[\s,]+[\d.]+(?:deg)?(?:[\s,/]+[\d.]+%?)?\s*\)/gi) ?? []),
