@@ -16,7 +16,6 @@ export interface BenchmarkRunResult {
   imageResolution: { width: number; height: number };
   imagePayloadBytes: number;
   imageFormat: string;
-  promptTokens: number;
   imageTokens: number;
   completionTokens: number;
   reasoningTokens: number;

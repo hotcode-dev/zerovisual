@@ -324,7 +324,6 @@ Identify:
       imageResolution,
       imagePayloadBytes,
       imageFormat,
-      promptTokens: res.usage.prompt_tokens,
       imageTokens: res.usage.image_tokens,
       completionTokens: res.usage.completion_tokens,
       reasoningTokens: res.usage.reasoning_tokens,
