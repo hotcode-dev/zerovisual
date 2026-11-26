@@ -163,9 +163,13 @@ export const FailureEntrySchema = z.object({
 export type FailureEntry = z.infer<typeof FailureEntrySchema>;
 
 export const PipelineModeSchema = z.enum(['regression', 'design-qa']);
+export type PipelineMode = z.infer<typeof PipelineModeSchema>;
+
+/** Pinned payload version — single source of truth shared by the schema and all producers. */
+export const TRIAGE_PAYLOAD_VERSION = '1.0.0' as const;
 
 export const TriagePayloadSchema = z.object({
-  version: z.literal('1.0.0'),
+  version: z.literal(TRIAGE_PAYLOAD_VERSION),
   mode: PipelineModeSchema,
   targetProvider: TargetProviderSchema,
   tileDimensions: TileDimensionsSchema,
@@ -173,6 +177,27 @@ export const TriagePayloadSchema = z.object({
   failures: z.array(FailureEntrySchema)
 });
 export type TriagePayload = z.infer<typeof TriagePayloadSchema>;
+
+/**
+ * Builds a canonical TriagePayload envelope: pinned version, fresh ISO-8601
+ * timestamp, and the caller-supplied mode/provider/dimensions/failures.
+ * All producers must use this helper so the envelope is written in one place.
+ */
+export function createTriagePayload(
+  mode: PipelineMode,
+  targetProvider: TargetProvider,
+  tileDimensions: TileDimensions,
+  failures: FailureEntry[]
+): TriagePayload {
+  return {
+    version: TRIAGE_PAYLOAD_VERSION,
+    mode,
+    targetProvider,
+    tileDimensions,
+    timestamp: new Date().toISOString(),
+    failures
+  };
+}
 
 export const RegressionVerdictSchema = z.object({
   testId: z.string(),

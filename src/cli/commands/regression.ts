@@ -6,6 +6,7 @@ import { slugify } from '../../core/slug.js';
 import {
   TriagePayloadSchema,
   TargetProviderSchema,
+  createTriagePayload,
   type TargetProvider,
   type FailureEntry,
   type ViewportArtifact,
@@ -94,14 +95,7 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
   const diffFiles = findDiffFiles(inputDir);
 
   if (diffFiles.length === 0) {
-    const emptyPayload: TriagePayload = {
-      version: '1.0.0',
-      mode: 'regression',
-      targetProvider: provider,
-      tileDimensions: getProviderDimensions(provider, lowTokenMode),
-      timestamp: new Date().toISOString(),
-      failures: []
-    };
+    const emptyPayload = createTriagePayload('regression', provider, getProviderDimensions(provider, lowTokenMode), []);
     if (options.json) {
       console.log(
         JSON.stringify(
@@ -205,14 +199,12 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
     }
   }
 
-  const payload: TriagePayload = {
-    version: '1.0.0',
-    mode: 'regression',
-    targetProvider: provider,
-    tileDimensions: getProviderDimensions(provider, lowTokenMode),
-    timestamp: new Date().toISOString(),
-    failures: Array.from(failureMap.values())
-  };
+  const payload = createTriagePayload(
+    'regression',
+    provider,
+    getProviderDimensions(provider, lowTokenMode),
+    Array.from(failureMap.values())
+  );
 
   const validated = TriagePayloadSchema.parse(payload);
   fs.mkdirSync(outputDir, { recursive: true });
