@@ -12,7 +12,7 @@ import {
   listCaseDirs
 } from './provider.js';
 import { latencySavingsPct } from './report.js';
-import type { GroundTruth } from './types.js';
+import type { GroundTruth, TokenMetrics } from './types.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
   const model = readBenchmarkEnv().AGENT_MODEL ?? DEFAULT_AGENT_MODEL;
@@ -23,29 +23,18 @@ function calculateVisionTokens(width: number, height: number): number {
   return estimateVisionTokens(width, height, getBenchmarkProvider());
 }
 
-interface SessionMetrics {
+interface SessionMetrics extends TokenMetrics {
   sessionId: string;
   imageResolution: { width: number; height: number };
   imagePayloadBytes: number;
-  imageTokens: number;
-  completionTokens: number;
-  reasoningTokens: number;
-  totalTokens: number;
-  latencyMs: number;
-  accuracyScore: number;
   modelAnswer: string;
   modelReasoning: string;
 }
 
 /** Per-mode fallbacks used when a benchmark session trace is absent or incomplete. */
-interface SessionMetricsFallbacks {
+interface SessionMetricsFallbacks extends Omit<TokenMetrics, 'accuracyScore'> {
   resolution: { width: number; height: number };
   payloadBytes: number;
-  imageTokens: number;
-  completionTokens: number;
-  reasoningTokens: number;
-  totalTokens: number;
-  latencyMs: number;
 }
 
 // Builds the "without"/"with" export block from a session trace (or null),

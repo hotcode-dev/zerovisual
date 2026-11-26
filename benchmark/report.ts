@@ -7,8 +7,9 @@
  */
 
 import { percentSavings, savingsPct } from '../src/core/provider-math.js';
+import type { TokenMetrics } from './types.js';
 
-export interface BenchmarkRunResult {
+export interface BenchmarkRunResult extends TokenMetrics {
   mode: 'without_zerovisual' | 'with_zerovisual';
   caseId: string;
   caseName: string;
@@ -16,12 +17,6 @@ export interface BenchmarkRunResult {
   imageResolution: { width: number; height: number };
   imagePayloadBytes: number;
   imageFormat: string;
-  imageTokens: number;
-  completionTokens: number;
-  reasoningTokens: number;
-  totalTokens: number;
-  latencyMs: number;
-  accuracyScore: number;
   defectFound: boolean;
   modelAnswer: string;
   modelReasoning: string;
