@@ -110,3 +110,14 @@ export function estimateVisionTokens(
 export function percentSavings(before: number, after: number): number {
   return before > 0 ? Math.max(0, Number((((before - after) / before) * 100).toFixed(1))) : 0;
 }
+
+/**
+ * One-decimal display string for the percent savings from `before` to `after`
+ * (e.g. "57.5"). Returns the `zero` fallback string when `before` is not
+ * positive. `percentSavings` already clamps at 0, so the default `'0.0'` is
+ * byte-identical to the legacy unguarded `percentSavings(b, a).toFixed(1)`
+ * spelling; pass `'0'` to preserve legacy guarded call sites spelled that way.
+ */
+export function savingsPct(before: number, after: number, zero = '0.0'): string {
+  return before > 0 ? percentSavings(before, after).toFixed(1) : zero;
+}

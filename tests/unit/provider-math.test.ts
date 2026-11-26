@@ -6,7 +6,8 @@ import {
   estimateVisionTokens,
   fitToTile,
   getProviderDimensions,
-  percentSavings
+  percentSavings,
+  savingsPct
 } from '../../src/core/provider-math.js';
 
 describe('provider-math', () => {
@@ -173,6 +174,30 @@ describe('provider-math', () => {
     it('returns 0 when before is not positive', () => {
       expect(percentSavings(0, 50)).toBe(0);
       expect(percentSavings(-10, 0)).toBe(0);
+    });
+  });
+
+  describe('savingsPct', () => {
+    it('formats one-decimal savings strings from positive baselines', () => {
+      expect(savingsPct(1000, 400)).toBe('60.0');
+      expect(savingsPct(2691, 198)).toBe('92.6');
+      expect(savingsPct(100, 0)).toBe('100.0');
+    });
+
+    it('clamps negative savings to "0.0"', () => {
+      expect(savingsPct(100, 120)).toBe('0.0');
+    });
+
+    it('returns the default "0.0" fallback when before is not positive', () => {
+      // Matches legacy unguarded percentSavings(b, a).toFixed(1) byte-for-byte
+      expect(savingsPct(0, 50)).toBe('0.0');
+      expect(savingsPct(-10, 0)).toBe('0.0');
+    });
+
+    it('honours a custom zero fallback for legacy "0"-spelled call sites', () => {
+      expect(savingsPct(0, 50, '0')).toBe('0');
+      expect(savingsPct(-1, 0, '0')).toBe('0');
+      expect(savingsPct(1000, 400, '0')).toBe('60.0'); // fallback only when before <= 0
     });
   });
 

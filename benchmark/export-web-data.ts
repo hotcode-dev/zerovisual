@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../src/core/image-optimizer.js';
-import { percentSavings } from '../src/core/provider-math.js';
+import { savingsPct } from '../src/core/provider-math.js';
 import {
   BENCHMARK_CROP_PADDING_PX,
   BENCHMARK_WEBP_QUALITY,
@@ -201,9 +201,9 @@ export async function exportWebData() {
       latencyMs: Math.round(18000 + optTokensCalc * 35)
     });
 
-    const tokenSaved = percentSavings(withoutObj.totalTokens, withObj.totalTokens).toFixed(1);
-    const imgTokenSaved = percentSavings(withoutObj.imageTokens, withObj.imageTokens).toFixed(1);
-    const byteSaved = percentSavings(withoutObj.imagePayloadBytes, withObj.imagePayloadBytes).toFixed(1);
+    const tokenSaved = savingsPct(withoutObj.totalTokens, withObj.totalTokens);
+    const imgTokenSaved = savingsPct(withoutObj.imageTokens, withObj.imageTokens);
+    const byteSaved = savingsPct(withoutObj.imagePayloadBytes, withObj.imagePayloadBytes);
     const latencySaved =
       withoutObj.latencyMs > withObj.latencyMs
         ? `${latencySavingsPct(withoutObj.latencyMs, withObj.latencyMs)}% faster`
