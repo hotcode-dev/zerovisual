@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import {
+  DEFAULT_TARGET_PROVIDER,
   PROVIDER_SPECS,
   estimateVisionTokens,
   fitToTile,
@@ -198,6 +199,25 @@ describe('provider-math', () => {
       expect(savingsPct(0, 50, '0')).toBe('0');
       expect(savingsPct(-1, 0, '0')).toBe('0');
       expect(savingsPct(1000, 400, '0')).toBe('60.0'); // fallback only when before <= 0
+    });
+  });
+
+  describe('DEFAULT_TARGET_PROVIDER (unified default, zf-hdz-073963e3)', () => {
+    it('is anthropic', () => {
+      expect(DEFAULT_TARGET_PROVIDER).toBe('anthropic');
+    });
+
+    it('is the shared default for both public APIs (no divergent pairing)', () => {
+      expect(getProviderDimensions()).toEqual(getProviderDimensions(DEFAULT_TARGET_PROVIDER));
+      expect(estimateVisionTokens(1920, 1080)).toBe(estimateVisionTokens(1920, 1080, DEFAULT_TARGET_PROVIDER));
+    });
+
+    it('is the default for getProviderDimensions (504x504 anthropic tiles)', () => {
+      expect(getProviderDimensions()).toEqual({ maxWidth: 504, maxHeight: 504 });
+    });
+
+    it('is the default for estimateVisionTokens (1920x1080 = 2691)', () => {
+      expect(estimateVisionTokens(1920, 1080)).toBe(2691);
     });
   });
 

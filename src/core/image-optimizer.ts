@@ -41,6 +41,7 @@ export interface OptimizedImageResult {
  * the browser. Re-exported here so the package's public API is unchanged.
  */
 export {
+  DEFAULT_TARGET_PROVIDER,
   PROVIDER_SPECS,
   estimateVisionTokens,
   fitToTile,
