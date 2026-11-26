@@ -15,14 +15,11 @@ import {
   optimizeAndWriteCompanionImage,
   getProviderDimensions
 } from '../core/image-optimizer.js';
+import { slugify } from '../core/slug.js';
 
 export function normalizeTestId(titlePath: string[]): string {
   const full = titlePath.slice(1).join(' > ');
-  const normalized = full
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return normalized || 'test-failure';
+  return slugify(full) || 'test-failure';
 }
 
 export class ZeroVisualReporter implements Reporter {
@@ -80,7 +77,7 @@ export class ZeroVisualReporter implements Reporter {
     const titlePath = test.titlePath();
     const fullTitle = titlePath.slice(1).join(' > ');
     const testId = normalizeTestId(titlePath);
-    const safeProject = project.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const safeProject = slugify(project);
 
     const outDir = path.resolve(process.cwd(), this.config.outputDir);
     const artifactsDir = path.join(outDir, 'artifacts');

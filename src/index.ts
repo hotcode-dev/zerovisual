@@ -1,4 +1,5 @@
 export * from './core/schema.js';
+export * from './core/slug.js';
 export {
   parseColor,
   hslToRgb,
