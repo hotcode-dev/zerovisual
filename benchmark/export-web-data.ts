@@ -3,12 +3,19 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider, estimateVisionTokens } from '../src/core/image-optimizer.js';
 import { percentSavings } from '../src/core/provider-math.js';
-import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
+import {
+  BENCHMARK_CROP_PADDING_PX,
+  BENCHMARK_WEBP_QUALITY,
+  DEFAULT_AGENT_MODEL,
+  classifyProvider,
+  readBenchmarkEnv,
+  listCaseDirs
+} from './provider.js';
 import { latencySavingsPct } from './report.js';
 import type { GroundTruth } from './types.js';
 
 function getBenchmarkProvider(): 'qwen' | 'gemini' | 'local' {
-  const model = readBenchmarkEnv().AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
+  const model = readBenchmarkEnv().AGENT_MODEL ?? DEFAULT_AGENT_MODEL;
   return classifyProvider(model);
 }
 
@@ -123,14 +130,14 @@ export async function exportWebData() {
     const rawHeight = rawSharpMeta.height || meta.viewport.height;
 
     // Detect crop box
-    const diffResult = await detectDiffBoundingBox(diffBuffer, { padding: 32 });
+    const diffResult = await detectDiffBoundingBox(diffBuffer, { padding: BENCHMARK_CROP_PADDING_PX });
     const cropBox = diffResult.boundingBox;
 
     // Optimize
     const optResult = await optimizeImageForProvider(actualBuffer, {
       provider: getBenchmarkProvider(),
       cropBox,
-      quality: 85
+      quality: BENCHMARK_WEBP_QUALITY
     });
 
     // Make sure public directory has the files

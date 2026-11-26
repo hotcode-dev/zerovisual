@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox } from '../src/core/image-optimizer.js';
+import { BENCHMARK_CROP_PADDING_PX } from './provider.js';
 import type { GroundTruth } from './types.js';
 
 interface BenchmarkCaseConfig {
@@ -680,7 +681,7 @@ async function generateBenchmarkDataset() {
     // 4. Compute or verify expectedBoundingBox
     let boundingBox = c.groundTruth.expectedBoundingBox;
     if (!boundingBox || boundingBox.width === 0) {
-      const detected = await detectDiffBoundingBox(diffPath, { padding: 32 });
+      const detected = await detectDiffBoundingBox(diffPath, { padding: BENCHMARK_CROP_PADDING_PX });
       boundingBox = detected.boundingBox;
     }
 
