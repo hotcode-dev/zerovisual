@@ -1,6 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+/** Default model used when AGENT_MODEL is absent from benchmark/.env. */
+export const DEFAULT_AGENT_MODEL = 'RadixArk/Qwen3.8-27B-NVFP4';
+
+/** WebP encoding quality for cropped benchmark artifacts and docs-site exports. */
+export const BENCHMARK_WEBP_QUALITY = 85;
+
+/** Padding (px) passed to detectDiffBoundingBox so the crop never touches diff edges. */
+export const BENCHMARK_CROP_PADDING_PX = 32;
+
 /**
  * Single source of truth for mapping an AGENT_MODEL name to the
  * TargetProvider tile/token math the benchmark suite must apply.

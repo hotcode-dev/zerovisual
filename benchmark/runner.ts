@@ -3,7 +3,14 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { detectDiffBoundingBox, optimizeImageForProvider } from '../src/core/image-optimizer.js';
 import { percentSavings } from '../src/core/provider-math.js';
-import { classifyProvider, readBenchmarkEnv, listCaseDirs } from './provider.js';
+import {
+  BENCHMARK_CROP_PADDING_PX,
+  BENCHMARK_WEBP_QUALITY,
+  DEFAULT_AGENT_MODEL,
+  classifyProvider,
+  readBenchmarkEnv,
+  listCaseDirs
+} from './provider.js';
 import { buildBenchmarkReport, type BenchmarkRunResult } from './report.js';
 import type { GroundTruth } from './types.js';
 
@@ -20,7 +27,7 @@ interface CaseMetadata {
 function loadEnv(): { baseUrl: string; model: string; apiKey?: string } {
   const env = readBenchmarkEnv();
   let baseUrl = env.OPENAI_BASE_URL ?? 'https://spark.ntsd.dev:8001/v1';
-  const model = env.AGENT_MODEL ?? 'RadixArk/Qwen3.8-27B-NVFP4';
+  const model = env.AGENT_MODEL ?? DEFAULT_AGENT_MODEL;
   let apiKey: string | undefined = env.OPENAI_API_KEY;
   const aiStudioKey: string | undefined = env.AI_STUDIO_API_KEY;
 
@@ -387,7 +394,7 @@ Identify:
     console.log(`   ⏳ Mode B: WITH ZeroVisual (Diff Bounding Box + Tile Downscaled WebP)...`);
 
     // Detect diff bounding box with ZeroVisual
-    const diffResult = await detectDiffBoundingBox(diffPng, { padding: 32 });
+    const diffResult = await detectDiffBoundingBox(diffPng, { padding: BENCHMARK_CROP_PADDING_PX });
 
     // Determine target provider based on model architecture
     const targetProvider = classifyProvider(model);
@@ -396,7 +403,7 @@ Identify:
     const optResult = await optimizeImageForProvider(actualPng, {
       provider: targetProvider,
       cropBox: diffResult.boundingBox,
-      quality: 85
+      quality: BENCHMARK_WEBP_QUALITY
     });
 
     const optPayloadBytes = optResult.buffer.length;
