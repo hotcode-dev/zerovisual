@@ -291,12 +291,13 @@ export const regressionCommand = defineCommand({
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);
+    const padding = parseInt(args.padding, 10);
     await runRegressionCommand({
       inputDir: args.input,
       outputDir: args.output,
       provider,
       lowTokenMode: args.lowTokenMode,
-      padding: parseInt(args.padding, 10) || 32,
+      padding: Number.isNaN(padding) ? 32 : padding,
       json: args.json
     });
   }

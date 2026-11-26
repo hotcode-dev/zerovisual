@@ -151,12 +151,13 @@ export const optimizeCommand = defineCommand({
   },
   async run({ args }) {
     const provider = TargetProviderSchema.parse(args.provider);
+    const quality = parseInt(args.quality, 10);
     await runOptimizeCommand({
       input: args.input,
       output: args.output,
       provider,
       lowTokenMode: args.lowTokenMode,
-      quality: parseInt(args.quality, 10) || 80,
+      quality: Number.isNaN(quality) ? 80 : quality,
       json: args.json
     });
   }
