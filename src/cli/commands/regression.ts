@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { defineCommand } from 'citty';
 import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
+import { slugify } from '../../core/slug.js';
 import {
   TriagePayloadSchema,
   TargetProviderSchema,
@@ -70,11 +71,7 @@ function inferTestId(filePath: string): { testId: string; testTitle: string } {
     .replace(/-(?:Desktop|Mobile|Tablet)[a-zA-Z0-9_-]*/gi, '')
     .replace(/-(?:chromium|firefox|webkit)/gi, '');
 
-  const testId =
-    cleaned
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'visual-test';
+  const testId = slugify(cleaned) || 'visual-test';
 
   const testTitle = cleaned
     .split(/[-_]+/)
@@ -141,7 +138,7 @@ export async function runRegressionCommand(options: RegressionOptions = {}): Pro
 
     const { testId, testTitle } = inferTestId(diffPath);
     const projectName = inferProjectName(diffPath);
-    const safeProject = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const safeProject = slugify(projectName);
 
     const diffImagePath = path.join(artifactsDir, `${testId}-${safeProject}-diff.webp`);
     fs.writeFileSync(diffImagePath, optimizedDiff.buffer);

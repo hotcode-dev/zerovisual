@@ -3,6 +3,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { defineCommand } from 'citty';
 import { providerArg, lowTokenModeArg, jsonArg } from './shared-args.js';
+import { slugify } from '../../core/slug.js';
 import type { Browser } from '@playwright/test';
 import {
   TriagePayloadSchema,
@@ -51,7 +52,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
   const outputDir = path.resolve(process.cwd(), options.outputDir ?? './test-results');
   const artifactsDir = path.join(outputDir, 'artifacts');
   fs.mkdirSync(artifactsDir, { recursive: true });
-  const testId = `design-qa-${url.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`;
+  const testId = `design-qa-${slugify(url)}`;
   const provider = options.provider ?? 'openai';
   const lowTokenMode = options.lowTokenMode ?? false;
   const maxCrops = options.maxCrops ?? 4;
@@ -124,7 +125,7 @@ export async function runDesignQaCommand(options: DesignQaOptions): Promise<Tria
         lowTokenMode
       });
 
-      const safeVpName = vp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const safeVpName = slugify(vp.name);
       const diffImagePath = path.join(artifactsDir, `${testId}-${safeVpName}.webp`);
       fs.writeFileSync(diffImagePath, optimized.buffer);
 
