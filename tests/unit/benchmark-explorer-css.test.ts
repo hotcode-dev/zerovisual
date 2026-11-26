@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import { cssRuleBody } from '../helpers/css-rule-body.js';
 
 // Regression guard for zf-hdz-2c3ea7d9 (Ponytail Rung 6/2): the three button
 // classes in BenchmarkExplorer.astro shared a byte-identical 10-line base
@@ -9,15 +10,6 @@ import { describe, it, expect } from 'vitest';
 // the consolidated structure so a future "restore the original classes"
 // edit cannot silently reintroduce the duplication.
 const readText = (rel: string): string => readFileSync(fileURLToPath(new URL(`../../${rel}`, import.meta.url)), 'utf8');
-
-// Extract one CSS rule body: from the given selector (line start) to its closing brace.
-const ruleBody = (src: string, selector: string): string => {
-  const idx = src.indexOf(selector);
-  expect(idx, `selector ${selector} not found`).toBeGreaterThanOrEqual(0);
-  const open = src.indexOf('{', idx);
-  const close = src.indexOf('}', open);
-  return src.slice(open + 1, close);
-};
 
 const SHARED_PROPS = [
   'min-height: 44px;',
@@ -36,14 +28,14 @@ describe('BenchmarkExplorer.astro button CSS dedupe', () => {
   const astro = readText('web/src/components/BenchmarkExplorer.astro');
 
   it('defines a single grouped base rule covering all three button classes', () => {
-    const body = ruleBody(astro, '.filter-btn, .img-view-tab, .session-mode-btn {');
+    const body = cssRuleBody(astro, '.filter-btn, .img-view-tab, .session-mode-btn {');
     for (const prop of SHARED_PROPS) {
       expect(body, `missing ${prop}`).toContain(prop);
     }
   });
 
   it('does not repeat the shared properties in any individual class rule', () => {
-    const imgBody = ruleBody(astro, '.img-view-tab {');
+    const imgBody = cssRuleBody(astro, '.img-view-tab {');
     for (const prop of SHARED_PROPS) {
       expect(imgBody, `img-view-tab reintroduced ${prop}`).not.toContain(prop);
     }
@@ -54,13 +46,13 @@ describe('BenchmarkExplorer.astro button CSS dedupe', () => {
   });
 
   it('keeps .img-view-tab layout-specific properties', () => {
-    const body = ruleBody(astro, '.img-view-tab {');
+    const body = cssRuleBody(astro, '.img-view-tab {');
     expect(body).toContain('display: inline-flex;');
     expect(body).toContain('align-items: center;');
   });
 
   it('groups the two identical hover:not(.active) states', () => {
-    const body = ruleBody(astro, '.filter-btn:hover:not(.active), .session-mode-btn:hover:not(.active) {');
+    const body = cssRuleBody(astro, '.filter-btn:hover:not(.active), .session-mode-btn:hover:not(.active) {');
     expect(body).toContain('color: #ffffff;');
     expect(body).toContain('background: #161d2b;');
     // The standalone session-mode hover rule must be gone (grouped now).
