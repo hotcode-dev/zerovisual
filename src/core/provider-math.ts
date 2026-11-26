@@ -17,7 +17,7 @@ export type { TargetProvider, TileDimensions };
  * (plus baseTokens) drive estimateVisionTokens. Providers that shrink their
  * tiles in lowTokenMode set lowTokenTileWidth/lowTokenTileHeight.
  */
-export interface ProviderSpec {
+interface ProviderSpec {
   tileWidth: number;
   tileHeight: number;
   lowTokenTileWidth?: number;

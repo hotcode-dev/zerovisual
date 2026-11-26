@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import {
   PROVIDER_SPECS,
@@ -171,6 +173,26 @@ describe('provider-math', () => {
     it('returns 0 when before is not positive', () => {
       expect(percentSavings(0, 50)).toBe(0);
       expect(percentSavings(-10, 0)).toBe(0);
+    });
+  });
+
+  describe('public surface (regression guard for zf-hdz-0f97eaf0)', () => {
+    const src = readFileSync(fileURLToPath(new URL('../../src/core/provider-math.ts', import.meta.url)), 'utf8');
+
+    it('no longer exports ProviderSpec (dead public surface removed)', () => {
+      expect(src).not.toMatch(/export\s+interface\s+ProviderSpec\b/);
+    });
+
+    it('keeps the internal ProviderSpec definition', () => {
+      expect(src).toMatch(/interface\s+ProviderSpec\s*\{/);
+    });
+
+    it('still exports PROVIDER_SPECS as the public data surface', () => {
+      expect(src).toMatch(/export\s+const\s+PROVIDER_SPECS/);
+    });
+
+    it('keeps the docs-site type re-exports used by TokenCalculator.astro', () => {
+      expect(src).toMatch(/export type \{ TargetProvider, TileDimensions \}/);
     });
   });
 });
