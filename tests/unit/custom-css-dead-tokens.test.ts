@@ -18,7 +18,10 @@ const DEAD_TOKENS = [
   '--zv-cyan',
   '--zv-rose',
   '--zv-rose-strong',
-  '--zv-amber'
+  '--zv-amber',
+  // zf-hdz-4442b007: the last orphaned radius token — no `var(--zv-radius-sm)`
+  // reference anywhere; its siblings -md/-lg remain live.
+  '--zv-radius-sm'
 ];
 
 // Live tokens that must survive (spot-check; the full live set is pinned by
@@ -43,5 +46,14 @@ describe('custom.css dead design tokens', () => {
 
   it.each(LIVE_TOKENS)('still defines the live token %s', token => {
     expect(css, `${token} missing from custom.css`).toContain(`${token}:`);
+  });
+
+  it('does not define a hand-written .tabular-nums utility rule', () => {
+    // zf-hdz-4442b007: Tailwind v4 ships `tabular-nums` as a built-in utility
+    // (imported via `@import 'tailwindcss/utilities.css'` + `@source "../"`),
+    // so a hand-written `.tabular-nums { ... }` block in custom.css is
+    // redundant and must not be reintroduced. The `table { ... }` element
+    // rule's `font-variant-numeric` property is unrelated and stays.
+    expect(css, 'hand-written .tabular-nums rule present').not.toMatch(/\.tabular-nums\s*\{/);
   });
 });
