@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { extractFunctionSource } from '../helpers/extract-function-source.js';
 
 // runner.ts is not importable in unit tests: it is a script that kicks off
 // runBenchmark() on load (network + filesystem side effects) and its helpers
@@ -11,23 +12,7 @@ import { describe, expect, it } from 'vitest';
 
 const runnerSource = readFileSync(fileURLToPath(new URL('../../benchmark/runner.ts', import.meta.url)), 'utf8');
 
-function extractFunctionSource(name: string): string {
-  const sf = ts.createSourceFile('runner.ts', runnerSource, ts.ScriptTarget.ES2022, true);
-  let found: ts.FunctionDeclaration | undefined;
-  const walk = (n: ts.Node): void => {
-    if (found) return;
-    if (ts.isFunctionDeclaration(n) && n.name && n.name.text === name) {
-      found = n;
-      return;
-    }
-    n.forEachChild(walk);
-  };
-  sf.forEachChild(walk);
-  if (!found) throw new Error(`function ${name} not found in benchmark/runner.ts`);
-  return runnerSource.slice(found.getFullStart(), found.getEnd());
-}
-
-const helperJs = ts.transpileModule(extractFunctionSource('pickEffectiveAnswer'), {
+const helperJs = ts.transpileModule(extractFunctionSource(runnerSource, 'runner.ts', 'pickEffectiveAnswer'), {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }
 }).outputText;
 

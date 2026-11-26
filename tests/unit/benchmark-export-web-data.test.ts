@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { extractFunctionSource } from '../helpers/extract-function-source.js';
 
 // export-web-data.ts is not importable in unit tests: it is a script that runs
 // exportWebData() on load (filesystem + sharp side effects) and
@@ -12,25 +13,9 @@ import { describe, expect, it } from 'vitest';
 
 const source = readFileSync(fileURLToPath(new URL('../../benchmark/export-web-data.ts', import.meta.url)), 'utf8');
 
-function extractFunctionSource(src: string, name: string): string {
-  const sf = ts.createSourceFile('export-web-data.ts', src, ts.ScriptTarget.ES2022, true);
-  let found: ts.FunctionDeclaration | undefined;
-  const walk = (n: ts.Node): void => {
-    if (found) return;
-    if (ts.isFunctionDeclaration(n) && n.name && n.name.text === name) {
-      found = n;
-      return;
-    }
-    n.forEachChild(walk);
-  };
-  sf.forEachChild(walk);
-  if (!found) throw new Error(`function ${name} not found in benchmark/export-web-data.ts`);
-  return src.slice(found.getFullStart(), found.getEnd());
-}
-
 const buildSessionMetrics = new Function(
   `${
-    ts.transpileModule(extractFunctionSource(source, 'buildSessionMetrics'), {
+    ts.transpileModule(extractFunctionSource(source, 'export-web-data.ts', 'buildSessionMetrics'), {
       compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }
     }).outputText
   }
