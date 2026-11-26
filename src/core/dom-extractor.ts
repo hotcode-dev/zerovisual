@@ -238,12 +238,8 @@ export async function captureDomContext(
   };
 }
 
-export interface AuditPageOptions {
-  isMobileViewport?: boolean;
-  viewportName?: string;
-  designMd?: DesignMdSpec;
-  ignoreRules?: string[];
-}
+/** Structurally identical to `CaptureDomOptions`; aliased to keep the shape declared once. */
+export type AuditPageOptions = CaptureDomOptions;
 
 /**
  * Audits all interactive, text, container, and media elements on the page for design-qa mode,
