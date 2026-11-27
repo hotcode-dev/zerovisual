@@ -362,6 +362,7 @@
     percentSavings,
     type TargetProvider
   } from '../../../src/core/provider-math.ts';
+  import { deactivateGroup, setGroupActive } from '../lib/toggle-group.ts';
 
   function setupCalculator() {
     const providerSelect = document.getElementById('provider-select') as HTMLSelectElement | null;
@@ -440,10 +441,7 @@
           diffWidthInput.value = Math.min(rawW, Math.round(rawW * 0.4)).toString();
           diffHeightInput.value = Math.min(rawH, Math.round(rawH * 0.4)).toString();
 
-          scenarioBtns.forEach((b) => {
-            b.classList.remove('active');
-            b.setAttribute('aria-pressed', 'false');
-          });
+          deactivateGroup(scenarioBtns, 'aria-pressed');
           if (uploadStatus) {
             uploadStatus.textContent = `Loaded: ${file.name} (${rawW}×${rawH}px, ${Math.round(file.size / 1024)} KB)`;
           }
@@ -487,12 +485,7 @@
 
     scenarioBtns.forEach((btn) => {
       btn.onclick = () => {
-        scenarioBtns.forEach((b) => {
-          b.classList.remove('active');
-          b.setAttribute('aria-pressed', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-pressed', 'true');
+        setGroupActive(scenarioBtns, btn, 'aria-pressed');
 
         const w = parseInt(btn.getAttribute('data-w') || '120', 10);
         const h = parseInt(btn.getAttribute('data-h') || '48', 10);
