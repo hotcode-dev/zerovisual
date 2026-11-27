@@ -21,7 +21,18 @@ describe('web @astrojs/markdown-remark guard (required despite zero direct impor
 
   it('declares @astrojs/markdown-remark in web devDependencies', () => {
     const range = pkg.devDependencies['@astrojs/markdown-remark'];
-    expect(range).toMatch(/^\^?7\./);
+    expect(
+      range,
+      [
+        '@astrojs/markdown-remark is REQUIRED at web build time, not bloat.',
+        'web/astro.config.mjs sets markdown.remarkPlugins/rehypePlugins, so Astro 7',
+        'coerceLegacyMarkdownPlugins runtime-imports it even though it has zero direct',
+        'imports in web/. This is a Ponytail Rung 5 false positive.',
+        'DO NOT remove this devDependency: removing it breaks `cd web && npm run build`.',
+        'Close any "remove unused @astrojs/markdown-remark" task as wontfix/invalid.',
+        'See zf-hdz-35160570 / zf-hdz-1cadcc31.'
+      ].join(' ')
+    ).toMatch(/^\^?7\./);
   });
 
   it('is present in the lockfile so `npm install` actually fetches it', () => {
