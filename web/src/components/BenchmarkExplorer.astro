@@ -581,7 +581,9 @@ import benchmarkData from '../data/benchmark-sessions.json';
   }
 </style>
 
-<script is:inline define:vars={{ benchmarkData }}>
+<script define:vars={{ benchmarkData }}>
+  import { setGroupActive } from '../lib/toggle-group.ts';
+
   (function () {
     let currentCaseIndex = 0;
     let currentViewMode = 'crop';
@@ -639,17 +641,6 @@ import benchmarkData from '../data/benchmark-sessions.json';
     const thinkTokenCount = document.getElementById('think-token-count');
     const groundTruthDesc = document.getElementById('ground-truth-desc');
     const groundTruthFix = document.getElementById('ground-truth-fix');
-
-    // Deactivate every element in a toggle group, then activate `clicked`,
-    // keeping the 'active' class and the group's aria state in sync.
-    function setGroupActive(group, clicked, ariaAttr) {
-      group.forEach((b) => {
-        b.classList.remove('active');
-        b.setAttribute(ariaAttr, 'false');
-      });
-      clicked.classList.add('active');
-      clicked.setAttribute(ariaAttr, 'true');
-    }
 
     function getDomainForCase(item) {
       if (item.id.includes('wikipedia')) return 'https://www.wikipedia.org/';

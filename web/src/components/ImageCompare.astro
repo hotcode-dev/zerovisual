@@ -948,23 +948,20 @@ import wikiDiffMobileCrop from '../assets/wiki-diff-mobile-crop.webp';
 </style>
 
 <script>
+  import { setGroupActive } from '../lib/toggle-group.ts';
+
   function setupImageCompareTabs() {
     const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.scenario-tab'));
     const contents = Array.from(document.querySelectorAll<HTMLElement>('.scenario-content'));
     if (!tabs.length) return;
 
     function activateTab(tab: HTMLButtonElement) {
-      tabs.forEach((t) => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
+      setGroupActive(tabs, tab, 'aria-selected');
       contents.forEach((c) => {
         c.classList.remove('active');
         c.hidden = true;
       });
 
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
       const scenario = tab.getAttribute('data-scenario');
       const target = document.getElementById(`scenario-${scenario}`);
       if (target) {
