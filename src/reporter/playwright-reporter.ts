@@ -213,5 +213,3 @@ export class ZeroVisualReporter implements Reporter {
     return this.failureMap;
   }
 }
-
-export default ZeroVisualReporter;
